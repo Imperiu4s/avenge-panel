@@ -197,6 +197,12 @@ input:focus {
 .findings-table td.mono {
   overflow-wrap: break-word;
 }
+/* Az "Elérési út" oszlop kapja a legtöbb helyet (hosszú fájlútvonalak),
+   a többi oszlop (Súlyosság/Címke/Forrás) kompakt marad. */
+.findings-table th:nth-child(1), .findings-table td:nth-child(1) { width: 12%; }
+.findings-table th:nth-child(2), .findings-table td:nth-child(2) { width: 22%; }
+.findings-table th:nth-child(3), .findings-table td:nth-child(3) { width: 16%; }
+.findings-table th:nth-child(4), .findings-table td:nth-child(4) { width: 50%; }
 .sessions-table th, .sessions-table td,
 .findings-table th, .findings-table td {
   text-align: left;

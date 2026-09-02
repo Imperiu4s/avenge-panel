@@ -203,7 +203,7 @@ export function SessionsPage() {
             </button>
             <a
               className="btn-secondary"
-              href="/downloads/avenge-client-win-x64.zip"
+              href="/downloads/Avenge.Client.exe"
               download
             >
               Kliens letöltése
