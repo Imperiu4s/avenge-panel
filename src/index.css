@@ -1,0 +1,312 @@
+:root {
+  --avenge-red: #e14b4b;
+  --avenge-red-dark: #c53a3a;
+  --bg: #f2f2f2;
+  --card-bg: #ffffff;
+  --text: #222222;
+  --muted: #6b7280;
+  --border: #e5e5e5;
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+a {
+  color: var(--avenge-red);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+.muted { color: var(--muted); }
+.mono { font-family: 'Cascadia Code', Consolas, monospace; }
+.small { font-size: 0.85em; }
+
+/* ── layout ── */
+.centered-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.app-shell {
+  min-height: 100vh;
+}
+
+.top-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+}
+.nav-brand {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--avenge-red);
+  letter-spacing: 0.05em;
+}
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.link-button {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+.link-button:hover { color: var(--avenge-red); }
+
+.app-main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.panel-header {
+  background: var(--avenge-red);
+  color: white;
+  padding: 32px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+.panel-header h1 {
+  margin: 0 0 4px 0;
+  font-size: 1.8rem;
+}
+.panel-header .subtitle {
+  margin: 0;
+  opacity: 0.85;
+}
+
+.panel-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+/* A Scan Result oldalon a jobb oldali találat-tábla igényli a szélesebb
+   sávot (több oszlop: súlyosság/címke/forrás/útvonal), a bal oldali
+   verdikt/rendszerinfó kártya viszont kompakt - fordított arány, mint a
+   Panel oldal session-táblájánál. */
+.panel-grid.result-grid {
+  grid-template-columns: 1fr 2fr;
+}
+@media (max-width: 800px) {
+  .panel-grid, .panel-grid.result-grid { grid-template-columns: 1fr; }
+}
+
+/* ── cards / forms ── */
+.card {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.login-card {
+  width: 360px;
+}
+.brand-title {
+  color: var(--avenge-red);
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 0 0 4px 0;
+  text-align: center;
+}
+.subtitle {
+  color: var(--muted);
+  text-align: center;
+  margin: 0 0 24px 0;
+}
+
+.field-label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin: 12px 0 4px 0;
+}
+input[type="email"], input[type="password"], input[type="text"] {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 1rem;
+}
+input:focus {
+  outline: 2px solid var(--avenge-red);
+  outline-offset: -1px;
+}
+
+.btn-primary {
+  margin-top: 20px;
+  width: 100%;
+  padding: 12px;
+  background: var(--avenge-red);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-primary:hover { background: var(--avenge-red-dark); }
+.btn-primary:disabled { opacity: 0.6; cursor: default; }
+
+.error-text {
+  color: var(--avenge-red-dark);
+  font-size: 0.9rem;
+  margin-top: 8px;
+}
+
+/* ── sessions table ── */
+.table-scroll {
+  overflow-x: auto;
+}
+
+.sessions-table, .findings-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.findings-table td.mono {
+  overflow-wrap: break-word;
+}
+.sessions-table th, .sessions-table td,
+.findings-table th, .findings-table td {
+  text-align: left;
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.92rem;
+}
+.sessions-table th, .findings-table th {
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.generate-card h2 { margin-top: 0; }
+.generated-code-box {
+  margin-top: 16px;
+  text-align: center;
+  padding: 16px;
+  background: var(--bg);
+  border-radius: 8px;
+}
+.generated-code {
+  font-family: 'Cascadia Code', Consolas, monospace;
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--avenge-red);
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: #eee;
+  color: #555;
+}
+.status-completed { background: #e6f4ea; color: #1e7d34; }
+.status-pending, .status-clientconnected, .status-scanning { background: #fff4e0; color: #a86400; }
+.status-interrupted, .status-expired { background: #fde8e8; color: #b42318; }
+
+.live-progress {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 10px;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--avenge-red);
+  animation: live-pulse 1.2s ease-in-out infinite;
+}
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* ── result page ── */
+.verdict-card {
+  text-align: center;
+}
+.verdict-label {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  color: white;
+}
+.verdict-legit .verdict-label { background: #1e7d34; }
+.verdict-unlegit .verdict-label { background: var(--avenge-red-dark); }
+.verdict-inconclusive .verdict-label { background: #a86400; }
+
+.info-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+}
+.info-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+.info-list li span:first-child {
+  color: var(--muted);
+  flex-shrink: 0;
+}
+.info-list li span:last-child {
+  /* flex gyerekek alapból nem zsugorodnának a tartalom szélessége alá (min-width:
+     auto), ami vízszintes túlcsordulást okozott hosszú HWID/elérési út értékeknél -
+     ez kényszeríti ki a tördelést a kártya szélességén belül. */
+  min-width: 0;
+  overflow-wrap: break-word;
+  text-align: right;
+}
+
+.finding-group { margin-top: 20px; }
+.finding-group h3 { margin-bottom: 8px; font-size: 1rem; }
+
+.severity-badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: white;
+}
+.severity-info { background: #6b7280; }
+.severity-low { background: #4a90d9; }
+.severity-medium { background: #a86400; }
+.severity-high { background: #d9534f; }
+.severity-critical { background: #8b0000; }
