@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Layout } from '../components/Layout';
+import { Icon, type IconName } from '../components/Icon';
 import avengeLogo from '../assets/avenge-logo.png';
 
 interface Tier {
@@ -36,34 +37,34 @@ const TIERS: Tier[] = [
   }
 ];
 
-const FEATURES = [
+const FEATURES: { icon: IconName; title: string; text: string }[] = [
   {
-    icon: '🚀',
+    icon: 'rocket',
     title: 'Easy to use',
     text: "Our tool is very simple to use, it is very intuitive and can help you in many situations in which you don't have time and are in a hurry. Anyway you can find tutorials by clicking here."
   },
   {
-    icon: '🏃',
+    icon: 'bolt',
     title: 'Speed',
     text: 'We use a method to maximize scanning speed without compromising results.'
   },
   {
-    icon: '🗂️',
+    icon: 'layers',
     title: 'Two type of scans',
     text: 'As opposed to others, our tool uses a normal string-scan and another deeper scan, with which it is able to find most of the clients around.'
   },
   {
-    icon: '🔒',
+    icon: 'shield',
     title: 'Protection',
     text: 'Our team uses a unique protection system that makes the tool as safe and efficient as possible.'
   },
   {
-    icon: '🎧',
+    icon: 'headset',
     title: 'Support',
     text: 'We are active 24/7 to give support to the most dubious users.'
   },
   {
-    icon: '🔑',
+    icon: 'key',
     title: 'Authenticate',
     text: "Our auth system is one of the best around, you will be safe in every situations and your informations as passwords and emails won't be published."
   }
@@ -193,7 +194,7 @@ export function HomePage() {
           <div className="features-grid">
             {FEATURES.map((f) => (
               <div className="feature-card" key={f.title}>
-                <span className="feature-icon">{f.icon}</span>
+                <span className="feature-icon"><Icon name={f.icon} size={26} /></span>
                 <h3>{f.title}</h3>
                 <p className="muted">{f.text}</p>
               </div>
@@ -241,7 +242,7 @@ export function HomePage() {
                   className={tier.highlighted ? 'btn-primary' : 'btn-secondary'}
                   onClick={() => showComingSoon(tier.label)}
                 >
-                  🛒 Buy now
+                  <Icon name="cart" size={18} /> Buy now
                 </button>
               </div>
             ))}
