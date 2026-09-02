@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Avenge</title>
+    <script type="text/javascript">
+      // GitHub Pages statikus hosting - nem tud kiszolgálni tetszőleges
+      // kliens-oldali útvonalat (pl. az /avenge-panel/panel közvetlen
+      // megnyitása/frissítése 404-et adna, mert nincs ilyen fájl a szerveren).
+      // Ez a jól ismert "spa-github-pages" trükk: GitHub Pages ezt a 404.html-t
+      // szolgálja ki minden ismeretlen útvonalra, ami átirányít az index.html-re,
+      // az eredeti útvonalat query stringbe kódolva - az index.html egy kis
+      // script-je (lásd ott) ezt visszaalakítja valódi URL-lé, MIELŐTT a React
+      // Router (BrowserRouter) inicializálódna.
+      var pathSegmentsToKeep = 1; // "/avenge-panel" - a repo-név szegmens
+
+      var l = window.location;
+      l.replace(
+        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+        l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
+        l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+        (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+        l.hash
+      );
+    </script>
+  </head>
+  <body></body>
+</html>
