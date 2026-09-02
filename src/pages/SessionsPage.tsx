@@ -203,7 +203,7 @@ export function SessionsPage() {
             </button>
             <a
               className="btn-secondary"
-              href="https://github.com/Imperiu4s/avenge-panel/releases/download/client/Avenge.exe"
+              href="https://github.com/Imperiu4s/avenge-client-releases/releases/download/client/Avenge.exe"
             >
               Kliens letöltése
             </a>
