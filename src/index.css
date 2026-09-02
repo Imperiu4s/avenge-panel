@@ -79,6 +79,15 @@ a:hover {
   padding: 32px 24px;
 }
 
+.back-link {
+  display: inline-block;
+  margin-bottom: 16px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.back-link:hover { color: var(--avenge-red); text-decoration: none; }
+
 .panel-header {
   background: var(--avenge-red);
   color: white;
@@ -203,6 +212,33 @@ input:focus {
 }
 
 .generate-card h2 { margin-top: 0; }
+
+.generate-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.generate-actions .btn-primary { margin-top: 0; flex: 1; }
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: 12px;
+  background: transparent;
+  color: var(--avenge-red);
+  border: 1px solid var(--avenge-red);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn-secondary:hover { background: #fdeceb; text-decoration: none; }
+
 .generated-code-box {
   margin-top: 16px;
   text-align: center;
@@ -217,6 +253,30 @@ input:focus {
   letter-spacing: 0.1em;
   color: var(--avenge-red);
 }
+.copied-text {
+  margin: 8px 0 0 0;
+  color: #1e7d34;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.verdict-badge {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: white;
+}
+/* FONTOS: a szelektor mindkét osztályt megköveteli (".verdict-badge.verdict-legit"),
+   nem csak a bare ".verdict-legit"-et - a Scan Result oldal kártyájának ÖNMAGÁNAK
+   is van "verdict-legit/unlegit/inconclusive" osztálya (lásd lejjebb
+   ".verdict-legit .verdict-label" szabály), egy bare szelektor véletlenül arra a
+   kártyára is ráragadt volna, pirosra festve az egész hátterét a badge-szín miatt. */
+.verdict-badge.verdict-legit { background: #1e7d34; }
+.verdict-badge.verdict-unlegit { background: var(--avenge-red-dark); }
+.verdict-badge.verdict-inconclusive { background: #a86400; }
 
 .status-badge {
   display: inline-block;

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { api, ApiError } from '../api/client';
 import type { FindingDto, ScanResultView } from '../api/types';
 import { Layout } from '../components/Layout';
@@ -64,6 +64,7 @@ export function ResultPage() {
   if (error || !result) {
     return (
       <Layout>
+        <Link to="/panel" className="back-link">&larr; Vissza a Panelre</Link>
         <p className="error-text">{error ?? 'Ismeretlen hiba.'}</p>
       </Layout>
     );
@@ -73,6 +74,7 @@ export function ResultPage() {
 
   return (
     <Layout>
+      <Link to="/panel" className="back-link">&larr; Vissza a Panelre</Link>
       <div className="panel-header">
         <h1>Scan Result</h1>
         <p className="subtitle">Result ID: {resultId}</p>

@@ -14,8 +14,8 @@ export default defineConfig({
         target: 'https://api.overclockgame.hu:8908',
         changeOrigin: true,
         secure: true,
-        // A SignalR hub (/avenge/hub/scan) WebSocket upgrade-et használ -
-        // enélkül a dev proxy csak a sima HTTP kéréseket engedné át.
+        // A SignalR hub (/avenge/hub/scan) most Long Pollingot használ (lásd
+        // realtime/scanHub.ts megjegyzését), nem WebSocketet.
         ws: true
       }
     }

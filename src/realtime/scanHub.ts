@@ -8,6 +8,7 @@ export interface SessionStatusChangedEvent {
   code: string;
   status: string;
   resultId: string | null;
+  verdict: string | null;
 }
 
 export interface ScanProgressEvent {
@@ -31,7 +32,18 @@ export function connectScanHub(): signalR.HubConnection {
       // Nincs cookie-alapú hitelesítés - a JWT a query stringben megy (lásd
       // Avenge.Api Program.cs OnMessageReceived) - így nincs szükség
       // AllowCredentials()-re a backend CORS policy-jében.
-      withCredentials: false
+      withCredentials: false,
+      // A backend jelenleg egy kézzel írt Node.js proxy mögött fut (lásd
+      // server/PTERODACTYL_DEPLOY.md), ami NEM támogatja a WebSocket upgrade-et,
+      // a Server-Sent Events pedig a proxy előtt futó compression()
+      // middleware-rel ütközik (a tartós, streamelt választ tömöríteni
+      // próbálja, ami "Handshake was canceled" hibával megszakítja a
+      // kapcsolatot, majd egy végtelen újracsatlakozási hurkot indít el) - ez
+      // éles teszttel felfedezett, valódi hiba volt. Amíg ez nincs a proxy
+      // oldalán javítva, kényszerítve Long Pollingra állunk: ez ismételt,
+      // sima (nem streamelt) HTTP kérés-válasz párokból áll, amit a
+      // compression middleware nem tör el.
+      transport: signalR.HttpTransportType.LongPolling
     })
     .withAutomaticReconnect()
     .build();

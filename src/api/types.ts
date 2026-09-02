@@ -25,6 +25,7 @@ export interface SessionListItem {
   status: SessionStatus;
   createdAt: string;
   completedAt: string | null;
+  verdict: ScanVerdict | null;
 }
 
 export interface SystemFingerprintDto {

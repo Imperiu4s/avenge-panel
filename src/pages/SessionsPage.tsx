@@ -9,9 +9,15 @@ const STATUS_LABELS: Record<string, string> = {
   Pending: 'Várakozik a kliensre',
   ClientConnected: 'Kliens csatlakozott',
   Scanning: 'Vizsgálat folyamatban',
-  Completed: 'Kész',
+  Completed: 'Sikeres vizsgálat',
   Interrupted: 'Megszakadt',
   Expired: 'Lejárt'
+};
+
+const VERDICT_LABELS: Record<string, string> = {
+  Legit: 'LEGIT',
+  Unlegit: 'UNLEGIT',
+  Inconclusive: 'Nem egyértelmű'
 };
 
 export function SessionsPage() {
@@ -23,6 +29,7 @@ export function SessionsPage() {
   const [newSession, setNewSession] = useState<CreateSessionResponse | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generateError, setGenerateError] = useState<string | null>(null);
+  const [codeCopied, setCodeCopied] = useState(false);
 
   const loadSessions = useCallback(async () => {
     setIsLoadingList(true);
@@ -67,7 +74,12 @@ export function SessionsPage() {
       setSessions((prev) =>
         prev.map((s) =>
           s.code === event.code
-            ? { ...s, status: event.status as SessionListItem['status'], resultIdHash: event.resultId ?? s.resultIdHash }
+            ? {
+                ...s,
+                status: event.status as SessionListItem['status'],
+                resultIdHash: event.resultId ?? s.resultIdHash,
+                verdict: (event.verdict as SessionListItem['verdict']) ?? s.verdict
+              }
             : s
         )
       );
@@ -93,10 +105,20 @@ export function SessionsPage() {
   async function handleGenerate() {
     setIsGenerating(true);
     setGenerateError(null);
+    setCodeCopied(false);
     try {
       const result = await api.createSession();
       setNewSession(result);
       await loadSessions();
+
+      try {
+        await navigator.clipboard.writeText(result.code);
+        setCodeCopied(true);
+      } catch {
+        // A vágólap-hozzáférés böngésző-beállítástól/engedélytől függ - ha
+        // nem sikerül, a kód akkor is megjelenik a képernyőn, csak kézzel
+        // kell kimásolni. Nem blokkoló hiba.
+      }
     } catch {
       setGenerateError('Nem sikerült session kódot generálni.');
     } finally {
@@ -128,7 +150,13 @@ export function SessionsPage() {
                 const progress = progressByCode[s.code];
                 return (
                   <tr key={s.code}>
-                    <td className="mono">#{s.code}</td>
+                    <td className="mono">
+                      {s.resultIdHash ? (
+                        <Link to={`/results/${s.resultIdHash}`}>#{s.code}</Link>
+                      ) : (
+                        <>#{s.code}</>
+                      )}
+                    </td>
                     <td>{new Date(s.createdAt).toLocaleString('hu-HU')}</td>
                     <td>
                       <span className={`status-badge status-${s.status.toLowerCase()}`}>
@@ -141,8 +169,10 @@ export function SessionsPage() {
                       )}
                     </td>
                     <td>
-                      {s.resultIdHash ? (
-                        <Link to={`/results/${s.resultIdHash}`}>Megtekintés</Link>
+                      {s.verdict ? (
+                        <span className={`verdict-badge verdict-${s.verdict.toLowerCase()}`}>
+                          {VERDICT_LABELS[s.verdict] ?? s.verdict}
+                        </span>
                       ) : (
                         <span className="muted">-</span>
                       )}
@@ -167,9 +197,18 @@ export function SessionsPage() {
             A generált kódot add meg a vizsgálandó játékosnak - a kliensben ezt kell
             beírnia a vizsgálat indításához.
           </p>
-          <button className="btn-primary" onClick={handleGenerate} disabled={isGenerating}>
-            {isGenerating ? 'Generálás...' : 'Generálás'}
-          </button>
+          <div className="generate-actions">
+            <button className="btn-primary" onClick={handleGenerate} disabled={isGenerating}>
+              {isGenerating ? 'Generálás...' : 'Generálás'}
+            </button>
+            <a
+              className="btn-secondary"
+              href="/downloads/avenge-client-win-x64.zip"
+              download
+            >
+              Kliens letöltése
+            </a>
+          </div>
           {generateError && <p className="error-text">{generateError}</p>}
           {newSession && (
             <div className="generated-code-box">
@@ -177,6 +216,7 @@ export function SessionsPage() {
               <p className="muted">
                 Érvényes eddig: {new Date(newSession.expiresAt).toLocaleTimeString('hu-HU')}
               </p>
+              {codeCopied && <p className="copied-text">Kód a vágólapra másolva!</p>}
             </div>
           )}
         </div>
