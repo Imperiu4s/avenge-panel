@@ -10,7 +10,7 @@ export function LoginPage() {
   const location = useLocation();
 
   if (isAuthenticated) {
-    const redirectTo = (location.state as { from?: string } | null)?.from ?? '/panel';
+    const redirectTo = (location.state as { from?: string } | null)?.from ?? '/home';
     return <Navigate to={redirectTo} replace />;
   }
 
@@ -18,7 +18,7 @@ export function LoginPage() {
     e.preventDefault();
     const ok = await login(email, password);
     if (ok) {
-      navigate('/panel', { replace: true });
+      navigate('/home', { replace: true });
     }
   }
 

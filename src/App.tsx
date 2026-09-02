@@ -4,13 +4,40 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { LoginPage } from './pages/LoginPage';
 import { SessionsPage } from './pages/SessionsPage';
 import { ResultPage } from './pages/ResultPage';
+import { HomePage } from './pages/HomePage';
+import { AccountPage } from './pages/AccountPage';
+import { ChangelogsPage } from './pages/ChangelogsPage';
 
 export default function App() {
   return (
     <AuthProvider>
       <Routes>
-        <Route path="/" element={<Navigate to="/panel" replace />} />
+        <Route path="/" element={<Navigate to="/home" replace />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route
+          path="/home"
+          element={
+            <ProtectedRoute>
+              <HomePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/account"
+          element={
+            <ProtectedRoute>
+              <AccountPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/changelogs"
+          element={
+            <ProtectedRoute>
+              <ChangelogsPage />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/panel"
           element={
@@ -27,7 +54,7 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="*" element={<Navigate to="/panel" replace />} />
+        <Route path="*" element={<Navigate to="/home" replace />} />
       </Routes>
     </AuthProvider>
   );
