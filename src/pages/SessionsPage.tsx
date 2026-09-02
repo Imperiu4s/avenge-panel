@@ -20,8 +20,11 @@ const VERDICT_LABELS: Record<string, string> = {
   Inconclusive: 'Nem egyértelmű'
 };
 
+const PAGE_SIZE = 5;
+
 export function SessionsPage() {
   const [sessions, setSessions] = useState<SessionListItem[]>([]);
+  const [page, setPage] = useState(1);
   const [isLoadingList, setIsLoadingList] = useState(true);
   const [listError, setListError] = useState<string | null>(null);
   const [progressByCode, setProgressByCode] = useState<Record<string, ScanProgressEvent>>({});
@@ -30,12 +33,13 @@ export function SessionsPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generateError, setGenerateError] = useState<string | null>(null);
   const [codeCopied, setCodeCopied] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
 
-  const loadSessions = useCallback(async () => {
+  const loadSessions = useCallback(async (targetPage: number) => {
     setIsLoadingList(true);
     setListError(null);
     try {
-      const result = await api.listSessions();
+      const result = await api.listSessions(targetPage, PAGE_SIZE);
       setSessions(result);
     } catch {
       setListError('Nem sikerült betölteni a session-listát.');
@@ -45,8 +49,8 @@ export function SessionsPage() {
   }, []);
 
   useEffect(() => {
-    loadSessions();
-  }, [loadSessions]);
+    loadSessions(page);
+  }, [loadSessions, page]);
 
   // A jelenleg ismert kódok gyors halmaza - a SignalR handlerben (ami nem
   // kap friss "sessions" closure-t, mert csak mount-kor iratkozik fel) ebből
@@ -65,9 +69,11 @@ export function SessionsPage() {
   useEffect(() => {
     const offStatus = onSessionStatusChanged((event) => {
       if (!knownCodesRef.current.has(event.code)) {
-        // Egy MÁS staff (vagy egy még le nem kérdezett) session-je - nincs mit
-        // helyben frissíteni, teljes újratöltéssel kerül be a listába.
-        loadSessions();
+        // Egy MÁS staff (vagy egy még le nem kérdezett) session-je - csak az
+        // első oldalon van értelme újratölteni, különben elcsúszna a lapozás.
+        if (page === 1) {
+          loadSessions(1);
+        }
         return;
       }
 
@@ -100,7 +106,7 @@ export function SessionsPage() {
       offStatus();
       offProgress();
     };
-  }, [loadSessions]);
+  }, [loadSessions, page]);
 
   async function handleGenerate() {
     setIsGenerating(true);
@@ -109,7 +115,8 @@ export function SessionsPage() {
     try {
       const result = await api.createSession();
       setNewSession(result);
-      await loadSessions();
+      setPage(1);
+      await loadSessions(1);
 
       try {
         await navigator.clipboard.writeText(result.code);
@@ -126,98 +133,120 @@ export function SessionsPage() {
     }
   }
 
+  async function handleCopyLink() {
+    try {
+      await navigator.clipboard.writeText(
+        'https://github.com/Imperiu4s/avenge-client-releases/releases/download/client/Avenge.exe'
+      );
+      setLinkCopied(true);
+      window.setTimeout(() => setLinkCopied(false), 2000);
+    } catch {
+      // nem blokkoló, ha a vágólap nem elérhető
+    }
+  }
+
+  const hasNextPage = sessions.length === PAGE_SIZE;
+
   return (
-    <Layout>
-      <div className="panel-header">
+    <Layout fullBleed>
+      <div className="panel-hero">
         <h1>Panel</h1>
         <p className="subtitle">Session-kódok generálása és a korábbi vizsgálatok áttekintése</p>
       </div>
 
-      <div className="panel-grid">
-        <div className="card">
-          <div className="table-scroll">
-          <table className="sessions-table">
-            <thead>
-              <tr>
-                <th>Kód</th>
-                <th>Létrehozva</th>
-                <th>Állapot</th>
-                <th>Eredmény</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sessions.map((s) => {
-                const progress = progressByCode[s.code];
-                return (
-                  <tr key={s.code}>
-                    <td className="mono">
-                      {s.resultIdHash ? (
-                        <Link to={`/results/${s.resultIdHash}`}>#{s.code}</Link>
-                      ) : (
-                        <>#{s.code}</>
-                      )}
-                    </td>
-                    <td>{new Date(s.createdAt).toLocaleString('hu-HU')}</td>
-                    <td>
-                      <span className={`status-badge status-${s.status.toLowerCase()}`}>
-                        {STATUS_LABELS[s.status] ?? s.status}
-                      </span>
-                      {progress && s.status === 'Scanning' && (
-                        <span className="live-progress">
-                          <span className="live-dot" /> {progress.percent}% - {progress.statusText}
-                        </span>
-                      )}
-                    </td>
-                    <td>
-                      {s.verdict ? (
-                        <span className={`verdict-badge verdict-${s.verdict.toLowerCase()}`}>
-                          {VERDICT_LABELS[s.verdict] ?? s.verdict}
-                        </span>
-                      ) : (
-                        <span className="muted">-</span>
-                      )}
-                    </td>
+      <div className="panel-content">
+        <div className="panel-grid">
+          <div className="card">
+            <div className="table-scroll">
+              <table className="sessions-table simple-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Time</th>
+                    <th>Result</th>
                   </tr>
-                );
-              })}
-              {!isLoadingList && sessions.length === 0 && (
-                <tr>
-                  <td colSpan={4} className="muted">Még nincs egyetlen session sem.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-          </div>
-          {listError && <p className="error-text">{listError}</p>}
-        </div>
-
-        <div className="card generate-card">
-          <h2>Új session</h2>
-          <p className="muted">
-            A generált kódot add meg a vizsgálandó játékosnak - a kliensben ezt kell
-            beírnia a vizsgálat indításához.
-          </p>
-          <div className="generate-actions">
-            <button className="btn-primary" onClick={handleGenerate} disabled={isGenerating}>
-              {isGenerating ? 'Generálás...' : 'Generálás'}
-            </button>
-            <a
-              className="btn-secondary"
-              href="https://github.com/Imperiu4s/avenge-client-releases/releases/download/client/Avenge.exe"
-            >
-              Kliens letöltése
-            </a>
-          </div>
-          {generateError && <p className="error-text">{generateError}</p>}
-          {newSession && (
-            <div className="generated-code-box">
-              <div className="generated-code">{newSession.code}</div>
-              <p className="muted">
-                Érvényes eddig: {new Date(newSession.expiresAt).toLocaleTimeString('hu-HU')}
-              </p>
-              {codeCopied && <p className="copied-text">Kód a vágólapra másolva!</p>}
+                </thead>
+                <tbody>
+                  {sessions.map((s) => {
+                    const progress = progressByCode[s.code];
+                    return (
+                      <tr key={s.code}>
+                        <td className="mono">
+                          {s.resultIdHash ? (
+                            <Link to={`/results/${s.resultIdHash}`}>#{s.code}</Link>
+                          ) : (
+                            <>#{s.code}</>
+                          )}
+                        </td>
+                        <td>{new Date(s.createdAt).toLocaleString('hu-HU')}</td>
+                        <td>
+                          {s.verdict ? (
+                            <span className={`verdict-badge verdict-${s.verdict.toLowerCase()}`}>
+                              {VERDICT_LABELS[s.verdict] ?? s.verdict}
+                            </span>
+                          ) : (
+                            <span className={`status-badge status-${s.status.toLowerCase()}`}>
+                              {STATUS_LABELS[s.status] ?? s.status}
+                            </span>
+                          )}
+                          {progress && s.status === 'Scanning' && (
+                            <span className="live-progress">
+                              <span className="live-dot" /> {progress.percent}%
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {!isLoadingList && sessions.length === 0 && (
+                    <tr>
+                      <td colSpan={3} className="muted">No data available in table</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </div>
-          )}
+            {listError && <p className="error-text">{listError}</p>}
+
+            <div className="pagination">
+              <button
+                className="page-pill"
+                disabled={page <= 1}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+              >
+                Previous
+              </button>
+              <span className="page-pill active">{page}</span>
+              <button className="page-pill" disabled={!hasNextPage} onClick={() => setPage((p) => p + 1)}>
+                Next
+              </button>
+            </div>
+          </div>
+
+          <div className="card generate-card">
+            <div className="generated-code-display">{newSession?.code ?? 'XXXXXX'}</div>
+            <button className="btn-primary" onClick={handleGenerate} disabled={isGenerating}>
+              {isGenerating ? 'Generálás...' : 'Generate'}
+            </button>
+            {generateError && <p className="error-text">{generateError}</p>}
+            {newSession && (
+              <p className="muted small" style={{ textAlign: 'center', margin: '8px 0 0 0' }}>
+                Érvényes eddig: {new Date(newSession.expiresAt).toLocaleTimeString('hu-HU')}
+                {codeCopied && ' · vágólapra másolva'}
+              </p>
+            )}
+            <div className="generate-pill-row">
+              <a
+                className="btn-secondary"
+                href="https://github.com/Imperiu4s/avenge-client-releases/releases/download/client/Avenge.exe"
+              >
+                Avenge
+              </a>
+              <button className="btn-secondary" onClick={handleCopyLink}>
+                {linkCopied ? 'Másolva!' : 'dl.avenge.ac'}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </Layout>

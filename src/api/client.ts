@@ -1,8 +1,11 @@
 import type {
+  AdminUserView,
   CreateSessionResponse,
+  CreateUserRequest,
   LoginResponse,
   ScanResultView,
-  SessionListItem
+  SessionListItem,
+  UpdateUserRequest
 } from './types';
 import { API_BASE } from './config';
 
@@ -78,5 +81,18 @@ export const api = {
   listSessions: (page = 1, pageSize = 20) =>
     request<SessionListItem[]>(`/api/sessions?page=${page}&pageSize=${pageSize}`),
 
-  getScanResult: (resultId: string) => request<ScanResultView>(`/api/scan-results/${encodeURIComponent(resultId)}`)
+  getScanResult: (resultId: string) => request<ScanResultView>(`/api/scan-results/${encodeURIComponent(resultId)}`),
+
+  listAdminUsers: () => request<AdminUserView[]>('/api/admin/users'),
+
+  createAdminUser: (body: CreateUserRequest) =>
+    request<AdminUserView>('/api/admin/users', { method: 'POST', body }),
+
+  updateAdminUser: (id: string, body: UpdateUserRequest) =>
+    request<AdminUserView>(`/api/admin/users/${encodeURIComponent(id)}`, { method: 'PATCH', body }),
+
+  listAdminUserSessions: (id: string, page = 1, pageSize = 20) =>
+    request<SessionListItem[]>(
+      `/api/admin/users/${encodeURIComponent(id)}/sessions?page=${page}&pageSize=${pageSize}`
+    )
 };

@@ -74,3 +74,26 @@ export interface ScanResultView {
   createdAt: string;
   findings: FindingDto[];
 }
+
+// ── Admin (tulajdonos) ──
+export type UserRole = 'Admin' | 'Staff';
+
+export interface AdminUserView {
+  id: string;
+  email: string;
+  role: UserRole;
+  isActive: boolean;
+  createdAt: string;
+  lastLoginAt: string | null;
+}
+
+export interface CreateUserRequest {
+  email: string;
+  password: string;
+  role: UserRole;
+}
+
+export interface UpdateUserRequest {
+  role?: UserRole;
+  isActive?: boolean;
+}

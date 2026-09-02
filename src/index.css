@@ -85,6 +85,15 @@ a:hover {
 }
 .btn-support:hover { background: #fbdada; text-decoration: none; }
 
+.nav-right { display: flex; align-items: center; gap: 12px; }
+.btn-login {
+  color: var(--avenge-red);
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 8px 4px;
+}
+.btn-login:hover { text-decoration: none; opacity: 0.8; }
+
 .app-main {
   max-width: 1100px;
   margin: 0 auto;
@@ -440,7 +449,10 @@ input:focus {
   padding: 12px 24px;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
+  min-width: 170px;
+  box-sizing: border-box;
 }
 
 .mini-pricing-row {
@@ -698,6 +710,241 @@ input:focus {
 .footer-cta-actions { display: flex; gap: 12px; }
 .footer-cta-actions a { width: auto; padding: 12px 22px; }
 .footer-legal { text-align: center; margin-top: 24px; }
+
+/* ── Panel / Scan Result (a kepek/panel*.png alapjan, teljes szelesseguu hero) ── */
+.panel-hero {
+  background: var(--avenge-red);
+  color: white;
+  padding: 56px 24px;
+  text-align: left;
+}
+.panel-hero h1 { margin: 0 0 6px 0; font-size: 2.2rem; }
+.panel-hero .subtitle { margin: 0; opacity: 0.9; }
+
+.panel-content {
+  max-width: 1100px;
+  margin: -32px auto 0 auto;
+  padding: 0 24px 48px 24px;
+  position: relative;
+}
+
+.simple-table th:nth-child(3), .simple-table td:nth-child(3) { text-align: right; }
+.simple-table th:nth-child(3) { text-align: right; }
+
+.pagination {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+.page-pill {
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: #fdeceb;
+  color: var(--avenge-red);
+  font-weight: 600;
+  font-size: 0.85rem;
+  border: none;
+  cursor: pointer;
+}
+.page-pill:hover:not(:disabled) { background: #fbdada; }
+.page-pill:disabled { opacity: 0.4; cursor: default; }
+.page-pill.active { background: var(--avenge-red); color: white; cursor: default; }
+
+.generated-code-display {
+  text-align: center;
+  padding: 12px;
+  margin-bottom: 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: 'Cascadia Code', Consolas, monospace;
+  font-size: 1.3rem;
+  letter-spacing: 0.15em;
+  color: var(--muted);
+}
+.generate-pill-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+.generate-pill-row .btn-secondary { flex: 1; padding: 10px; font-size: 0.85rem; }
+
+/* Scan Result / Scan Info bal oldali toggle kartya */
+.scan-toggle-card {
+  background: var(--avenge-red);
+  color: white;
+  text-align: center;
+  padding: 28px 24px;
+}
+.scan-toggle-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin-bottom: 20px;
+}
+.toggle-arrow {
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.toggle-arrow:hover { background: rgba(255,255,255,0.28); }
+.scan-toggle-body { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.fingerprint-icon { font-size: 2.2rem; }
+.verdict-label-plain { font-size: 1.3rem; font-weight: 800; letter-spacing: 0.05em; }
+.btn-outline-white {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.6);
+  color: white;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-outline-white:hover { background: rgba(255,255,255,0.12); }
+.info-list-white { list-style: none; padding: 0; margin: 0; text-align: left; }
+.info-list-white li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  font-size: 0.9rem;
+}
+.pill-value {
+  background: rgba(255,255,255,0.18);
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* Jobb oldali accordion-ok (Alts / Recording Software / XRay Texture Packs) */
+.accordion-stack { display: flex; flex-direction: column; gap: 14px; }
+.accordion-item {
+  background: var(--card-bg);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  overflow: hidden;
+}
+.accordion-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  text-align: left;
+}
+.accordion-icon { font-size: 1.1rem; }
+.accordion-label { font-weight: 600; flex: 1; }
+.accordion-chevron { transition: transform 0.15s ease; color: var(--muted); }
+.accordion-chevron-open { transform: rotate(180deg); }
+.accordion-panel { padding: 0 20px 18px 20px; display: flex; flex-direction: column; gap: 8px; }
+.accordion-finding { display: flex; align-items: center; gap: 10px; }
+.accordion-finding-thumb {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Details modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 24px;
+}
+.modal-card {
+  background: var(--card-bg);
+  border-radius: 14px;
+  max-width: 720px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+}
+.modal-header {
+  background: var(--avenge-red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  border-radius: 14px 14px 0 0;
+}
+.modal-header-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: white;
+  color: var(--avenge-red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+.modal-body { padding: 24px; }
+.modal-stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.modal-stat {
+  background: var(--bg);
+  border-radius: 10px;
+  padding: 14px;
+}
+.modal-stat-label { color: var(--muted); font-size: 0.82rem; margin-bottom: 8px; }
+.modal-stat-value { font-weight: 700; }
+.type-pill {
+  display: inline-block;
+  background: #fdeceb;
+  color: var(--avenge-red-dark);
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+.modal-findings-table th:nth-child(3), .modal-findings-table td:nth-child(3) { width: 55%; }
+@media (max-width: 700px) {
+  .modal-stats-row { grid-template-columns: 1fr; }
+}
+
+/* ── Admin (tulajdonos) panel ── */
+.admin-users-table th:last-child, .admin-users-table td:last-child { width: 1%; white-space: nowrap; }
+.row-selected { background: var(--bg); }
+.admin-actions { display: flex; gap: 6px; }
+.btn-tiny { padding: 6px 10px; font-size: 0.78rem; flex: none; }
+.role-select {
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  background: white;
+}
+.role-select-full { width: 100%; margin: 0 0 4px 0; }
+.generate-card form { display: flex; flex-direction: column; }
+.generate-card form .btn-primary { margin-top: 20px; }
 
 .home-toast {
   position: fixed;

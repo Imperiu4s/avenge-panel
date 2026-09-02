@@ -4,22 +4,30 @@ import { api, ApiError } from '../api/client';
 import type { FindingDto, ScanResultView } from '../api/types';
 import { Layout } from '../components/Layout';
 
-const CATEGORY_LABELS: Record<string, string> = {
-  CheatSignature: 'Cheat',
-  SuspiciousSavedFile: 'Gyanús mentett fájl',
-  SuspiciousDeletedFile: 'Gyanús törölt fájl',
-  AltAccount: 'Alt fiók',
-  RecordingSoftware: 'Felvevőszoftver',
-  XrayTexturePack: 'XRay texture pack',
-  Injector: 'Injector',
-  VmSandbox: 'VM / Sandbox',
-  TamperAttempt: 'Manipulációs kísérlet'
-};
-
 const VERDICT_LABELS: Record<string, string> = {
   Legit: 'LEGIT',
   Unlegit: 'UNLEGIT',
   Inconclusive: 'NEM EGYÉRTELMŰ'
+};
+
+// Jobb oldali, lenyitható szekciók - csak "identitás/média" jellegű
+// kategóriák, pontosan a referencia-képek szerint (Alts / Recording Software
+// / XRay Texture Packs). A többi kategória (cheat-jel, gyanús fájlok, stb.)
+// a bal oldali kártya "Details" gombja mögötti modálban jelenik meg - lásd
+// DETAILS_MODAL_CATEGORIES.
+const ACCORDION_CATEGORIES: { category: FindingDto['category']; label: string; icon: string }[] = [
+  { category: 'AltAccount', label: 'Alts', icon: '👥' },
+  { category: 'RecordingSoftware', label: 'Recording Software', icon: '🎥' },
+  { category: 'XrayTexturePack', label: 'XRay Texture Packs', icon: '🎮' }
+];
+
+const MODAL_TYPE_LABELS: Record<string, string> = {
+  CheatSignature: 'Cheat',
+  SuspiciousSavedFile: 'Suspicious Files',
+  SuspiciousDeletedFile: 'Suspicious Files',
+  Injector: 'Injector',
+  VmSandbox: 'VM / Sandbox',
+  TamperAttempt: 'Tamper'
 };
 
 function groupByCategory(findings: FindingDto[]): Record<string, FindingDto[]> {
@@ -29,11 +37,25 @@ function groupByCategory(findings: FindingDto[]): Record<string, FindingDto[]> {
   }, {});
 }
 
+function formatRelativeToNow(iso: string | null): string {
+  if (!iso) return '-';
+  const diffMs = Date.now() - new Date(iso).getTime();
+  if (diffMs < 0) return '-';
+  const minutes = Math.floor(diffMs / 60000);
+  const seconds = Math.floor((diffMs % 60000) / 1000);
+  if (minutes <= 0) return `${seconds}s ago`;
+  return `${minutes}m, ${seconds}s ago`;
+}
+
 export function ResultPage() {
   const { resultId } = useParams<{ resultId: string }>();
   const [result, setResult] = useState<ScanResultView | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  const [leftView, setLeftView] = useState<'result' | 'info'>('result');
+  const [openAccordion, setOpenAccordion] = useState<string | null>(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
   useEffect(() => {
     if (!resultId) return;
@@ -71,65 +93,142 @@ export function ResultPage() {
   }
 
   const grouped = groupByCategory(result.findings);
+  const modalFindings = result.findings.filter(
+    (f) => !ACCORDION_CATEGORIES.some((a) => a.category === f.category)
+  );
+  const savedCount = (grouped.SuspiciousSavedFile ?? []).length;
+  const deletedCount = (grouped.SuspiciousDeletedFile ?? []).length;
+  const cheatCount = (grouped.CheatSignature ?? []).length;
 
   return (
-    <Layout>
-      <Link to="/panel" className="back-link">&larr; Vissza a Panelre</Link>
-      <div className="panel-header">
+    <Layout fullBleed>
+      <div className="panel-hero">
         <h1>Scan Result</h1>
-        <p className="subtitle">Result ID: {resultId}</p>
+        <p className="subtitle">View your scan details</p>
       </div>
 
-      <div className="panel-grid result-grid">
-        <div className={`card verdict-card verdict-${result.verdict.toLowerCase()}`}>
-          <div className="verdict-label">{VERDICT_LABELS[result.verdict] ?? result.verdict}</div>
-          <ul className="info-list">
-            <li><span>HWID</span><span className="mono">{result.system.hwid}</span></li>
-            <li><span>Gépnév</span><span>{result.system.hostname || '-'}</span></li>
-            <li><span>OS</span><span>{result.system.osVersion}</span></li>
-            <li><span>CPU</span><span>{result.system.cpuModel ?? '-'}</span></li>
-            <li><span>GPU</span><span>{result.system.gpuModel ?? '-'}</span></li>
-            <li><span>RAM</span><span>{result.system.ramTotalMb ? `${(result.system.ramTotalMb / 1024).toFixed(1)} GB` : '-'}</span></li>
-            <li><span>Játék</span><span>{result.detectedGame ?? '-'}</span></li>
-            <li><span>Scan időtartama</span><span>{result.scanDurationMs} ms</span></li>
-            <li><span>Kliens verzió</span><span>{result.clientVersion}</span></li>
-            <li><span>Időpont</span><span>{new Date(result.createdAt).toLocaleString('hu-HU')}</span></li>
-          </ul>
+      <div className="panel-content">
+        <Link to="/panel" className="back-link">&larr; Vissza a Panelre</Link>
+
+        <div className="panel-grid result-grid">
+          <div className={`card scan-toggle-card verdict-${result.verdict.toLowerCase()}`}>
+            <div className="scan-toggle-header">
+              <span>{leftView === 'result' ? 'Scan Result' : 'Scan Info'}</span>
+              <button
+                className="toggle-arrow"
+                onClick={() => setLeftView((v) => (v === 'result' ? 'info' : 'result'))}
+                aria-label="Váltás Scan Result és Scan Info között"
+              >
+                →
+              </button>
+            </div>
+
+            {leftView === 'result' ? (
+              <div className="scan-toggle-body">
+                <span className="fingerprint-icon">👆</span>
+                <div className="verdict-label-plain">{VERDICT_LABELS[result.verdict] ?? result.verdict}</div>
+                <button className="btn-outline-white" onClick={() => setIsDetailsOpen(true)}>
+                  Details
+                </button>
+              </div>
+            ) : (
+              <ul className="info-list info-list-white">
+                <li><span>Recycle Bin:</span><span className="pill-value">{formatRelativeToNow(result.system.recycleBinLastEmptiedAt)}</span></li>
+                <li><span>Operating System:</span><span className="pill-value">{result.system.osVersion}</span></li>
+                <li><span>Scan Time:</span><span className="pill-value">{new Date(result.createdAt).toLocaleString('hu-HU')}</span></li>
+                <li><span>Scan Speed:</span><span className="pill-value">{result.scanDurationMs}ms</span></li>
+              </ul>
+            )}
+          </div>
+
+          <div className="accordion-stack">
+            {ACCORDION_CATEGORIES.map(({ category, label, icon }) => {
+              const items = grouped[category] ?? [];
+              const isOpen = openAccordion === category;
+              return (
+                <div className="accordion-item" key={category}>
+                  <button
+                    className="accordion-trigger"
+                    onClick={() => setOpenAccordion(isOpen ? null : category)}
+                  >
+                    <span className="accordion-icon">{icon}</span>
+                    <span className="accordion-label">{label}</span>
+                    <span className="muted small">({items.length})</span>
+                    <span className={`accordion-chevron ${isOpen ? 'accordion-chevron-open' : ''}`}>⌄</span>
+                  </button>
+                  {isOpen && (
+                    <div className="accordion-panel">
+                      {items.length === 0 && <p className="muted small">Nincs találat ebben a kategóriában.</p>}
+                      {items.map((f, i) => (
+                        <div className="accordion-finding" key={i}>
+                          <span className="accordion-finding-thumb">{icon}</span>
+                          <span className="mono small">{f.filePath ?? f.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
+      </div>
 
-        <div className="card findings-card">
-          <h2>Találatok ({result.findings.length})</h2>
-          {result.findings.length === 0 && <p className="muted">Nincs találat.</p>}
+      {isDetailsOpen && (
+        <div className="modal-overlay" onClick={() => setIsDetailsOpen(false)}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <span className="modal-header-icon">ⓘ</span>
+            </div>
+            <div className="modal-body">
+              <div className="modal-stats-row">
+                <div className="modal-stat">
+                  <div className="modal-stat-label">Suspicious Saved Files 💾</div>
+                  <div className="modal-stat-value">🔍 {savedCount}</div>
+                </div>
+                <div className="modal-stat">
+                  <div className="modal-stat-label">Suspicious Deleted Files 🗑️</div>
+                  <div className="modal-stat-value">🔍 {deletedCount}</div>
+                </div>
+                <div className="modal-stat">
+                  <div className="modal-stat-label">Cheats Found 🐛</div>
+                  <div className="modal-stat-value">🔍 {cheatCount}</div>
+                </div>
+              </div>
 
-          {Object.entries(grouped).map(([category, items]) => (
-            <div key={category} className="finding-group">
-              <h3>{CATEGORY_LABELS[category] ?? category} <span className="muted">({items.length})</span></h3>
               <div className="table-scroll">
-                <table className="findings-table">
+                <table className="sessions-table modal-findings-table">
                   <thead>
                     <tr>
-                      <th>Súlyosság</th>
-                      <th>Címke</th>
-                      <th>Forrás</th>
-                      <th>Elérési út</th>
+                      <th>Type</th>
+                      <th>Details</th>
+                      <th>Found</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {items.map((f, i) => (
+                    {modalFindings.map((f, i) => (
                       <tr key={i}>
-                        <td><span className={`severity-badge severity-${f.severity.toLowerCase()}`}>{f.severity}</span></td>
-                        <td>{f.label}</td>
-                        <td>{f.source}</td>
-                        <td className="mono small">{f.filePath ?? '-'}</td>
+                        <td>
+                          <span className="type-pill">{MODAL_TYPE_LABELS[f.category] ?? f.category}</span>
+                        </td>
+                        <td>
+                          <span className={`severity-badge severity-${f.severity.toLowerCase()}`}>{f.severity}</span>
+                        </td>
+                        <td className="mono small">{f.filePath ?? f.label}</td>
                       </tr>
                     ))}
+                    {modalFindings.length === 0 && (
+                      <tr>
+                        <td colSpan={3} className="muted">Nincs további találat.</td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>
             </div>
-          ))}
+          </div>
         </div>
-      </div>
+      )}
     </Layout>
   );
 }
