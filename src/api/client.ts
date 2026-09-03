@@ -1,10 +1,15 @@
 import type {
   AdminUserView,
+  BannedHwidView,
+  CreateBannedHwidRequest,
   CreateSessionResponse,
+  CreateSignatureRequest,
   CreateUserRequest,
   LoginResponse,
   ScanResultView,
   SessionListItem,
+  SignatureDto,
+  UpdateSignatureRequest,
   UpdateUserRequest
 } from './types';
 import { API_BASE } from './config';
@@ -97,5 +102,24 @@ export const api = {
   listAdminUserSessions: (id: string, page = 1, pageSize = 20) =>
     request<SessionListItem[]>(
       `/api/admin/users/${encodeURIComponent(id)}/sessions?page=${page}&pageSize=${pageSize}`
-    )
+    ),
+
+  listAdminSignatures: () => request<SignatureDto[]>('/api/admin/signatures'),
+
+  createAdminSignature: (body: CreateSignatureRequest) =>
+    request<SignatureDto>('/api/admin/signatures', { method: 'POST', body }),
+
+  updateAdminSignature: (id: string, body: UpdateSignatureRequest) =>
+    request<SignatureDto>(`/api/admin/signatures/${encodeURIComponent(id)}`, { method: 'PATCH', body }),
+
+  deleteAdminSignature: (id: string) =>
+    request<void>(`/api/admin/signatures/${encodeURIComponent(id)}`, { method: 'DELETE' }),
+
+  listAdminBannedHwids: () => request<BannedHwidView[]>('/api/admin/banned-hwids'),
+
+  createAdminBannedHwid: (body: CreateBannedHwidRequest) =>
+    request<BannedHwidView>('/api/admin/banned-hwids', { method: 'POST', body }),
+
+  deleteAdminBannedHwid: (id: string) =>
+    request<void>(`/api/admin/banned-hwids/${encodeURIComponent(id)}`, { method: 'DELETE' })
 };

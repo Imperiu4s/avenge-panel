@@ -17,6 +17,10 @@ export type IconName =
   | 'search'
   | 'info'
   | 'cart'
+  | 'globe'
+  | 'server'
+  | 'ban'
+  | 'plus'
   | 'arrow-right';
 
 const PATHS: Record<IconName, ReactElement> = {
@@ -128,6 +132,26 @@ const PATHS: Record<IconName, ReactElement> = {
       <circle cx="17" cy="20" r="1.4" />
     </>
   ),
+  globe: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3 12h18M12 3c2.5 2.5 3.8 6 3.8 9s-1.3 6.5-3.8 9c-2.5-2.5-3.8-6-3.8-9s1.3-6.5 3.8-9Z" />
+    </>
+  ),
+  server: (
+    <>
+      <rect x="3" y="4" width="18" height="6.5" rx="1.5" />
+      <rect x="3" y="13.5" width="18" height="6.5" rx="1.5" />
+      <path d="M7 7.25h.01M7 16.75h.01" />
+    </>
+  ),
+  ban: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="m5.5 5.5 13 13" />
+    </>
+  ),
+  plus: <path d="M12 4.5v15M4.5 12h15" />,
   'arrow-right': <path d="M4 12h16M14 6l6 6-6 6" />
 };
 

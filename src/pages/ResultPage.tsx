@@ -19,7 +19,8 @@ const VERDICT_LABELS: Record<string, string> = {
 const ACCORDION_CATEGORIES: { category: FindingDto['category']; label: string; icon: IconName }[] = [
   { category: 'AltAccount', label: 'Alts', icon: 'users' },
   { category: 'RecordingSoftware', label: 'Recording Software', icon: 'video' },
-  { category: 'XrayTexturePack', label: 'XRay Texture Packs', icon: 'gamepad' }
+  { category: 'XrayTexturePack', label: 'XRay Texture Packs', icon: 'gamepad' },
+  { category: 'VpnOrProxy', label: 'VPN / Proxy', icon: 'globe' }
 ];
 
 const MODAL_TYPE_LABELS: Record<string, string> = {
@@ -134,6 +135,9 @@ export function ResultPage() {
               </div>
             ) : (
               <ul className="info-list-white" key="info">
+                {result.minecraftUsername && (
+                  <li><span>Minecraft Username:</span><span className="pill-value">{result.minecraftUsername}</span></li>
+                )}
                 <li><span>Recycle Bin:</span><span className="pill-value">{formatRelativeToNow(result.system.recycleBinLastEmptiedAt)}</span></li>
                 <li><span>Operating System:</span><span className="pill-value">{result.system.osVersion}</span></li>
                 <li><span>Scan Time:</span><span className="pill-value">{new Date(result.createdAt).toLocaleString('hu-HU')}</span></li>

@@ -47,7 +47,8 @@ export type FindingCategory =
   | 'XrayTexturePack'
   | 'Injector'
   | 'VmSandbox'
-  | 'TamperAttempt';
+  | 'TamperAttempt'
+  | 'VpnOrProxy';
 
 export type FindingSeverity = 'Info' | 'Low' | 'Medium' | 'High' | 'Critical';
 
@@ -73,6 +74,7 @@ export interface ScanResultView {
   detectedGame: string | null;
   createdAt: string;
   findings: FindingDto[];
+  minecraftUsername: string | null;
 }
 
 // ── Admin (tulajdonos) ──
@@ -96,4 +98,40 @@ export interface CreateUserRequest {
 export interface UpdateUserRequest {
   role?: UserRole;
   isActive?: boolean;
+}
+
+// ── Ismert csaló-jel katalógus (szerver-vezérelt) ──
+export interface SignatureDto {
+  id: string;
+  game: string;
+  name: string;
+  sha256: string | null;
+  processName: string | null;
+  severity: FindingSeverity;
+  isActive: boolean;
+}
+
+export interface CreateSignatureRequest {
+  game: string;
+  name: string;
+  sha256?: string;
+  processName?: string;
+  severity: FindingSeverity;
+}
+
+export interface UpdateSignatureRequest {
+  isActive?: boolean;
+}
+
+// ── HWID-feketelista ──
+export interface BannedHwidView {
+  id: string;
+  hwid: string;
+  reason: string | null;
+  createdAt: string;
+}
+
+export interface CreateBannedHwidRequest {
+  hwid: string;
+  reason?: string;
 }

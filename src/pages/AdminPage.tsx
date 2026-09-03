@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { Layout } from '../components/Layout';
+import { SignatureCatalogSection } from '../components/SignatureCatalogSection';
+import { BannedHwidsSection } from '../components/BannedHwidsSection';
 import { api, ApiError } from '../api/client';
 import type { AdminUserView, SessionListItem, UserRole } from '../api/types';
 
@@ -258,6 +260,9 @@ export function AdminPage() {
           </div>
         </div>
       )}
+
+      <SignatureCatalogSection />
+      <BannedHwidsSection />
     </Layout>
   );
 }
