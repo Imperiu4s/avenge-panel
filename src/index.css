@@ -1046,6 +1046,8 @@ input:focus {
 .row-selected { background: var(--bg); }
 .admin-actions { display: flex; gap: 6px; }
 .btn-tiny { padding: 6px 10px; font-size: 0.78rem; flex: none; }
+.btn-danger { background: var(--avenge-red-dark); color: white; border-color: var(--avenge-red-dark); }
+.btn-danger:hover { background: #a52d2d; }
 .role-select {
   padding: 4px 8px;
   border: 1px solid var(--border);

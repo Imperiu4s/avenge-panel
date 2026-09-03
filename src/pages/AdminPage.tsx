@@ -86,6 +86,21 @@ export function AdminPage() {
     }
   }
 
+  async function handleDelete(user: AdminUserView) {
+    if (!window.confirm(`Biztosan törlöd a(z) ${user.email} felhasználót? Ez nem vonható vissza.`)) {
+      return;
+    }
+    try {
+      await api.deleteAdminUser(user.id);
+      setUsers((prev) => prev.filter((u) => u.id !== user.id));
+      if (selectedUser?.id === user.id) {
+        setSelectedUser(null);
+      }
+    } catch (err) {
+      setListError(err instanceof ApiError ? err.message : 'Nem sikerült törölni a felhasználót.');
+    }
+  }
+
   async function handleViewSessions(user: AdminUserView) {
     setSelectedUser(user);
     setIsLoadingSessions(true);
@@ -146,6 +161,9 @@ export function AdminPage() {
                       </button>
                       <button className="btn-secondary btn-tiny" onClick={() => handleToggleActive(u)}>
                         {u.isActive ? 'Deaktiválás' : 'Aktiválás'}
+                      </button>
+                      <button className="btn-secondary btn-tiny btn-danger" onClick={() => handleDelete(u)}>
+                        Törlés
                       </button>
                     </td>
                   </tr>

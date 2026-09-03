@@ -91,6 +91,9 @@ export const api = {
   updateAdminUser: (id: string, body: UpdateUserRequest) =>
     request<AdminUserView>(`/api/admin/users/${encodeURIComponent(id)}`, { method: 'PATCH', body }),
 
+  deleteAdminUser: (id: string) =>
+    request<void>(`/api/admin/users/${encodeURIComponent(id)}`, { method: 'DELETE' }),
+
   listAdminUserSessions: (id: string, page = 1, pageSize = 20) =>
     request<SessionListItem[]>(
       `/api/admin/users/${encodeURIComponent(id)}/sessions?page=${page}&pageSize=${pageSize}`
