@@ -466,8 +466,28 @@ input:focus {
   justify-content: center;
   gap: 8px;
   min-width: 170px;
+  /* A .btn-secondary alap flex:1-et ad (hogy PL. a Panel generálás-gombjait
+     egyenlő szélesre nyújtsa) - itt viszont a hero két gombjának a SAJÁT
+     tartalma alapján, egyformán, DE NEM nyújtva kell méreteződnie, különben
+     a "Learn more" (rövidebb szöveg) szélesebbre nő a "Get started"-nél,
+     mert egyedül ő örökölte a nyújtást. */
+  flex: none;
   box-sizing: border-box;
 }
+
+.admin-cta-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: #fdeceb;
+  color: var(--avenge-red);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.admin-cta-link:hover { background: #fbdada; text-decoration: none; }
 
 .mini-pricing-row {
   display: grid;

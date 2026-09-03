@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { Icon, type IconName } from '../components/Icon';
+import { useAuth } from '../auth/AuthContext';
 import avengeLogo from '../assets/avenge-logo.png';
 
 interface Tier {
@@ -92,6 +94,7 @@ function buildAreaPath(points: number[], width: number, height: number, max: num
 }
 
 export function HomePage() {
+  const { isAdmin } = useAuth();
   const [billing, setBilling] = useState<'monthly' | 'annual'>('monthly');
   const [toast, setToast] = useState<string | null>(null);
 
@@ -118,6 +121,12 @@ export function HomePage() {
             <a href="#plans" className="btn-primary hero-btn">Get started →</a>
             <a href="#features" className="btn-secondary hero-btn-secondary">Learn more</a>
           </div>
+
+          {isAdmin && (
+            <Link to="/admin" className="admin-cta-link">
+              <Icon name="shield" size={16} /> Admin panel megnyitása
+            </Link>
+          )}
 
           <div className="mini-pricing-row">
             {TIERS.map((tier) => (

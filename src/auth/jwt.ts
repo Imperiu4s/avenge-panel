@@ -21,9 +21,14 @@ export function decodeStaffToken(token: string): StaffTokenClaims {
     const claims = JSON.parse(json) as Record<string, string>;
     // A szerver a ClaimTypes.Role-t közvetlenül JwtSecurityToken konstruktorral
     // adja ki (nincs outbound claim-mapping), ezért a payloadban a teljes
-    // "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role" kulcs alatt
-    // szerepel, nem az egyszerű "role" néven.
-    const roleClaimKey = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role';
+    // URI kulcs alatt szerepel, nem az egyszerű "role" néven. FONTOS, éles
+    // hibajelentés alapján javítva: a .NET ClaimTypes.Role tényleges értéke
+    // "http://schemas.MICROSOFT.com/ws/2008/06/identity/claims/role" - a
+    // korábbi (xmlsoap.org/2005/05-ös) kulcs egy másik, hasonló nevű WS-*
+    // claim-típus URI-ja volt, soha nem egyezett a valódi tokennel. Ezt egy
+    // saját JwtTokenService.IssueStaffToken-t ténylegesen lefuttató teszttel
+    // erősítettem meg, nem csak dokumentációból - lásd a beszélgetést.
+    const roleClaimKey = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role';
     return {
       userId: claims.sub ?? null,
       organizationId: claims.org ?? null,
