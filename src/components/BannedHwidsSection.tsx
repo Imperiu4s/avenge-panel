@@ -84,8 +84,8 @@ export function BannedHwidsSection() {
               </tr>
             </thead>
             <tbody>
-              {banned.map((b) => (
-                <tr key={b.id}>
+              {banned.map((b, i) => (
+                <tr key={b.id} className="row-in" style={{ animationDelay: `${i * 40}ms` }}>
                   <td className="mono small">{b.hwid}</td>
                   <td>{b.reason ?? <span className="muted">-</span>}</td>
                   <td>{new Date(b.createdAt).toLocaleString('hu-HU')}</td>

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { api } from '../api/client';
 import type { CreateSessionResponse, SessionListItem } from '../api/types';
 import { Layout } from '../components/Layout';
+import { ScrambleText, Skeleton } from '../components/motion';
 import { onScanProgress, onSessionStatusChanged, type ScanProgressEvent } from '../realtime/scanHub';
 
 const STATUS_LABELS: Record<string, string> = {
@@ -166,11 +167,23 @@ export function SessionsPage() {
                     <th>Result</th>
                   </tr>
                 </thead>
-                <tbody>
-                  {sessions.map((s) => {
+                <tbody key={`page-${page}`}>
+                  {isLoadingList && sessions.length === 0 &&
+                    Array.from({ length: 3 }, (_, i) => (
+                      <tr key={`skeleton-${i}`}>
+                        <td><Skeleton width={70} /></td>
+                        <td><Skeleton width={140} /></td>
+                        <td><Skeleton width={90} height={20} radius={999} style={{ marginLeft: 'auto' }} /></td>
+                      </tr>
+                    ))}
+                  {sessions.map((s, i) => {
                     const progress = progressByCode[s.code];
                     return (
-                      <tr key={s.code}>
+                      <tr
+                        key={s.code}
+                        className={`row-in ${s.code === newSession?.code ? 'row-new' : ''}`}
+                        style={{ animationDelay: `${i * 55}ms` }}
+                      >
                         <td className="mono">
                           {s.resultIdHash ? (
                             <Link to={`/results/${s.resultIdHash}`}>#{s.code}</Link>
@@ -181,17 +194,21 @@ export function SessionsPage() {
                         <td>{new Date(s.createdAt).toLocaleString('hu-HU')}</td>
                         <td>
                           {s.verdict ? (
-                            <span className={`verdict-badge verdict-${s.verdict.toLowerCase()}`}>
+                            <span className={`verdict-badge verdict-pop verdict-${s.verdict.toLowerCase()}`} key={s.verdict}>
                               {VERDICT_LABELS[s.verdict] ?? s.verdict}
                             </span>
                           ) : (
-                            <span className={`status-badge status-${s.status.toLowerCase()}`}>
+                            <span className={`status-badge status-${s.status.toLowerCase()}`} key={s.status}>
                               {STATUS_LABELS[s.status] ?? s.status}
                             </span>
                           )}
                           {progress && s.status === 'Scanning' && (
-                            <span className="live-progress">
-                              <span className="live-dot" /> {progress.percent}%
+                            <span className="live-progress" title={progress.statusText}>
+                              <span className="live-dot" />
+                              <span className="live-bar">
+                                <span className="live-bar-fill" style={{ transform: `scaleX(${progress.percent / 100})` }} />
+                              </span>
+                              <span className="live-percent">{progress.percent}%</span>
                             </span>
                           )}
                         </td>
@@ -223,9 +240,12 @@ export function SessionsPage() {
             </div>
           </div>
 
-          <div className="card generate-card">
-            <div className="generated-code-display">{newSession?.code ?? 'XXXXXX'}</div>
-            <button className="btn-primary" onClick={handleGenerate} disabled={isGenerating}>
+          <div className="card generate-card" style={{ animationDelay: '90ms' }}>
+            <div className={`generated-code-display ${newSession ? 'has-code' : ''}`}>
+              <ScrambleText text={newSession?.code ?? 'XXXXXX'} />
+            </div>
+            <button className={`btn-primary ${isGenerating ? 'is-loading' : ''}`} onClick={handleGenerate} disabled={isGenerating}>
+              {isGenerating && <span className="btn-spinner" aria-hidden="true" />}
               {isGenerating ? 'Generálás...' : 'Generate'}
             </button>
             {generateError && <p className="error-text">{generateError}</p>}

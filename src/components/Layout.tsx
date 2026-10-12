@@ -1,26 +1,40 @@
-import type { ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 
 export function Layout({ children, fullBleed = false }: { children: ReactNode; fullBleed?: boolean }) {
   const { isAuthenticated, isAdmin, logout } = useAuth();
   const location = useLocation();
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const isActive = (path: string) => location.pathname.startsWith(path);
 
+  useEffect(() => {
+    const onScroll = () => setIsScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const navLink = (to: string, label: string, active: boolean) => (
+    <Link to={to} className={`nav-link ${active ? 'nav-active' : ''}`}>{label}</Link>
+  );
+
   return (
     <div className="app-shell">
-      <nav className="top-nav">
+      {/* Oldalváltáskor végigfutó piros csík - a key miatt minden
+          navigációnál újraindul az animációja. */}
+      <div className="route-progress" key={`progress-${location.pathname}`} aria-hidden="true" />
+
+      <nav className={`top-nav ${isScrolled ? 'top-nav-scrolled' : ''}`}>
         <div className="nav-links">
-          <Link to="/home" className={isActive('/home') ? 'nav-active' : ''}>Home</Link>
-          <Link to="/account" className={isActive('/account') ? 'nav-active' : ''}>Account</Link>
-          <Link to="/panel" className={isActive('/panel') || isActive('/results') ? 'nav-active' : ''}>Panel</Link>
-          {isAdmin && (
-            <Link to="/admin" className={isActive('/admin') ? 'nav-active' : ''}>Admin</Link>
-          )}
-          <Link to="/changelogs" className={isActive('/changelogs') ? 'nav-active' : ''}>Changelogs</Link>
-          <a href="#" onClick={(e) => e.preventDefault()}>Discord</a>
-          {isAuthenticated && <button className="link-button" onClick={logout}>Logout</button>}
+          {navLink('/home', 'Home', isActive('/home'))}
+          {navLink('/account', 'Account', isActive('/account'))}
+          {navLink('/panel', 'Panel', isActive('/panel') || isActive('/results'))}
+          {isAdmin && navLink('/admin', 'Admin', isActive('/admin'))}
+          {navLink('/changelogs', 'Changelogs', isActive('/changelogs'))}
+          <a href="#" className="nav-link" onClick={(e) => e.preventDefault()}>Discord</a>
+          {isAuthenticated && <button className="link-button nav-link" onClick={logout}>Logout</button>}
         </div>
         <div className="nav-right">
           {!isAuthenticated && (
@@ -29,7 +43,10 @@ export function Layout({ children, fullBleed = false }: { children: ReactNode; f
           <a href="#" className="btn-support" onClick={(e) => e.preventDefault()}>Support</a>
         </div>
       </nav>
-      {fullBleed ? children : <main className="app-main">{children}</main>}
+
+      <div className="page-transition" key={location.pathname}>
+        {fullBleed ? children : <main className="app-main">{children}</main>}
+      </div>
     </div>
   );
 }

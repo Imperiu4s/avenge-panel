@@ -1092,3 +1092,560 @@ input:focus {
   box-shadow: 0 6px 20px rgba(0,0,0,0.3);
   z-index: 50;
 }
+
+/* ════════════════════════════════════════════════════════════════════════
+   Motion system
+   Minden animáció csak transform/opacity-t (ritkán box-shadow-t egy-egy kis
+   elemen) mozgat, hogy GPU-n komponálódjon és akadásmentes maradjon. A
+   belépő animációk "backwards" kitöltést használnak: lefutás után az elem
+   visszakapja a saját stílusait, így a hover-effektek nem ütköznek velük.
+   ════════════════════════════════════════════════════════════════════════ */
+:root {
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+html { scroll-behavior: smooth; }
+section[id] { scroll-margin-top: 72px; }
+
+@keyframes stagger-in { from { opacity: 0; transform: translateY(18px); } }
+@keyframes fade-in { to { opacity: 1; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes orb-drift {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(60px, -40px); }
+}
+@keyframes shimmer-sweep {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
+}
+
+.stagger-in { animation: stagger-in 0.8s var(--ease-out-expo) backwards; }
+
+/* ── oldalváltás ── */
+.route-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 200;
+  background: linear-gradient(90deg, var(--avenge-red), #ff8f8f);
+  box-shadow: 0 0 10px rgba(225, 75, 75, 0.6);
+  transform-origin: left;
+  transform: scaleX(0);
+  pointer-events: none;
+  animation:
+    route-progress 0.75s var(--ease-out-expo) forwards,
+    route-progress-fade 0.35s 0.75s ease forwards;
+}
+@keyframes route-progress { to { transform: scaleX(1); } }
+@keyframes route-progress-fade { to { opacity: 0; } }
+
+.page-transition { animation: page-enter 0.5s var(--ease-out-expo) backwards; }
+@keyframes page-enter { from { opacity: 0; transform: translateY(12px); } }
+
+/* ── navigáció ── */
+.top-nav {
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.top-nav-scrolled {
+  /* Elég átlátszatlan ahhoz, hogy a sötét "Plans" szekció fehér szövege ne
+     ütközzön át rajta - a blur így csak finom mélységet ad. */
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: saturate(180%) blur(14px);
+  -webkit-backdrop-filter: saturate(180%) blur(14px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.07);
+  border-bottom-color: transparent;
+}
+.nav-link {
+  position: relative;
+  padding: 4px 0;
+  transition: color 0.2s ease;
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -5px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--avenge-red);
+  transform: scaleX(0);
+  transition: transform 0.35s var(--ease-out-expo);
+}
+.nav-link:hover::after, .nav-link.nav-active::after { transform: scaleX(1); }
+.btn-support, .btn-login { transition: background-color 0.2s ease, transform 0.25s var(--ease-spring), opacity 0.2s ease; }
+.btn-support:hover { transform: translateY(-1px); }
+
+/* ── gombok ── */
+.btn-primary, .btn-secondary, .page-pill, .btn-outline-white, .mini-pricing-link {
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 0.25s var(--ease-out-expo),
+    box-shadow 0.3s ease,
+    background-color 0.2s ease,
+    color 0.2s ease,
+    opacity 0.2s ease;
+}
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(225, 75, 75, 0.35);
+}
+.btn-secondary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(225, 75, 75, 0.14);
+}
+.btn-primary:active:not(:disabled), .btn-secondary:active:not(:disabled), .page-pill:active:not(:disabled) {
+  transform: translateY(0) scale(0.97);
+  box-shadow: none;
+  transition-duration: 0.08s;
+}
+/* fényes "végigsöprés" a fő gombokon hoverre */
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 55%;
+  height: 100%;
+  background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transform: translateX(-150%) skewX(-20deg);
+  pointer-events: none;
+}
+.btn-primary:hover:not(:disabled)::before { animation: btn-shine 0.8s ease; }
+@keyframes btn-shine { to { transform: translateX(260%) skewX(-20deg); } }
+
+.btn-arrow { display: inline-block; transition: transform 0.3s var(--ease-spring); }
+.hero-btn:hover .btn-arrow { transform: translateX(5px); }
+
+.btn-spinner {
+  width: 14px;
+  height: 14px;
+  margin-right: 8px;
+  display: inline-block;
+  vertical-align: -2px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: white;
+  animation: spin 0.7s linear infinite;
+}
+.page-pill:hover:not(:disabled):not(.active) { transform: translateY(-1px); }
+.mini-pricing-link:hover { transform: translateX(3px); }
+.toggle-knob { transition: left 0.35s var(--ease-spring); }
+.toggle-switch { transition: background-color 0.3s ease; }
+
+/* ── űrlapmezők ── */
+input[type="email"], input[type="password"], input[type="text"], .role-select {
+  transition: border-color 0.2s ease, box-shadow 0.25s ease;
+}
+input:focus, .role-select:focus {
+  outline: none;
+  border-color: var(--avenge-red);
+  box-shadow: 0 0 0 4px rgba(225, 75, 75, 0.14);
+}
+.error-in { animation: fade-slide-in 0.3s ease both; }
+
+/* ── kártyák ── */
+.card {
+  animation: card-fade-up 0.6s var(--ease-out-expo) backwards;
+  transition: box-shadow 0.3s ease;
+}
+.card:hover { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07); }
+@keyframes card-fade-up { from { opacity: 0; transform: translateY(14px); } }
+
+.hover-lift { transition: transform 0.4s var(--ease-out-expo), box-shadow 0.4s ease; }
+.hover-lift:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
+}
+
+/* ── görgetéses beúszás (lásd components/motion.tsx Reveal) ── */
+.reveal:not(.is-visible) { opacity: 0; }
+.reveal.is-visible { animation: reveal-up 0.85s var(--ease-out-expo) backwards; }
+.reveal-fade.is-visible { animation-name: reveal-fade; }
+.reveal-scale.is-visible { animation-name: reveal-scale; }
+.reveal-left.is-visible { animation-name: reveal-left; }
+.reveal-right.is-visible { animation-name: reveal-right; }
+@keyframes reveal-up { from { opacity: 0; transform: translateY(30px); } }
+@keyframes reveal-fade { from { opacity: 0; } }
+@keyframes reveal-scale { from { opacity: 0; transform: translateY(16px) scale(0.92); } }
+@keyframes reveal-left { from { opacity: 0; transform: translateX(-30px); } }
+@keyframes reveal-right { from { opacity: 0; transform: translateX(30px); } }
+
+.skeleton {
+  display: block;
+  background: linear-gradient(90deg, #ececec 25%, #f7f7f7 37%, #ececec 63%);
+  background-size: 400% 100%;
+  animation: skeleton-shimmer 1.4s ease infinite;
+}
+@keyframes skeleton-shimmer {
+  from { background-position: 100% 50%; }
+  to { background-position: 0 50%; }
+}
+
+/* ── Home hero ── */
+.home-hero { position: relative; }
+.home-hero > *:not(.hero-glow) { position: relative; z-index: 1; }
+.hero-glow {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  width: 560px;
+  height: 560px;
+  margin-left: -280px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(225, 75, 75, 0.2), transparent 65%);
+  pointer-events: none;
+  z-index: 0;
+  animation: glow-breathe 7s ease-in-out infinite;
+}
+@keyframes glow-breathe {
+  0%, 100% { opacity: 0.65; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+.hero-logo-wrap { display: inline-block; }
+.hero-logo {
+  animation: logo-float 6s ease-in-out infinite;
+  filter: drop-shadow(0 14px 26px rgba(225, 75, 75, 0.25));
+}
+@keyframes logo-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.admin-cta-link { transition: background-color 0.2s ease, transform 0.3s var(--ease-spring); }
+.admin-cta-link:hover { transform: translateY(-2px); }
+
+/* ── statisztika + grafikon ── */
+.stat-cell { transition: background-color 0.3s ease; }
+.stat-cell:hover { background: #fff6f6; }
+.count-up { font-variant-numeric: tabular-nums; }
+.chart-line { stroke-dasharray: 1; stroke-dashoffset: 1; }
+.chart-area { opacity: 0; }
+.chart-drawn .chart-line { animation: draw-line 2s var(--ease-out-expo) forwards; }
+.chart-drawn .chart-area { animation: fade-in 1.2s 0.6s ease forwards; }
+@keyframes draw-line { to { stroke-dashoffset: 0; } }
+
+/* ── funkciók ── */
+.feature-icon {
+  transition:
+    transform 0.5s var(--ease-spring),
+    background-color 0.3s ease,
+    color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+.feature-card:hover .feature-icon {
+  transform: translateY(-4px) rotate(-8deg) scale(1.1);
+  background: var(--avenge-red);
+  color: white;
+  box-shadow: 0 10px 24px rgba(225, 75, 75, 0.35);
+}
+
+/* ── csomagok ── */
+.home-plans > *:not(.plans-orb):not(.plans-wave) { position: relative; z-index: 1; }
+.plans-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: 0.35;
+  pointer-events: none;
+  z-index: 0;
+}
+.plans-orb-a {
+  width: 380px;
+  height: 380px;
+  top: 12%;
+  left: -140px;
+  background: var(--avenge-red);
+  animation: orb-drift 14s ease-in-out infinite;
+}
+.plans-orb-b {
+  width: 320px;
+  height: 320px;
+  bottom: -90px;
+  right: -110px;
+  background: #4f63c9;
+  animation: orb-drift 18s ease-in-out infinite reverse;
+}
+
+@property --border-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+.plan-card-highlight {
+  border: 2px solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    conic-gradient(from var(--border-angle), var(--avenge-red), #ffb0a0, #f5c542, #ff7a7a, var(--avenge-red)) border-box;
+}
+.plan-card-highlight.is-visible {
+  animation:
+    reveal-up 0.85s var(--ease-out-expo) backwards,
+    border-spin 5s linear infinite;
+}
+@keyframes border-spin { to { --border-angle: 360deg; } }
+
+.plan-price-value { display: inline-block; animation: price-flip 0.55s var(--ease-spring) backwards; }
+@keyframes price-flip { from { opacity: 0; transform: translateY(-14px) scale(0.8); } }
+.plan-card.is-visible .plan-features li { animation: li-in 0.55s var(--ease-out-expo) backwards; }
+@keyframes li-in { from { opacity: 0; transform: translateX(-10px); } }
+.check-dot { transition: transform 0.3s var(--ease-spring); }
+.plan-features li:hover .check-dot { transform: scale(1.2); }
+
+.home-toast { animation: toast-in 0.45s var(--ease-spring) both; }
+@keyframes toast-in {
+  from { opacity: 0; transform: translate(-50%, 20px) scale(0.95); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* ── piros fejlécek (Panel / Scan Result / Admin) ── */
+.panel-hero, .panel-header {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(120deg, #c53a3a, var(--avenge-red) 45%, #ef6f5e);
+  background-size: 220% 220%;
+  animation: hero-gradient 14s ease infinite;
+}
+.panel-hero::before, .panel-hero::after, .panel-header::before {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+}
+.panel-hero::before, .panel-header::before {
+  width: 420px;
+  height: 420px;
+  right: -120px;
+  top: -190px;
+  animation: orb-drift 16s ease-in-out infinite;
+}
+.panel-hero::after {
+  width: 260px;
+  height: 260px;
+  left: 30%;
+  bottom: -180px;
+  animation: orb-drift 21s ease-in-out infinite reverse;
+}
+.panel-hero h1, .panel-hero .subtitle, .panel-header h1, .panel-header .subtitle {
+  position: relative;
+  animation: stagger-in 0.7s var(--ease-out-expo) backwards;
+}
+.panel-hero .subtitle, .panel-header .subtitle { animation-delay: 90ms; }
+/* A referencia-képek (images/panel.png) szerint a cím és az alcím is balra
+   zárt, a tartalom-oszloppal (max 1100px) egy vonalban. */
+.panel-hero {
+  padding-left: max(24px, calc((100% - 1100px) / 2 + 24px));
+  padding-right: max(24px, calc((100% - 1100px) / 2 + 24px));
+}
+.panel-hero .subtitle { text-align: left; }
+.panel-content .card:not(.scan-toggle-card) { border-top: 3px solid var(--avenge-red); }
+@keyframes hero-gradient {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ── táblák ── */
+.row-in { animation: row-in 0.5s var(--ease-out-expo) backwards; }
+@keyframes row-in { from { opacity: 0; transform: translateX(-10px); } }
+.sessions-table tbody tr td, .findings-table tbody tr td { transition: background-color 0.2s ease; }
+.sessions-table tbody tr:hover td, .findings-table tbody tr:hover td { background: #fafafa; }
+.row-new td { animation: row-flash 2s ease-out; }
+@keyframes row-flash {
+  0%, 35% { background: #fdeceb; }
+  100% { background: transparent; }
+}
+
+.verdict-badge, .status-badge, .severity-badge { animation: badge-pop 0.5s var(--ease-spring) backwards; }
+@keyframes badge-pop { from { opacity: 0; transform: scale(0.6); } }
+.status-badge.status-scanning, .status-badge.status-clientconnected {
+  background: linear-gradient(90deg, #fff4e0 0%, #ffe0a8 50%, #fff4e0 100%);
+  background-size: 200% 100%;
+  animation: badge-pop 0.5s var(--ease-spring) backwards, badge-shimmer 1.6s linear infinite;
+}
+@keyframes badge-shimmer {
+  from { background-position: 100% 0; }
+  to { background-position: -100% 0; }
+}
+
+/* élő scan-progress a session-listában */
+.live-dot { animation: live-ring 1.4s ease-out infinite; }
+@keyframes live-ring {
+  0% { box-shadow: 0 0 0 0 rgba(225, 75, 75, 0.55); }
+  100% { box-shadow: 0 0 0 8px rgba(225, 75, 75, 0); }
+}
+.live-bar {
+  position: relative;
+  display: inline-block;
+  width: 72px;
+  height: 6px;
+  border-radius: 999px;
+  background: #f3e3e3;
+  overflow: hidden;
+}
+.live-bar-fill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  transform-origin: left;
+  background: linear-gradient(90deg, var(--avenge-red), #ff8f8f);
+  transition: transform 0.7s var(--ease-out-expo);
+  overflow: hidden;
+}
+.live-bar-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+  animation: shimmer-sweep 1.2s ease-in-out infinite;
+}
+.live-percent { font-variant-numeric: tabular-nums; min-width: 32px; }
+
+/* generált session-kód */
+.generated-code-display { transition: color 0.3s ease, border-color 0.3s ease, box-shadow 0.4s ease; }
+.generated-code-display.has-code {
+  color: var(--avenge-red);
+  font-weight: 700;
+  border-color: rgba(225, 75, 75, 0.45);
+  box-shadow: 0 0 0 4px rgba(225, 75, 75, 0.08);
+}
+
+/* ── Scan Result ── */
+.scan-toggle-card { transition: background-color 0.4s ease, box-shadow 0.3s ease; }
+.fingerprint-scanning {
+  position: relative;
+  overflow: hidden;
+  animation: fp-pulse 2.4s ease-out infinite;
+}
+.fingerprint-scanline {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, white, transparent);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.9);
+  animation: scanline 2.4s ease-in-out infinite;
+}
+@keyframes scanline {
+  0% { transform: translateY(8px); opacity: 0; }
+  15%, 85% { opacity: 1; }
+  100% { transform: translateY(54px); opacity: 0; }
+}
+@keyframes fp-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.45); }
+  70%, 100% { box-shadow: 0 0 0 16px rgba(255, 255, 255, 0); }
+}
+.verdict-reveal { animation: verdict-reveal 0.8s 0.2s var(--ease-spring) backwards; }
+@keyframes verdict-reveal { from { opacity: 0; transform: scale(0.6); filter: blur(6px); } }
+
+.accordion-item { transition: box-shadow 0.3s ease; }
+.accordion-item:hover { box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08); }
+.accordion-item-open { box-shadow: 0 12px 30px rgba(225, 75, 75, 0.12); }
+.accordion-trigger { transition: background-color 0.2s ease; }
+.accordion-trigger:hover { background: #fffafa; }
+.accordion-icon { transition: transform 0.45s var(--ease-spring); }
+.accordion-item-open .accordion-icon { transform: scale(1.18) rotate(-6deg); }
+.accordion-chevron .chevron-svg { transition: transform 0.35s var(--ease-out-expo); }
+.accordion-panel-wrapper { transition: grid-template-rows 0.4s var(--ease-out-expo); }
+.accordion-finding {
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 0.35s ease, transform 0.4s var(--ease-out-expo);
+}
+.accordion-panel-wrapper-open .accordion-finding { opacity: 1; transform: none; }
+.count-chip {
+  min-width: 26px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-align: center;
+}
+.count-chip-hot {
+  background: #fdeceb;
+  color: var(--avenge-red);
+  animation: chip-pulse 2.2s ease-out infinite;
+}
+@keyframes chip-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(225, 75, 75, 0.35); }
+  70%, 100% { box-shadow: 0 0 0 7px rgba(225, 75, 75, 0); }
+}
+
+.modal-header-icon { animation: badge-pop 0.6s 0.1s var(--ease-spring) backwards; }
+.modal-stat { animation: stagger-in 0.5s var(--ease-out-expo) backwards; }
+.modal-stat:nth-child(2) { animation-delay: 70ms; }
+.modal-stat:nth-child(3) { animation-delay: 140ms; }
+.skeleton-card { animation: none; }
+
+/* ── Login ── */
+.login-page { position: relative; overflow: hidden; }
+.login-bg { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+.login-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.4;
+}
+.login-blob-a {
+  width: 440px;
+  height: 440px;
+  top: -140px;
+  left: -90px;
+  background: var(--avenge-red);
+  animation: orb-drift 14s ease-in-out infinite;
+}
+.login-blob-b {
+  width: 380px;
+  height: 380px;
+  bottom: -150px;
+  right: -70px;
+  background: #ff9f7a;
+  animation: orb-drift 17s ease-in-out infinite reverse;
+}
+.login-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+  background-size: 36px 36px;
+  -webkit-mask-image: radial-gradient(circle at center, black, transparent 70%);
+  mask-image: radial-gradient(circle at center, black, transparent 70%);
+}
+.login-card {
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.12);
+  animation: login-card-in 0.8s var(--ease-out-expo) backwards;
+}
+@keyframes login-card-in { from { opacity: 0; transform: translateY(26px) scale(0.97); } }
+.login-card.shake { animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+@keyframes shake {
+  10%, 90% { transform: translateX(-2px); }
+  20%, 80% { transform: translateX(4px); }
+  30%, 50%, 70% { transform: translateX(-7px); }
+  40%, 60% { transform: translateX(7px); }
+}
+.brand-letter { display: inline-block; animation: letter-drop 0.65s var(--ease-spring) backwards; }
+@keyframes letter-drop { from { opacity: 0; transform: translateY(-20px) rotate(-10deg); } }
+
+/* ── mozgáscsökkentés (rendszerbeállítás) ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal:not(.is-visible), .accordion-finding { opacity: 1; transform: none; }
+}

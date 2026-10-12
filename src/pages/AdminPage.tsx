@@ -138,8 +138,12 @@ export function AdminPage() {
                 </tr>
               </thead>
               <tbody>
-                {users.map((u) => (
-                  <tr key={u.id} className={selectedUser?.id === u.id ? 'row-selected' : ''}>
+                {users.map((u, i) => (
+                  <tr
+                    key={u.id}
+                    className={`row-in ${selectedUser?.id === u.id ? 'row-selected' : ''}`}
+                    style={{ animationDelay: `${i * 45}ms` }}
+                  >
                     <td className="mono small">{u.email}</td>
                     <td>
                       <select
@@ -181,7 +185,7 @@ export function AdminPage() {
           {listError && <p className="error-text">{listError}</p>}
         </div>
 
-        <div className="card generate-card">
+        <div className="card generate-card" style={{ animationDelay: '90ms' }}>
           <h2>Új felhasználó</h2>
           <form onSubmit={handleCreate}>
             <label className="field-label">Email</label>
@@ -211,7 +215,7 @@ export function AdminPage() {
       </div>
 
       {selectedUser && (
-        <div className="card" style={{ marginTop: 24 }}>
+        <div className="card" style={{ marginTop: 24 }} key={selectedUser.id}>
           <h2 style={{ marginTop: 0 }}>
             {selectedUser.email} vizsgálat-előzményei
           </h2>
@@ -226,8 +230,8 @@ export function AdminPage() {
                 </tr>
               </thead>
               <tbody>
-                {userSessions.map((s) => (
-                  <tr key={s.code}>
+                {userSessions.map((s, i) => (
+                  <tr key={s.code} className="row-in" style={{ animationDelay: `${i * 40}ms` }}>
                     <td className="mono">
                       {s.resultIdHash ? (
                         <Link to={`/results/${s.resultIdHash}`}>#{s.code}</Link>

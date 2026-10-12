@@ -4,6 +4,7 @@ import { api, ApiError } from '../api/client';
 import type { FindingDto, ScanResultView } from '../api/types';
 import { Layout } from '../components/Layout';
 import { Icon, type IconName } from '../components/Icon';
+import { CountUp, Skeleton } from '../components/motion';
 
 const VERDICT_LABELS: Record<string, string> = {
   Legit: 'LEGIT',
@@ -79,8 +80,27 @@ export function ResultPage() {
 
   if (isLoading) {
     return (
-      <Layout>
-        <p className="muted">Betöltés...</p>
+      <Layout fullBleed>
+        <div className="panel-hero">
+          <h1>Scan Result</h1>
+          <p className="subtitle">View your scan details</p>
+        </div>
+        <div className="panel-content">
+          <div className="panel-grid result-grid" style={{ marginTop: 32 }}>
+            <div className="card skeleton-card">
+              <Skeleton width={64} height={64} radius={999} style={{ margin: '0 auto 16px' }} />
+              <Skeleton width="60%" height={22} style={{ margin: '0 auto 16px' }} />
+              <Skeleton width={110} height={38} style={{ margin: '0 auto' }} />
+            </div>
+            <div className="accordion-stack">
+              {[0, 1, 2, 3].map((i) => (
+                <div className="accordion-item skeleton-card" key={i} style={{ padding: 20 }}>
+                  <Skeleton width={`${45 + i * 10}%`} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </Layout>
     );
   }
@@ -127,8 +147,11 @@ export function ResultPage() {
 
             {leftView === 'result' ? (
               <div className="scan-toggle-body" key="result">
-                <span className="fingerprint-icon"><Icon name="fingerprint" size={40} /></span>
-                <div className="verdict-label-plain">{VERDICT_LABELS[result.verdict] ?? result.verdict}</div>
+                <span className="fingerprint-icon fingerprint-scanning">
+                  <Icon name="fingerprint" size={40} />
+                  <span className="fingerprint-scanline" aria-hidden="true" />
+                </span>
+                <div className="verdict-label-plain verdict-reveal">{VERDICT_LABELS[result.verdict] ?? result.verdict}</div>
                 <button className="btn-outline-white" onClick={() => setIsDetailsOpen(true)}>
                   Details
                 </button>
@@ -147,18 +170,22 @@ export function ResultPage() {
           </div>
 
           <div className="accordion-stack">
-            {ACCORDION_CATEGORIES.map(({ category, label, icon }) => {
+            {ACCORDION_CATEGORIES.map(({ category, label, icon }, index) => {
               const items = grouped[category] ?? [];
               const isOpen = openAccordion === category;
               return (
-                <div className="accordion-item" key={category}>
+                <div
+                  className={`accordion-item stagger-in ${isOpen ? 'accordion-item-open' : ''}`}
+                  key={category}
+                  style={{ animationDelay: `${120 + index * 80}ms` }}
+                >
                   <button
                     className="accordion-trigger"
                     onClick={() => setOpenAccordion(isOpen ? null : category)}
                   >
                     <span className="accordion-icon"><Icon name={icon} size={19} /></span>
                     <span className="accordion-label">{label}</span>
-                    <span className="muted small">({items.length})</span>
+                    <span className={`count-chip ${items.length > 0 ? 'count-chip-hot' : ''}`}>{items.length}</span>
                     <span className={`accordion-chevron ${isOpen ? 'accordion-chevron-open' : ''}`}>
                       <Icon name="arrow-right" size={14} className="chevron-svg" />
                     </span>
@@ -168,7 +195,7 @@ export function ResultPage() {
                       <div className="accordion-panel">
                         {items.length === 0 && <p className="muted small">Nincs találat ebben a kategóriában.</p>}
                         {items.map((f, i) => (
-                          <div className="accordion-finding" key={i}>
+                          <div className="accordion-finding" key={i} style={{ transitionDelay: isOpen ? `${80 + i * 45}ms` : '0ms' }}>
                             <span className="accordion-finding-thumb"><Icon name={icon} size={16} /></span>
                             <span className="mono small">{f.filePath ?? f.label}</span>
                           </div>
@@ -193,15 +220,15 @@ export function ResultPage() {
               <div className="modal-stats-row">
                 <div className="modal-stat">
                   <div className="modal-stat-label"><Icon name="save" size={15} /> Suspicious Saved Files</div>
-                  <div className="modal-stat-value"><Icon name="search" size={15} /> {savedCount}</div>
+                  <div className="modal-stat-value"><Icon name="search" size={15} /> <CountUp value={savedCount} duration={700} /></div>
                 </div>
                 <div className="modal-stat">
                   <div className="modal-stat-label"><Icon name="trash" size={15} /> Suspicious Deleted Files</div>
-                  <div className="modal-stat-value"><Icon name="search" size={15} /> {deletedCount}</div>
+                  <div className="modal-stat-value"><Icon name="search" size={15} /> <CountUp value={deletedCount} duration={700} /></div>
                 </div>
                 <div className="modal-stat">
                   <div className="modal-stat-label"><Icon name="bug" size={15} /> Cheats Found</div>
-                  <div className="modal-stat-value"><Icon name="search" size={15} /> {cheatCount}</div>
+                  <div className="modal-stat-value"><Icon name="search" size={15} /> <CountUp value={cheatCount} duration={700} /></div>
                 </div>
               </div>
 
@@ -216,7 +243,7 @@ export function ResultPage() {
                   </thead>
                   <tbody>
                     {modalFindings.map((f, i) => (
-                      <tr key={i}>
+                      <tr key={i} className="row-in" style={{ animationDelay: `${150 + Math.min(i, 20) * 35}ms` }}>
                         <td>
                           <span className="type-pill">{MODAL_TYPE_LABELS[f.category] ?? f.category}</span>
                         </td>

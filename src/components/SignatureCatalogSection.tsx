@@ -95,8 +95,8 @@ export function SignatureCatalogSection() {
               </tr>
             </thead>
             <tbody>
-              {signatures.map((s) => (
-                <tr key={s.id}>
+              {signatures.map((s, i) => (
+                <tr key={s.id} className="row-in" style={{ animationDelay: `${i * 40}ms` }}>
                   <td className="mono small">{s.game}</td>
                   <td>{s.name}</td>
                   <td><span className={`severity-badge severity-${s.severity.toLowerCase()}`}>{s.severity}</span></td>
