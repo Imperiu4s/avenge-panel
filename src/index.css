@@ -1639,6 +1639,43 @@ input:focus, .role-select:focus {
 .brand-letter { display: inline-block; animation: letter-drop 0.65s var(--ease-spring) backwards; }
 @keyframes letter-drop { from { opacity: 0; transform: translateY(-20px) rotate(-10deg); } }
 
+/* ── Details modal: lenyitható találat-sorok (miért jelzett a scanner) ── */
+.finding-row { cursor: pointer; }
+.finding-row td:last-child { position: relative; padding-right: 28px; }
+.finding-row-text { display: block; }
+.finding-row-chevron {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  display: flex;
+  color: var(--muted);
+  transform: translateY(-50%) rotate(90deg);
+  transition: transform 0.3s var(--ease-out-expo), color 0.2s ease;
+}
+.finding-row:hover .finding-row-chevron { color: var(--avenge-red); }
+.finding-row-chevron-open { transform: translateY(-50%) rotate(-90deg); color: var(--avenge-red); }
+.finding-row-open td { background: #fff6f6; }
+.finding-detail-row td { padding: 0; border-bottom: 1px solid var(--border); background: #fffafa; }
+.finding-detail {
+  padding: 14px 16px 16px 16px;
+  animation: fade-slide-in 0.3s var(--ease-out-expo) both;
+}
+.finding-detail-label { margin: 0 0 10px 0; font-weight: 700; font-size: 0.9rem; }
+.finding-detail-grid {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 6px 14px;
+  margin: 0;
+  font-size: 0.85rem;
+}
+.finding-detail-grid dt { color: var(--muted); font-weight: 600; }
+.finding-detail-grid dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.finding-detail-hash { font-size: 0.78rem; color: var(--muted); }
+@media (max-width: 600px) {
+  .finding-detail-grid { grid-template-columns: 1fr; }
+  .finding-detail-grid dt { margin-top: 6px; }
+}
+
 /* ── mozgáscsökkentés (rendszerbeállítás) ── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api, ApiError } from '../api/client';
 import type { FindingDto, ScanResultView } from '../api/types';
@@ -33,6 +33,8 @@ const MODAL_TYPE_LABELS: Record<string, string> = {
   TamperAttempt: 'Tamper'
 };
 
+const SEVERITY_ORDER: FindingDto['severity'][] = ['Critical', 'High', 'Medium', 'Low', 'Info'];
+
 function groupByCategory(findings: FindingDto[]): Record<string, FindingDto[]> {
   return findings.reduce<Record<string, FindingDto[]>>((acc, f) => {
     (acc[f.category] ??= []).push(f);
@@ -59,6 +61,7 @@ export function ResultPage() {
   const [leftView, setLeftView] = useState<'result' | 'info'>('result');
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [expandedFinding, setExpandedFinding] = useState<number | null>(null);
 
   useEffect(() => {
     if (!resultId) return;
@@ -115,12 +118,12 @@ export function ResultPage() {
   }
 
   const grouped = groupByCategory(result.findings);
-  const modalFindings = result.findings.filter(
-    (f) => !ACCORDION_CATEGORIES.some((a) => a.category === f.category)
-  );
+  const modalFindings = result.findings
+    .filter((f) => !ACCORDION_CATEGORIES.some((a) => a.category === f.category))
+    .sort((a, b) => SEVERITY_ORDER.indexOf(a.severity) - SEVERITY_ORDER.indexOf(b.severity));
   const savedCount = (grouped.SuspiciousSavedFile ?? []).length;
   const deletedCount = (grouped.SuspiciousDeletedFile ?? []).length;
-  const cheatCount = (grouped.CheatSignature ?? []).length;
+  const cheatCount = (grouped.CheatSignature ?? []).length + (grouped.Injector ?? []).length;
 
   return (
     <Layout fullBleed>
@@ -242,17 +245,70 @@ export function ResultPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {modalFindings.map((f, i) => (
-                      <tr key={i} className="row-in" style={{ animationDelay: `${150 + Math.min(i, 20) * 35}ms` }}>
-                        <td>
-                          <span className="type-pill">{MODAL_TYPE_LABELS[f.category] ?? f.category}</span>
-                        </td>
-                        <td>
-                          <span className={`severity-badge severity-${f.severity.toLowerCase()}`}>{f.severity}</span>
-                        </td>
-                        <td className="mono small">{f.filePath ?? f.label}</td>
-                      </tr>
-                    ))}
+                    {modalFindings.map((f, i) => {
+                      const isExpanded = expandedFinding === i;
+                      return (
+                        <Fragment key={i}>
+                          <tr
+                            className={`row-in finding-row ${isExpanded ? 'finding-row-open' : ''}`}
+                            style={{ animationDelay: `${150 + Math.min(i, 20) * 35}ms` }}
+                            onClick={() => setExpandedFinding(isExpanded ? null : i)}
+                            title="Kattints a részletekért"
+                          >
+                            <td>
+                              <span className="type-pill">{MODAL_TYPE_LABELS[f.category] ?? f.category}</span>
+                            </td>
+                            <td>
+                              <span className={`severity-badge severity-${f.severity.toLowerCase()}`}>{f.severity}</span>
+                            </td>
+                            <td className="mono small">
+                              <span className="finding-row-text">{f.filePath ?? f.label}</span>
+                              <span className={`finding-row-chevron ${isExpanded ? 'finding-row-chevron-open' : ''}`}>
+                                <Icon name="arrow-right" size={12} />
+                              </span>
+                            </td>
+                          </tr>
+                          {isExpanded && (
+                            <tr className="finding-detail-row">
+                              <td colSpan={3}>
+                                <div className="finding-detail">
+                                  <p className="finding-detail-label">{f.label}</p>
+                                  <dl className="finding-detail-grid">
+                                    <dt>Forrás</dt>
+                                    <dd>{f.source}</dd>
+                                    {f.foundAt && (
+                                      <>
+                                        <dt>Időpont</dt>
+                                        <dd>{new Date(f.foundAt).toLocaleString('hu-HU')}</dd>
+                                      </>
+                                    )}
+                                    {f.filePath && (
+                                      <>
+                                        <dt>Elérési út</dt>
+                                        <dd className="mono">{f.filePath}</dd>
+                                      </>
+                                    )}
+                                    {f.details &&
+                                      Object.entries(f.details).map(([key, value]) => (
+                                        <Fragment key={key}>
+                                          <dt>{key}</dt>
+                                          <dd>{value}</dd>
+                                        </Fragment>
+                                      ))}
+                                    {f.fileHashSha256 && (
+                                      <>
+                                        <dt>SHA-256</dt>
+                                        <dd className="mono finding-detail-hash">{f.fileHashSha256}</dd>
+                                      </>
+                                    )}
+                                  </dl>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </Fragment>
+                      );
+                    })}
                     {modalFindings.length === 0 && (
                       <tr>
                         <td colSpan={3} className="muted">Nincs további találat.</td>
