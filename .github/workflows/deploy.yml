@@ -32,7 +32,7 @@ jobs:
       # amit egyébként is látna bárki a böngésző hálózati fülén.
       - run: npm run build
         env:
-          VITE_API_BASE_URL: https://api.overclockgame.hu:8908/avenge
+          VITE_API_BASE_URL: https://api.avenge.hu:25573
 
       - uses: actions/upload-pages-artifact@v3
         with:

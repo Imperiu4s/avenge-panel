@@ -33,17 +33,12 @@ export function connectScanHub(): signalR.HubConnection {
       // Avenge.Api Program.cs OnMessageReceived) - így nincs szükség
       // AllowCredentials()-re a backend CORS policy-jében.
       withCredentials: false,
-      // A backend jelenleg egy kézzel írt Node.js proxy mögött fut (lásd
-      // server/PTERODACTYL_DEPLOY.md), ami NEM támogatja a WebSocket upgrade-et,
-      // a Server-Sent Events pedig a proxy előtt futó compression()
-      // middleware-rel ütközik (a tartós, streamelt választ tömöríteni
-      // próbálja, ami "Handshake was canceled" hibával megszakítja a
-      // kapcsolatot, majd egy végtelen újracsatlakozási hurkot indít el) - ez
-      // éles teszttel felfedezett, valódi hiba volt. Amíg ez nincs a proxy
-      // oldalán javítva, kényszerítve Long Pollingra állunk: ez ismételt,
-      // sima (nem streamelt) HTTP kérés-válasz párokból áll, amit a
-      // compression middleware nem tör el.
-      transport: signalR.HttpTransportType.LongPolling
+      // A dedikált szerver hostja (server/node-host) valódi WebSocketet
+      // továbbít, ezért elsődlegesen azt használjuk. Ha egy hálózat (pl. céges
+      // proxy) blokkolja a WebSocketet, Long Pollingra esik vissza. A
+      // Server-Sent Events szándékosan kimarad: a régi, megosztott szerveren
+      // egy tömörítő proxy "Handshake was canceled" hibával törte el.
+      transport: signalR.HttpTransportType.WebSockets | signalR.HttpTransportType.LongPolling
     })
     .withAutomaticReconnect()
     .build();

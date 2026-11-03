@@ -3,9 +3,8 @@ import react from '@vitejs/plugin-react'
 
 // A dev proxy azért kell, hogy a böngésző MINDIG same-origin (localhost:5173)
 // kérést lásson - így a helyi fejlesztés/tesztelés nem függ attól, hogy az
-// éles backend CORS listája tartalmazza-e a localhost origint (nem kell
-// emiatt a _.js-t módosítani/újraindítani a Pterodactyl szerveren minden
-// helyi teszthez - lásd server/PTERODACTYL_DEPLOY.md).
+// éles backend CORS listája tartalmazza-e a localhost origint. A szerver
+// hostja a régi "/avenge" előtagot is elfogadja (lásd server/node-host).
 export default defineConfig(() => ({
   plugins: [react()],
   // Az avenge.hu egyedi domain a GitHub Pages projekt-repót a domain
@@ -19,11 +18,9 @@ export default defineConfig(() => ({
   server: {
     proxy: {
       '/avenge': {
-        target: 'https://api.overclockgame.hu:8908',
+        target: 'https://api.avenge.hu:25573',
         changeOrigin: true,
         secure: true,
-        // A SignalR hub (/avenge/hub/scan) most Long Pollingot használ (lásd
-        // realtime/scanHub.ts megjegyzését), nem WebSocketet.
         ws: true
       }
     }
