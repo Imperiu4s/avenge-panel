@@ -8,11 +8,11 @@ import avengeLogo from '../assets/avenge-logo-crop.png';
 const SOURCES = [
   'Prefetch', 'BAM', 'UserAssist', 'MuiCache', 'PCA', 'AppSwitched', 'NTFS MFT', 'Lomtár',
   'Microsoft Defender', 'Authenticode', 'PE-elemzés', 'JAR-elemzés', 'AutoHotkey', 'Futó folyamatok',
-  'Minecraft mods', 'Registry', 'VPN / proxy', 'Virtuális gép'
+  'Minecraft mods', 'Egérprogramok', 'Makrók', 'Registry', 'VPN / proxy', 'Virtuális gép'
 ];
 
 const STATS: { value: number; label: string; note: string }[] = [
-  { value: 10, label: 'detektor', note: 'minden vizsgálatban lefut' },
+  { value: 11, label: 'detektor', note: 'minden vizsgálatban lefut' },
   { value: 7, label: 'futtatási nyomforrás', note: 'a törölt programok is látszanak' },
   { value: 30, label: 'nap visszamenőleg', note: 'a futtatási előzményekben' },
   { value: 1, label: 'exe', note: 'nem kell telepíteni' }
@@ -71,6 +71,13 @@ const CAPABILITIES: { icon: IconName; title: string; text: string; size: 'wide' 
     fx: 'none'
   },
   {
+    icon: 'activity',
+    title: 'Egérprogramok és makrók',
+    text: 'Több mint 600 egérprogramot ismer fel. Megmutatja a profilokat és a makrókat, és azt is, mi változott bennük: melyik mentés mikor történt, mit töröltek, melyik profil lett aktív a vizsgálat előtt.',
+    size: 'wide',
+    fx: 'rows'
+  },
+  {
     icon: 'alert',
     title: 'Nyomeltüntetés',
     text: 'Naplótörlés, Prefetch-takarítás, frissen ürített lomtár: a takarítás maga is találat.',
@@ -88,7 +95,7 @@ const CAPABILITIES: { icon: IconName; title: string; text: string; size: 'wide' 
     icon: 'lock',
     title: 'Manipulálhatatlan eredmény',
     text: 'A kliens aláírja a beküldött eredményt és ellenőrzi a szerver tanúsítványát, így útközben nem lehet átírni. A frissítéseket is csak aláírva fogadja el.',
-    size: 'std',
+    size: 'wide',
     fx: 'none'
   }
 ];

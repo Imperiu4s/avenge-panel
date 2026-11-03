@@ -8,6 +8,17 @@ interface ChangelogEntry {
 
 const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '2.1.0',
+    date: '2026-11-04',
+    items: [
+      'Egérprogramok felismerése: több mint 600 gyártói program és makróeszköz, az ismeretleneket általános szabályok fogják meg.',
+      'Látszanak a profilok, az aktív profil és a makrók, a gyors kattintást és a visszarúgás-kompenzációt külön jelzi.',
+      'Idővonal arról, mi változott az egérprogramban: mentések, törölt makrók, profilváltások a program naplójából.',
+      'Összevetés ugyanennek a gépnek az előző vizsgálatával: mi tűnt el, és melyik profil lett aktív.',
+      'Látszik a csatlakoztatott egér valódi neve is.'
+    ]
+  },
+  {
     version: '2.0.0',
     date: '2026-11-03',
     items: [

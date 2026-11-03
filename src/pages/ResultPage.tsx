@@ -4,6 +4,7 @@ import { api, ApiError } from '../api/client';
 import type { FindingDto, ScanResultView } from '../api/types';
 import { Icon, type IconName } from '../components/Icon';
 import { CountUp, Skeleton } from '../components/motion';
+import { MouseSoftwareSection } from '../components/MouseSoftwareSection';
 
 const VERDICT_LABELS: Record<string, string> = {
   Legit: 'LEGIT',
@@ -121,8 +122,11 @@ export function ResultPage() {
   }
 
   const grouped = groupByCategory(result.findings);
+  const mouseFindings = grouped.MouseSoftware ?? [];
+  const mouseProductCount = mouseFindings.filter((f) => f.details?.['Gyártó']).length;
+  const mouseMacroCount = mouseFindings.filter((f) => f.details?.['Makró típusa']).length;
   const mainFindings = result.findings
-    .filter((f) => !ACCORDION_CATEGORIES.some((a) => a.category === f.category))
+    .filter((f) => f.category !== 'MouseSoftware' && !ACCORDION_CATEGORIES.some((a) => a.category === f.category))
     .sort((a, b) => SEVERITY_ORDER.indexOf(a.severity) - SEVERITY_ORDER.indexOf(b.severity));
   const savedCount = (grouped.SuspiciousSavedFile ?? []).length;
   const deletedCount = (grouped.SuspiciousDeletedFile ?? []).length;
@@ -177,6 +181,11 @@ export function ResultPage() {
           <Icon name="trash" size={20} />
           <strong><CountUp value={deletedCount} duration={700} /></strong>
           <span>Törölt fájl nyoma</span>
+        </div>
+        <div className={`tally ${mouseMacroCount > 0 ? 'tally-hot' : ''}`}>
+          <Icon name="activity" size={20} />
+          <strong><CountUp value={mouseProductCount} duration={700} /></strong>
+          <span>Egérprogram{mouseMacroCount > 0 ? `, ${mouseMacroCount} gyanús makró` : ''}</span>
         </div>
       </div>
 
@@ -261,6 +270,8 @@ export function ResultPage() {
           </table>
         </div>
       </section>
+
+      <MouseSoftwareSection findings={mouseFindings} scanTime={result.createdAt} clientVersion={result.clientVersion} />
 
       <div className="accordion-grid">
         {ACCORDION_CATEGORIES.map(({ category, label, icon }, index) => {

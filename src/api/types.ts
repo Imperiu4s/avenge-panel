@@ -76,7 +76,8 @@ export type FindingCategory =
   | 'Injector'
   | 'VmSandbox'
   | 'TamperAttempt'
-  | 'VpnOrProxy';
+  | 'VpnOrProxy'
+  | 'MouseSoftware';
 
 export type FindingSeverity = 'Info' | 'Low' | 'Medium' | 'High' | 'Critical';
 
