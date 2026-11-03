@@ -26,6 +26,7 @@ const SOURCES: Omit<Blip, 'hitAt'>[] = [
 const TWO_PI = Math.PI * 2;
 const SWEEP_PERIOD_MS = 5200;
 const AFTERGLOW_MS = 2600;
+const MIN_DRAW_SIZE = 64;
 
 export function RadarScope({ className = '' }: { className?: string }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -43,6 +44,10 @@ export function RadarScope({ className = '' }: { className?: string }) {
 
     const render = (time: number) => {
       const size = canvas.clientWidth;
+      // Háttérben megnyitott lapon a méret eleinte 0 - ilyenkor a körök sugara negatív
+      // lenne, a kivétel pedig végleg megállítaná a rajzolási ciklust.
+      if (size < MIN_DRAW_SIZE) return;
+
       const ratio = Math.min(window.devicePixelRatio || 1, 2);
       if (canvas.width !== Math.round(size * ratio)) {
         canvas.width = Math.round(size * ratio);
