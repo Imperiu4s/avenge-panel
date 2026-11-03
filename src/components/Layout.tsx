@@ -1,52 +1,41 @@
-import { useEffect, useState, type ReactNode } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { useAuth } from '../auth/AuthContext';
+import { useEffect } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
+import { BladeNav } from './BladeNav';
+import { usePointerSpotlight } from './motion';
 
-export function Layout({ children, fullBleed = false }: { children: ReactNode; fullBleed?: boolean }) {
-  const { isAuthenticated, isAdmin, logout } = useAuth();
+/** A teljes oldal kerete - route-ok között NEM épül újra, így a navbar mozgása folytonos. */
+export function Layout() {
   const location = useLocation();
-  const [isScrolled, setIsScrolled] = useState(false);
-
-  const isActive = (path: string) => location.pathname.startsWith(path);
+  usePointerSpotlight();
 
   useEffect(() => {
-    const onScroll = () => setIsScrolled(window.scrollY > 8);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
-  const navLink = (to: string, label: string, active: boolean) => (
-    <Link to={to} className={`nav-link ${active ? 'nav-active' : ''}`}>{label}</Link>
-  );
+    if (!location.hash) window.scrollTo({ top: 0 });
+  }, [location.pathname, location.hash]);
 
   return (
     <div className="app-shell">
-      {/* Oldalváltáskor végigfutó piros csík - a key miatt minden
-          navigációnál újraindul az animációja. */}
-      <div className="route-progress" key={`progress-${location.pathname}`} aria-hidden="true" />
+      <div className="backdrop" aria-hidden="true">
+        <span className="backdrop-grid" />
+        <span className="backdrop-ember backdrop-ember-a" />
+        <span className="backdrop-ember backdrop-ember-b" />
+        <span className="backdrop-scan" />
+      </div>
 
-      <nav className={`top-nav ${isScrolled ? 'top-nav-scrolled' : ''}`}>
-        <div className="nav-links">
-          {navLink('/home', 'Home', isActive('/home'))}
-          {navLink('/account', 'Account', isActive('/account'))}
-          {navLink('/panel', 'Panel', isActive('/panel') || isActive('/results'))}
-          {isAdmin && navLink('/admin', 'Admin', isActive('/admin'))}
-          {navLink('/changelogs', 'Changelogs', isActive('/changelogs'))}
-          <a href="#" className="nav-link" onClick={(e) => e.preventDefault()}>Discord</a>
-          {isAuthenticated && <button className="link-button nav-link" onClick={logout}>Logout</button>}
-        </div>
-        <div className="nav-right">
-          {!isAuthenticated && (
-            <Link to="/login" className="btn-login">Login</Link>
-          )}
-          <a href="#" className="btn-support" onClick={(e) => e.preventDefault()}>Support</a>
-        </div>
-      </nav>
+      <BladeNav />
+
+      {/* Oldalváltáskor végigsöprő vörös vizsgálati csík - a key miatt minden
+          navigációnál újraindul. */}
+      <div className="route-sweep" key={`sweep-${location.pathname}`} aria-hidden="true" />
 
       <div className="page-transition" key={location.pathname}>
-        {fullBleed ? children : <main className="app-main">{children}</main>}
+        <Outlet />
       </div>
+
+      <footer className="site-footer">
+        <span>© {new Date().getFullYear()} Avenge</span>
+        <span className="site-footer-sep" aria-hidden="true" />
+        <span>Hozzáférés csak meghívással</span>
+      </footer>
     </div>
   );
 }

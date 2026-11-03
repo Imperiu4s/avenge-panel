@@ -6,6 +6,34 @@ export interface LoginResponse {
   expiresAt: string;
 }
 
+export interface CurrentUserView {
+  id: string;
+  email: string;
+  role: UserRole;
+  organizationName: string;
+  createdAt: string;
+  lastLoginAt: string | null;
+}
+
+export interface ClientReleaseView {
+  version: string;
+  sizeBytes: number;
+  publishedAt: string;
+  notes: string | null;
+}
+
+export interface DownloadTicketView {
+  ticket: string;
+  expiresAt: string;
+}
+
+export interface DownloadStatusView {
+  version: string;
+  sizeBytes: number;
+  publishedAt: string;
+  sessionExpiresAt: string;
+}
+
 export interface CreateSessionResponse {
   code: string;
   expiresAt: string;

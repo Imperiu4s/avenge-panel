@@ -98,14 +98,22 @@ export function CountUp({ value, suffix = '', duration = 1600 }: { value: number
   );
 }
 
-const SCRAMBLE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const SCRAMBLE_CHARS = '0123456789';
 
 /**
  * "Nyerőgép"-szerű betűpörgetés: amikor a szöveg megváltozik (pl. új session
  * kód generálásakor), a karakterek balról jobbra, egymás után állnak be a
  * végleges értékre.
  */
-export function ScrambleText({ text, className = '' }: { text: string; className?: string }) {
+export function ScrambleText({
+  text,
+  className = '',
+  renderChar
+}: {
+  text: string;
+  className?: string;
+  renderChar?: (char: string, index: number) => ReactNode;
+}) {
   const [display, setDisplay] = useState(text);
   const previous = useRef(text);
 
@@ -139,7 +147,61 @@ export function ScrambleText({ text, className = '' }: { text: string; className
     return () => cancelAnimationFrame(frame);
   }, [text]);
 
+  if (renderChar) {
+    return <>{display.split('').map(renderChar)}</>;
+  }
   return <span className={className}>{display}</span>;
+}
+
+/**
+ * A ".spot" osztályú elemeken a kurzor alatt felizzik egy fényfolt (lásd
+ * index.css). Egyetlen, dokumentum-szintű figyelő - nem kártyánként külön.
+ */
+export function usePointerSpotlight() {
+  useEffect(() => {
+    if (prefersReducedMotion()) return;
+    const onMove = (event: PointerEvent) => {
+      const target = (event.target as Element | null)?.closest?.('.spot') as HTMLElement | null;
+      if (!target) return;
+      const rect = target.getBoundingClientRect();
+      target.style.setProperty('--spot-x', `${event.clientX - rect.left}px`);
+      target.style.setProperty('--spot-y', `${event.clientY - rect.top}px`);
+    };
+    document.addEventListener('pointermove', onMove, { passive: true });
+    return () => document.removeEventListener('pointermove', onMove);
+  }, []);
+}
+
+/** Vágólapra másolás rövid "Másolva" visszajelzéssel. */
+export function useCopyFeedback(resetMs = 1800) {
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const timer = useRef(0);
+
+  useEffect(() => () => window.clearTimeout(timer.current), []);
+
+  const copy = async (key: string, text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedKey(key);
+      window.clearTimeout(timer.current);
+      timer.current = window.setTimeout(() => setCopiedKey(null), resetMs);
+    } catch {
+      // A vágólap-hozzáférés böngésző-engedélytől függ - nem blokkoló hiba,
+      // a szöveg a képernyőn marad, kézzel is kimásolható.
+    }
+  };
+
+  return { copiedKey, copy };
+}
+
+/** Másodpercenként frissülő jelenlegi idő - visszaszámlálókhoz. */
+export function useNow(intervalMs = 1000): number {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now()), intervalMs);
+    return () => window.clearInterval(timer);
+  }, [intervalMs]);
+  return now;
 }
 
 /** Betöltés közbeni, csillogó helykitöltő blokk. */

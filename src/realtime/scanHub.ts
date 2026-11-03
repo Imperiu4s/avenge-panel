@@ -17,7 +17,28 @@ export interface ScanProgressEvent {
   statusText: string;
 }
 
+const MAX_RETRY_DELAY_MS = 60000;
+
 let connection: signalR.HubConnection | null = null;
+
+/// A withAutomaticReconnect csak egy már felépült kapcsolatot állít helyre, és
+/// néhány próba után feladja - enélkül egy induláskori hálózati hiba után az
+/// élő nézet az oldal újratöltéséig némán leállna.
+function startWithRetry(hub: signalR.HubConnection, attempt = 0) {
+  hub.start().catch((err) => {
+    console.error('[scanHub] Nem sikerült csatlakozni:', err);
+    scheduleRetry(hub, attempt + 1);
+  });
+}
+
+function scheduleRetry(hub: signalR.HubConnection, attempt: number) {
+  const delay = Math.min(MAX_RETRY_DELAY_MS, 2000 * 2 ** attempt);
+  window.setTimeout(() => {
+    if (connection === hub && hub.state === signalR.HubConnectionState.Disconnected && getStoredToken()) {
+      startWithRetry(hub, attempt);
+    }
+  }, delay);
+}
 
 /// Egyetlen, megosztott hub-kapcsolat az egész appban (nem oldalanként újat
 /// nyitunk) - a Panel és egy jövőbeli Dashboard is ugyanezt hívná.
@@ -26,7 +47,7 @@ export function connectScanHub(): signalR.HubConnection {
     return connection;
   }
 
-  connection = new signalR.HubConnectionBuilder()
+  const hub = new signalR.HubConnectionBuilder()
     .withUrl(`${API_BASE}/hub/scan`, {
       accessTokenFactory: () => getStoredToken() ?? '',
       // Nincs cookie-alapú hitelesítés - a JWT a query stringben megy (lásd
@@ -43,16 +64,22 @@ export function connectScanHub(): signalR.HubConnection {
     .withAutomaticReconnect()
     .build();
 
-  connection.start().catch((err) => {
-    console.error('[scanHub] Nem sikerült csatlakozni:', err);
+  hub.onclose(() => {
+    if (connection === hub) {
+      scheduleRetry(hub, 1);
+    }
   });
 
-  return connection;
+  connection = hub;
+  startWithRetry(hub);
+
+  return hub;
 }
 
 export function disconnectScanHub() {
-  connection?.stop();
+  const hub = connection;
   connection = null;
+  hub?.stop();
 }
 
 export function onSessionStatusChanged(handler: (event: SessionStatusChangedEvent) => void): () => void {

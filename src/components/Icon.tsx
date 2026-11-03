@@ -1,11 +1,9 @@
 import type { ReactElement } from 'react';
 
 export type IconName =
-  | 'rocket'
   | 'bolt'
   | 'layers'
   | 'shield'
-  | 'headset'
   | 'key'
   | 'fingerprint'
   | 'users'
@@ -16,21 +14,33 @@ export type IconName =
   | 'bug'
   | 'search'
   | 'info'
-  | 'cart'
   | 'globe'
   | 'server'
   | 'ban'
   | 'plus'
-  | 'arrow-right';
+  | 'arrow-right'
+  | 'home'
+  | 'radar'
+  | 'user'
+  | 'logout'
+  | 'copy'
+  | 'check'
+  | 'download'
+  | 'eye'
+  | 'eye-off'
+  | 'dice'
+  | 'lock'
+  | 'link'
+  | 'clock'
+  | 'cpu'
+  | 'file'
+  | 'drive'
+  | 'alert'
+  | 'x'
+  | 'history'
+  | 'activity';
 
 const PATHS: Record<IconName, ReactElement> = {
-  rocket: (
-    <>
-      <path d="M12 2.5c2.4 1.9 4 5.3 4 8.7 0 2-.5 4-1.6 5.9L12 20l-2.4-2.9C8.5 15.2 8 13.2 8 11.2c0-3.4 1.6-6.8 4-8.7Z" />
-      <circle cx="12" cy="10.5" r="1.6" />
-      <path d="M8.3 15.8 5.8 18v2.7l2.5-1 1.1-2.4M15.7 15.8l2.5 2.2v2.7l-2.5-1-1.1-2.4" />
-    </>
-  ),
   bolt: <path d="M13 2 4 14h6l-1 8 9-12h-6z" />,
   layers: (
     <>
@@ -43,14 +53,6 @@ const PATHS: Record<IconName, ReactElement> = {
     <>
       <path d="M12 3 4.5 5.5v5.4c0 5 3.2 8.4 7.5 10 4.3-1.6 7.5-5 7.5-10V5.5L12 3Z" />
       <path d="m9 12 2 2 4-4" />
-    </>
-  ),
-  headset: (
-    <>
-      <path d="M4 13.5v-2a8 8 0 0 1 16 0v2" />
-      <rect x="3" y="13" width="4" height="6" rx="1.5" />
-      <rect x="17" y="13" width="4" height="6" rx="1.5" />
-      <path d="M20 19.5a3.5 3.5 0 0 1-3.5 3.5H14" />
     </>
   ),
   key: (
@@ -125,13 +127,6 @@ const PATHS: Record<IconName, ReactElement> = {
       <path d="M12 11v5.5M12 8v.01" />
     </>
   ),
-  cart: (
-    <>
-      <path d="M3 4h2l2.4 11.5a2 2 0 0 0 2 1.6h7.2a2 2 0 0 0 2-1.6L20.5 8H6" />
-      <circle cx="9.5" cy="20" r="1.4" />
-      <circle cx="17" cy="20" r="1.4" />
-    </>
-  ),
   globe: (
     <>
       <circle cx="12" cy="12" r="9" />
@@ -152,7 +147,88 @@ const PATHS: Record<IconName, ReactElement> = {
     </>
   ),
   plus: <path d="M12 4.5v15M4.5 12h15" />,
-  'arrow-right': <path d="M4 12h16M14 6l6 6-6 6" />
+  'arrow-right': <path d="M4 12h16M14 6l6 6-6 6" />,
+  home: <path d="M4 11.5 12 4l8 7.5M6.5 9.5V20h11V9.5M10 20v-5.5h4V20" />,
+  radar: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <circle cx="12" cy="12" r="4.5" />
+      <path d="m12 12 6.4-6.4M12 3v2M21 12h-2M12 21v-2M3 12h2" />
+    </>
+  ),
+  user: (
+    <>
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4.5 20.5c1-4 4-6 7.5-6s6.5 2 7.5 6" />
+    </>
+  ),
+  logout: <path d="M14 4h5.5v16H14M10 8l-4.5 4L10 16M5.5 12H15" />,
+  copy: (
+    <>
+      <rect x="8.5" y="8.5" width="11.5" height="11.5" rx="1.5" />
+      <path d="M15.5 8.5V5.5A1.5 1.5 0 0 0 14 4H5.5A1.5 1.5 0 0 0 4 5.5V14a1.5 1.5 0 0 0 1.5 1.5h3" />
+    </>
+  ),
+  check: <path d="m4.5 12.5 5 5 10-11" />,
+  download: <path d="M12 3.5v12M6.5 10.5 12 16l5.5-5.5M4 20.5h16" />,
+  eye: (
+    <>
+      <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" />
+      <circle cx="12" cy="12" r="2.8" />
+    </>
+  ),
+  'eye-off': (
+    <>
+      <path d="M9.5 5.8A9 9 0 0 1 12 5.5c6 0 9.5 6.5 9.5 6.5a17 17 0 0 1-3 3.8M6.200 7.300A16 16 0 0 0 2.5 12s3.5 6.5 9.5 6.5a9.300 9.300 0 0 0 4.200-1" />
+      <path d="m3.5 3.5 17 17M10 10a2.8 2.8 0 0 0 4 4" />
+    </>
+  ),
+  dice: (
+    <>
+      <rect x="4" y="4" width="16" height="16" rx="2.5" />
+      <path d="M8.5 8.5h.01M15.5 8.5h.01M12 12h.01M8.5 15.5h.01M15.5 15.5h.01" strokeWidth={2.4} />
+    </>
+  ),
+  lock: (
+    <>
+      <rect x="5" y="10.5" width="14" height="10" rx="1.8" />
+      <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3M12 14.5v2" />
+    </>
+  ),
+  link: <path d="M10 14a4.5 4.5 0 0 0 6.4 0l2.8-2.8a4.5 4.5 0 0 0-6.4-6.4L11.5 6M14 10a4.5 4.5 0 0 0-6.4 0l-2.8 2.8a4.5 4.5 0 0 0 6.4 6.4l1.300-1.200" />,
+  clock: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 6.5V12l3.5 2" />
+    </>
+  ),
+  cpu: (
+    <>
+      <rect x="6.5" y="6.5" width="11" height="11" rx="1.5" />
+      <path d="M10 2.5v4M14 2.5v4M10 17.5v4M14 17.5v4M2.5 10h4M2.5 14h4M17.5 10h4M17.5 14h4" />
+    </>
+  ),
+  file: (
+    <>
+      <path d="M6 3h8.5L19 7.5V21H6Z" />
+      <path d="M14 3v5h5M9 13h6M9 16.5h6" />
+    </>
+  ),
+  drive: (
+    <>
+      <path d="M3.5 14 6.5 5h11l3 9v5.5h-17Z" />
+      <path d="M3.5 14h17M16.5 17h.01" />
+    </>
+  ),
+  alert: <path d="M12 3.5 2.5 20.5h19ZM12 10v4.5M12 17.5v.01" />,
+  x: <path d="m5.5 5.5 13 13M18.5 5.5l-13 13" />,
+  history: (
+    <>
+      <path d="M3.5 12a8.5 8.5 0 1 0 2.700-6.200L3.5 8.5" />
+      <path d="M3.5 4v4.5H8M12 7.5V12l3 2" />
+    </>
+  ),
+  activity: <path d="M2.5 12h4l3-8 5 16 3-8h4" />
 };
 
 export function Icon({ name, size = 22, className }: { name: IconName; size?: number; className?: string }) {

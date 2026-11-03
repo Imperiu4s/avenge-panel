@@ -1,14 +1,16 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
+import '@fontsource/chakra-petch/500.css'
+import '@fontsource/chakra-petch/600.css'
+import '@fontsource/chakra-petch/700.css'
+import '@fontsource-variable/manrope/index.css'
+import '@fontsource-variable/jetbrains-mono/index.css'
 import './index.css'
 import App from './App.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    {/* import.meta.env.BASE_URL a vite.config.ts "base" beállításából jön -
-        automatikusan "/avenge-panel/" éles buildben (GitHub Pages aloldal),
-        "/" helyi fejlesztésnél - lásd ott a részletes indoklást. */}
     <BrowserRouter basename={import.meta.env.BASE_URL}>
       <App />
     </BrowserRouter>

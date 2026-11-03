@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { api } from '../api/client';
+import { api, ApiError, clientDownloadUrl } from '../api/client';
 import type { CreateSessionResponse, SessionListItem } from '../api/types';
-import { Layout } from '../components/Layout';
-import { ScrambleText, Skeleton } from '../components/motion';
+import { Icon } from '../components/Icon';
+import { ScrambleText, Skeleton, useCopyFeedback, useNow } from '../components/motion';
 import { onScanProgress, onSessionStatusChanged, type ScanProgressEvent } from '../realtime/scanHub';
 
 const STATUS_LABELS: Record<string, string> = {
@@ -21,7 +21,14 @@ const VERDICT_LABELS: Record<string, string> = {
   Inconclusive: 'Nem egyértelmű'
 };
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 8;
+const CODE_PLACEHOLDER = '------';
+
+function formatCountdown(ms: number): string {
+  const totalSeconds = Math.max(0, Math.ceil(ms / 1000));
+  const minutes = Math.floor(totalSeconds / 60);
+  return `${minutes}:${String(totalSeconds % 60).padStart(2, '0')}`;
+}
 
 export function SessionsPage() {
   const [sessions, setSessions] = useState<SessionListItem[]>([]);
@@ -31,19 +38,24 @@ export function SessionsPage() {
   const [progressByCode, setProgressByCode] = useState<Record<string, ScanProgressEvent>>({});
 
   const [newSession, setNewSession] = useState<CreateSessionResponse | null>(null);
+  const [newSessionTotalMs, setNewSessionTotalMs] = useState(1);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generateError, setGenerateError] = useState<string | null>(null);
-  const [codeCopied, setCodeCopied] = useState(false);
-  const [linkCopied, setLinkCopied] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
+
+  const { copiedKey, copy } = useCopyFeedback();
+  const now = useNow();
 
   const loadSessions = useCallback(async (targetPage: number) => {
     setIsLoadingList(true);
     setListError(null);
     try {
-      const result = await api.listSessions(targetPage, PAGE_SIZE);
-      setSessions(result);
-    } catch {
-      setListError('Nem sikerült betölteni a session-listát.');
+      setSessions(await api.listSessions(targetPage, PAGE_SIZE));
+    } catch (err) {
+      if (!(err instanceof ApiError && err.status === 401)) {
+        setListError('Nem sikerült betölteni a vizsgálatokat.');
+      }
     } finally {
       setIsLoadingList(false);
     }
@@ -112,163 +124,203 @@ export function SessionsPage() {
   async function handleGenerate() {
     setIsGenerating(true);
     setGenerateError(null);
-    setCodeCopied(false);
     try {
       const result = await api.createSession();
       setNewSession(result);
+      setNewSessionTotalMs(Math.max(1, new Date(result.expiresAt).getTime() - Date.now()));
       setPage(1);
       await loadSessions(1);
-
-      try {
-        await navigator.clipboard.writeText(result.code);
-        setCodeCopied(true);
-      } catch {
-        // A vágólap-hozzáférés böngésző-beállítástól/engedélytől függ - ha
-        // nem sikerül, a kód akkor is megjelenik a képernyőn, csak kézzel
-        // kell kimásolni. Nem blokkoló hiba.
+      await copy('code', result.code);
+    } catch (err) {
+      if (!(err instanceof ApiError && err.status === 401)) {
+        setGenerateError('Nem sikerült kódot generálni.');
       }
-    } catch {
-      setGenerateError('Nem sikerült session kódot generálni.');
     } finally {
       setIsGenerating(false);
     }
   }
 
-  async function handleCopyLink() {
+  async function handleDownload() {
+    setIsDownloading(true);
+    setDownloadError(null);
     try {
-      await navigator.clipboard.writeText(
-        'https://github.com/Imperiu4s/avenge-client-releases/releases/download/client/Avenge.exe'
-      );
-      setLinkCopied(true);
-      window.setTimeout(() => setLinkCopied(false), 2000);
-    } catch {
-      // nem blokkoló, ha a vágólap nem elérhető
+      const { ticket } = await api.createDownloadTicket();
+      window.location.assign(clientDownloadUrl({ ticket }));
+    } catch (err) {
+      if (!(err instanceof ApiError && err.status === 401)) {
+        setDownloadError(err instanceof ApiError ? err.message : 'Nem sikerült elindítani a letöltést.');
+      }
+    } finally {
+      setIsDownloading(false);
     }
   }
 
   const hasNextPage = sessions.length === PAGE_SIZE;
+  const code = newSession?.code ?? CODE_PLACEHOLDER;
+  const playerLink = newSession ? `${window.location.origin}/d/${newSession.code}` : null;
+  const currentSession = sessions.find((s) => s.code === newSession?.code);
+  const currentProgress = newSession ? progressByCode[newSession.code] : undefined;
+  const remainingMs = newSession ? new Date(newSession.expiresAt).getTime() - now : 0;
+  const isCodeUnused = !currentSession || currentSession.status === 'Pending';
+  const isCodeExpired = Boolean(newSession) && isCodeUnused && remainingMs <= 0;
 
   return (
-    <Layout fullBleed>
-      <div className="panel-hero">
+    <main className="page">
+      <header className="page-head stagger-in">
+        <span className="eyebrow">Vizsgálatok</span>
         <h1>Panel</h1>
-        <p className="subtitle">Session-kódok generálása és a korábbi vizsgálatok áttekintése</p>
-      </div>
+        <p className="muted">Generálj kódot a játékosnak, és kövesd élőben a vizsgálatot.</p>
+      </header>
 
-      <div className="panel-content">
-        <div className="panel-grid">
-          <div className="card">
-            <div className="table-scroll">
-              <table className="sessions-table simple-table">
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Time</th>
-                    <th>Result</th>
-                  </tr>
-                </thead>
-                <tbody key={`page-${page}`}>
-                  {isLoadingList && sessions.length === 0 &&
-                    Array.from({ length: 3 }, (_, i) => (
-                      <tr key={`skeleton-${i}`}>
-                        <td><Skeleton width={70} /></td>
-                        <td><Skeleton width={140} /></td>
-                        <td><Skeleton width={90} height={20} radius={999} style={{ marginLeft: 'auto' }} /></td>
-                      </tr>
-                    ))}
-                  {sessions.map((s, i) => {
-                    const progress = progressByCode[s.code];
-                    return (
-                      <tr
-                        key={s.code}
-                        className={`row-in ${s.code === newSession?.code ? 'row-new' : ''}`}
-                        style={{ animationDelay: `${i * 55}ms` }}
-                      >
-                        <td className="mono">
-                          {s.resultIdHash ? (
-                            <Link to={`/results/${s.resultIdHash}`}>#{s.code}</Link>
-                          ) : (
-                            <>#{s.code}</>
-                          )}
-                        </td>
-                        <td>{new Date(s.createdAt).toLocaleString('hu-HU')}</td>
-                        <td>
-                          {s.verdict ? (
-                            <span className={`verdict-badge verdict-pop verdict-${s.verdict.toLowerCase()}`} key={s.verdict}>
-                              {VERDICT_LABELS[s.verdict] ?? s.verdict}
-                            </span>
-                          ) : (
-                            <span className={`status-badge status-${s.status.toLowerCase()}`} key={s.status}>
-                              {STATUS_LABELS[s.status] ?? s.status}
-                            </span>
-                          )}
-                          {progress && s.status === 'Scanning' && (
-                            <span className="live-progress" title={progress.statusText}>
-                              <span className="live-dot" />
-                              <span className="live-bar">
-                                <span className="live-bar-fill" style={{ transform: `scaleX(${progress.percent / 100})` }} />
-                              </span>
-                              <span className="live-percent">{progress.percent}%</span>
-                            </span>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                  {!isLoadingList && sessions.length === 0 && (
-                    <tr>
-                      <td colSpan={3} className="muted">No data available in table</td>
-                    </tr>
+      <div className="console-grid">
+        <section className="card console-card stagger-in" style={{ animationDelay: '80ms' }}>
+          <h2 className="card-title"><Icon name="key" size={18} /> Session kód</h2>
+
+          <div className={`code-cells ${newSession ? 'code-cells-live' : ''}`} aria-label={newSession ? `Kód: ${newSession.code}` : 'Még nincs kód'}>
+            <ScrambleText text={code} renderChar={(char, i) => <span className="code-cell" key={i}>{char}</span>} />
+          </div>
+
+          {newSession && isCodeUnused && !isCodeExpired && (
+            <div className="code-timer" title="Eddig használható fel a kód">
+              <span className="code-timer-bar">
+                <span style={{ transform: `scaleX(${Math.max(0, remainingMs / newSessionTotalMs)})` }} />
+              </span>
+              <span className="mono small">{formatCountdown(remainingMs)}</span>
+            </div>
+          )}
+          {isCodeExpired && <p className="notice-text"><Icon name="clock" size={16} /> Ez a kód lejárt, generálj újat.</p>}
+
+          {newSession && currentSession && !isCodeUnused && (
+            <div className="code-live">
+              {currentSession.verdict && currentSession.resultIdHash ? (
+                <Link to={`/results/${currentSession.resultIdHash}`} className={`verdict-badge verdict-pop verdict-${currentSession.verdict.toLowerCase()}`}>
+                  {VERDICT_LABELS[currentSession.verdict] ?? currentSession.verdict} <Icon name="arrow-right" size={14} />
+                </Link>
+              ) : (
+                <>
+                  <span className={`status-badge status-${currentSession.status.toLowerCase()}`}>
+                    {STATUS_LABELS[currentSession.status] ?? currentSession.status}
+                  </span>
+                  {currentProgress && (
+                    <div className="scan-meter">
+                      <span className="scan-meter-bar">
+                        <span style={{ transform: `scaleX(${currentProgress.percent / 100})` }} />
+                      </span>
+                      <span className="mono small">{currentProgress.percent}%</span>
+                      <p className="muted small scan-meter-text">{currentProgress.statusText}</p>
+                    </div>
                   )}
-                </tbody>
-              </table>
+                </>
+              )}
             </div>
-            {listError && <p className="error-text">{listError}</p>}
+          )}
 
-            <div className="pagination">
-              <button
-                className="page-pill"
-                disabled={page <= 1}
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-              >
-                Previous
-              </button>
-              <span className="page-pill active">{page}</span>
-              <button className="page-pill" disabled={!hasNextPage} onClick={() => setPage((p) => p + 1)}>
-                Next
-              </button>
-            </div>
-          </div>
+          <button className={`btn-primary btn-block btn-large ${isGenerating ? 'is-loading' : ''}`} onClick={handleGenerate} disabled={isGenerating}>
+            {isGenerating && <span className="btn-spinner" aria-hidden="true" />}
+            {isGenerating ? 'Generálás...' : newSession ? 'Új kód generálása' : 'Kód generálása'}
+          </button>
+          {generateError && <p className="error-text">{generateError}</p>}
 
-          <div className="card generate-card" style={{ animationDelay: '90ms' }}>
-            <div className={`generated-code-display ${newSession ? 'has-code' : ''}`}>
-              <ScrambleText text={newSession?.code ?? 'XXXXXX'} />
-            </div>
-            <button className={`btn-primary ${isGenerating ? 'is-loading' : ''}`} onClick={handleGenerate} disabled={isGenerating}>
-              {isGenerating && <span className="btn-spinner" aria-hidden="true" />}
-              {isGenerating ? 'Generálás...' : 'Generate'}
-            </button>
-            {generateError && <p className="error-text">{generateError}</p>}
-            {newSession && (
-              <p className="muted small" style={{ textAlign: 'center', margin: '8px 0 0 0' }}>
-                Érvényes eddig: {new Date(newSession.expiresAt).toLocaleTimeString('hu-HU')}
-                {codeCopied && ' · vágólapra másolva'}
-              </p>
-            )}
-            <div className="generate-pill-row">
-              <a
-                className="btn-secondary"
-                href="https://github.com/Imperiu4s/avenge-client-releases/releases/download/client/Avenge.exe"
-              >
-                Avenge
-              </a>
-              <button className="btn-secondary" onClick={handleCopyLink}>
-                {linkCopied ? 'Másolva!' : 'dl.avenge.ac'}
+          {newSession && (
+            <div className="console-actions">
+              <button className="btn-secondary" onClick={() => copy('code', newSession.code)}>
+                <Icon name={copiedKey === 'code' ? 'check' : 'copy'} size={16} />
+                {copiedKey === 'code' ? 'Kód másolva' : 'Kód másolása'}
               </button>
+              {playerLink && (
+                <button className="btn-secondary" onClick={() => copy('link', playerLink)}>
+                  <Icon name={copiedKey === 'link' ? 'check' : 'link'} size={16} />
+                  {copiedKey === 'link' ? 'Link másolva' : 'Link a játékosnak'}
+                </button>
+              )}
             </div>
+          )}
+          {newSession && (
+            <p className="muted small console-hint">
+              A linken a játékos a kód érvényessége alatt töltheti le az Avenge-et. Fiók nem kell hozzá.
+            </p>
+          )}
+
+          <div className="console-divider" />
+
+          <button className="btn-ghost btn-block" onClick={handleDownload} disabled={isDownloading}>
+            <Icon name="download" size={17} />
+            {isDownloading ? 'Letöltés indítása...' : 'Avenge letöltése magamnak'}
+          </button>
+          {downloadError && <p className="error-text">{downloadError}</p>}
+        </section>
+
+        <section className="card stagger-in" style={{ animationDelay: '150ms' }}>
+          <h2 className="card-title"><Icon name="activity" size={18} /> Korábbi vizsgálatok</h2>
+          <div className="table-scroll">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Kód</th>
+                  <th>Időpont</th>
+                  <th className="align-right">Eredmény</th>
+                </tr>
+              </thead>
+              <tbody key={`page-${page}`}>
+                {isLoadingList && sessions.length === 0 &&
+                  Array.from({ length: 4 }, (_, i) => (
+                    <tr key={`skeleton-${i}`}>
+                      <td><Skeleton width={70} /></td>
+                      <td><Skeleton width={140} /></td>
+                      <td><Skeleton width={90} height={20} style={{ marginLeft: 'auto' }} /></td>
+                    </tr>
+                  ))}
+                {sessions.map((s, i) => {
+                  const progress = progressByCode[s.code];
+                  return (
+                    <tr
+                      key={s.code}
+                      className={`row-in ${s.code === newSession?.code ? 'row-new' : ''}`}
+                      style={{ animationDelay: `${i * 45}ms` }}
+                    >
+                      <td className="mono">
+                        {s.resultIdHash ? <Link to={`/results/${s.resultIdHash}`}>#{s.code}</Link> : <>#{s.code}</>}
+                      </td>
+                      <td className="muted">{new Date(s.createdAt).toLocaleString('hu-HU')}</td>
+                      <td className="align-right">
+                        {s.verdict ? (
+                          <span className={`verdict-badge verdict-pop verdict-${s.verdict.toLowerCase()}`} key={s.verdict}>
+                            {VERDICT_LABELS[s.verdict] ?? s.verdict}
+                          </span>
+                        ) : (
+                          <span className={`status-badge status-${s.status.toLowerCase()}`} key={s.status}>
+                            {STATUS_LABELS[s.status] ?? s.status}
+                          </span>
+                        )}
+                        {progress && s.status === 'Scanning' && (
+                          <span className="live-progress" title={progress.statusText}>
+                            <span className="live-bar">
+                              <span style={{ transform: `scaleX(${progress.percent / 100})` }} />
+                            </span>
+                            <span className="mono small">{progress.percent}%</span>
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+                {!isLoadingList && sessions.length === 0 && (
+                  <tr>
+                    <td colSpan={3} className="muted empty-row">Még nincs vizsgálat. Generálj egy kódot a kezdéshez.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
-        </div>
+          {listError && <p className="error-text">{listError}</p>}
+
+          <div className="pager">
+            <button className="btn-ghost btn-tiny" disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>Előző</button>
+            <span className="mono small pager-page">{page}</span>
+            <button className="btn-ghost btn-tiny" disabled={!hasNextPage} onClick={() => setPage((p) => p + 1)}>Következő</button>
+          </div>
+        </section>
       </div>
-    </Layout>
+    </main>
   );
 }

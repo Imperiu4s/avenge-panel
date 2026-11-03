@@ -1,4 +1,4 @@
-import { Layout } from '../components/Layout';
+import { Reveal } from '../components/motion';
 
 interface ChangelogEntry {
   version: string;
@@ -8,12 +8,25 @@ interface ChangelogEntry {
 
 const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '2.0.0',
+    date: '2026-11-03',
+    items: [
+      'Teljes gép vizsgálata: az NTFS fájltáblából minden meghajtó minden fájlja látszik, a gyanús fájlok tartalmát is ellenőrzi.',
+      'Új futtatási előzmények: Prefetch, BAM, UserAssist, MuiCache és PCA. A már törölt programok is lebuknak.',
+      'Új Defender-vizsgálat: korábbi észlelések és gyanús kivételek.',
+      'Az exe a saját szerverünkről frissül, és csak aláírt frissítést fogad el.',
+      'Letölteni csak regisztrált fiókkal vagy érvényes session kóddal lehet.',
+      'Jelszó módosítása a Fiók oldalon, véletlen jelszó generálása fiók létrehozásakor.',
+      'Teljesen új megjelenés a weboldalon és az exében.'
+    ]
+  },
+  {
     version: '1.3.0',
     date: '2026-09-02',
     items: [
       'Rendszerszintű vizsgálat: Prefetch, Temp mappák és Legutóbbi elemek is a scan részévé váltak.',
       'A kliens alapértelmezetten rendszergazdai jogosultsággal indul, hogy a fenti helyekhez is hozzáférjen.',
-      'Elkészült a Home, Account és Changelogs oldal a Panelen.'
+      'Elkészült a Főoldal, a Fiók és az Újdonságok oldal a Panelen.'
     ]
   },
   {
@@ -30,7 +43,7 @@ const CHANGELOG: ChangelogEntry[] = [
     date: '2026-08-20',
     items: [
       'Élő állapotfrissítések a Panelen (SignalR) - a kódgenerálástól az eredményig nincs szükség oldalfrissítésre.',
-      'A Scan Result oldalon megjelenik a LEGIT/UNLEGIT verdikt és a vissza-navigáció a Panelre.',
+      'Az eredményoldalon megjelenik a LEGIT/UNLEGIT verdikt és a vissza-navigáció a Panelre.',
       'A generált kód automatikusan vágólapra kerül.'
     ]
   },
@@ -45,25 +58,32 @@ const CHANGELOG: ChangelogEntry[] = [
 
 export function ChangelogsPage() {
   return (
-    <Layout>
-      <h1 className="page-title">Changelogs</h1>
-      <p className="page-subtitle">Amin dolgoztunk, verziónként.</p>
+    <main className="page page-narrow">
+      <header className="page-head stagger-in">
+        <span className="eyebrow">Verziók</span>
+        <h1>Újdonságok</h1>
+        <p className="muted">Amin dolgoztunk, verziónként.</p>
+      </header>
 
-      <div className="changelog-list">
-        {CHANGELOG.map((entry) => (
-          <div className="card changelog-entry" key={entry.version}>
-            <div className="changelog-entry-header">
-              <span className="changelog-version">v{entry.version}</span>
-              <span className="muted small">{entry.date}</span>
+      <div className="timeline">
+        <span className="timeline-beam" aria-hidden="true" />
+        {CHANGELOG.map((entry, index) => (
+          <Reveal className={`timeline-entry ${index === 0 ? 'timeline-entry-latest' : ''}`} key={entry.version} delay={index * 60}>
+            <span className="timeline-node" aria-hidden="true" />
+            <div className="card timeline-card spot">
+              <div className="timeline-head">
+                <span className="timeline-version">v{entry.version}</span>
+                <span className="muted small">{entry.date}</span>
+              </div>
+              <ul>
+                {entry.items.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
             </div>
-            <ul>
-              {entry.items.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </div>
+          </Reveal>
         ))}
       </div>
-    </Layout>
+    </main>
   );
 }

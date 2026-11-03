@@ -1,1688 +1,1756 @@
-:root {
-  --avenge-red: #e14b4b;
-  --avenge-red-dark: #c53a3a;
-  --bg: #f2f2f2;
-  --card-bg: #ffffff;
-  --text: #222222;
-  --muted: #6b7280;
-  --border: #e5e5e5;
-  color-scheme: light;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  font-family: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-}
-
-a {
-  color: var(--avenge-red);
-  text-decoration: none;
-}
-a:hover {
-  text-decoration: underline;
-}
-
-.muted { color: var(--muted); }
-.mono { font-family: 'Cascadia Code', Consolas, monospace; overflow-wrap: anywhere; }
-.small { font-size: 0.85em; }
-
-/* ── layout ── */
-.centered-page {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-}
-
-.app-shell {
-  min-height: 100vh;
-}
-
-.top-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 32px;
-  background: #fff;
-  border-bottom: 1px solid var(--border);
-}
-.nav-brand {
-  font-size: 1.4rem;
-  font-weight: 800;
-  color: var(--avenge-red);
-  letter-spacing: 0.05em;
-}
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-}
-.link-button {
-  background: none;
-  border: none;
-  color: var(--muted);
-  cursor: pointer;
-  font-size: 0.95rem;
-}
-.link-button:hover { color: var(--avenge-red); }
-.nav-links a { color: var(--muted); font-weight: 500; }
-.nav-links a:hover { color: var(--avenge-red); text-decoration: none; }
-.nav-links a.nav-active { color: var(--avenge-red); font-weight: 700; }
-.btn-support {
-  background: #fdeceb;
-  color: var(--avenge-red);
-  padding: 8px 18px;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-.btn-support:hover { background: #fbdada; text-decoration: none; }
-
-.nav-right { display: flex; align-items: center; gap: 12px; }
-.btn-login {
-  color: var(--avenge-red);
-  font-weight: 700;
-  font-size: 0.9rem;
-  padding: 8px 4px;
-}
-.btn-login:hover { text-decoration: none; opacity: 0.8; }
-
-.app-main {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 32px 24px;
-}
-
-.back-link {
-  display: inline-block;
-  margin-bottom: 16px;
-  color: var(--muted);
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-.back-link:hover { color: var(--avenge-red); text-decoration: none; }
-
-.panel-header {
-  background: var(--avenge-red);
-  color: white;
-  padding: 32px;
-  border-radius: 12px;
-  margin-bottom: 24px;
-}
-.panel-header h1 {
-  margin: 0 0 4px 0;
-  font-size: 1.8rem;
-}
-.panel-header .subtitle {
-  margin: 0;
-  opacity: 0.85;
-  color: white;
-}
-
-.panel-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-  gap: 24px;
-  align-items: start;
-}
-/* A Scan Result oldalon a jobb oldali találat-tábla igényli a szélesebb
-   sávot (több oszlop: súlyosság/címke/forrás/útvonal), a bal oldali
-   verdikt/rendszerinfó kártya viszont kompakt - fordított arány, mint a
-   Panel oldal session-táblájánál. A minmax(0, ...) SZÁNDÉKOS: enélkül egy
-   hosszú, nem törő szöveg (pl. fájl elérési út) a "grid blowout" jelenség
-   miatt szélesebbre tudja nyomni a saját oszlopát, mint amennyi fr-arány
-   alapján járna neki - ez zsugorította össze korábban a bal oldali
-   verdikt-kártyát, amikor az XRay Texture Packs szekció hosszú fájlnevekkel
-   nyílt le (éles teszttel felfedezett hiba). */
-.panel-grid.result-grid {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
-}
-@media (max-width: 800px) {
-  .panel-grid, .panel-grid.result-grid { grid-template-columns: 1fr; }
-}
-
-/* ── cards / forms ── */
-.card {
-  background: var(--card-bg);
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-  animation: card-fade-up 0.35s ease both;
-}
-@keyframes card-fade-up {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: none; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .card { animation: none; }
-}
-
-.login-card {
-  width: 360px;
-}
-.brand-title {
-  color: var(--avenge-red);
-  font-size: 2rem;
-  font-weight: 800;
-  margin: 0 0 4px 0;
-  text-align: center;
-}
-.subtitle {
-  color: var(--muted);
-  text-align: center;
-  margin: 0 0 24px 0;
-}
-
-.field-label {
-  display: block;
-  font-size: 0.85rem;
-  color: var(--muted);
-  margin: 12px 0 4px 0;
-}
-input[type="email"], input[type="password"], input[type="text"] {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-size: 1rem;
-}
-input:focus {
-  outline: 2px solid var(--avenge-red);
-  outline-offset: -1px;
-}
-
-.btn-primary {
-  margin-top: 20px;
-  width: 100%;
-  padding: 12px;
-  background: var(--avenge-red);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-.btn-primary:hover { background: var(--avenge-red-dark); }
-.btn-primary:disabled { opacity: 0.6; cursor: default; }
-
-.error-text {
-  color: var(--avenge-red-dark);
-  font-size: 0.9rem;
-  margin-top: 8px;
-}
-
-/* ── sessions table ── */
-.table-scroll {
-  overflow-x: auto;
-}
-
-.sessions-table, .findings-table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-}
-.findings-table td.mono {
-  overflow-wrap: break-word;
-}
-/* Az "Elérési út" oszlop kapja a legtöbb helyet (hosszú fájlútvonalak),
-   a többi oszlop (Súlyosság/Címke/Forrás) kompakt marad. */
-.findings-table th:nth-child(1), .findings-table td:nth-child(1) { width: 12%; }
-.findings-table th:nth-child(2), .findings-table td:nth-child(2) { width: 22%; }
-.findings-table th:nth-child(3), .findings-table td:nth-child(3) { width: 16%; }
-.findings-table th:nth-child(4), .findings-table td:nth-child(4) { width: 50%; }
-.sessions-table th, .sessions-table td,
-.findings-table th, .findings-table td {
-  text-align: left;
-  padding: 10px 8px;
-  border-bottom: 1px solid var(--border);
-  font-size: 0.92rem;
-}
-.sessions-table th, .findings-table th {
-  color: var(--muted);
-  font-weight: 600;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-}
-
-.generate-card h2 { margin-top: 0; }
-
-.generate-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-  flex-wrap: wrap;
-}
-.generate-actions .btn-primary { margin-top: 0; flex: 1; }
-
-.btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-  padding: 12px;
-  background: transparent;
-  color: var(--avenge-red);
-  border: 1px solid var(--avenge-red);
-  border-radius: 8px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  text-decoration: none;
-  cursor: pointer;
-  white-space: nowrap;
-}
-.btn-secondary:hover { background: #fdeceb; text-decoration: none; }
-
-.generated-code-box {
-  margin-top: 16px;
-  text-align: center;
-  padding: 16px;
-  background: var(--bg);
-  border-radius: 8px;
-}
-.generated-code {
-  font-family: 'Cascadia Code', Consolas, monospace;
-  font-size: 1.8rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: var(--avenge-red);
-}
-.copied-text {
-  margin: 8px 0 0 0;
-  color: #1e7d34;
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-.verdict-badge {
-  display: inline-block;
-  padding: 3px 12px;
-  border-radius: 999px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  color: white;
-}
-/* FONTOS: a szelektor mindkét osztályt megköveteli (".verdict-badge.verdict-legit"),
-   nem csak a bare ".verdict-legit"-et - a Scan Result oldal kártyájának ÖNMAGÁNAK
-   is van "verdict-legit/unlegit/inconclusive" osztálya (lásd lejjebb
-   ".verdict-legit .verdict-label" szabály), egy bare szelektor véletlenül arra a
-   kártyára is ráragadt volna, pirosra festve az egész hátterét a badge-szín miatt. */
-.verdict-badge.verdict-legit { background: #1e7d34; }
-.verdict-badge.verdict-unlegit { background: var(--avenge-red-dark); }
-.verdict-badge.verdict-inconclusive { background: #a86400; }
-
-.status-badge {
-  display: inline-block;
-  padding: 2px 10px;
-  border-radius: 999px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  background: #eee;
-  color: #555;
-}
-.status-completed { background: #e6f4ea; color: #1e7d34; }
-.status-pending, .status-clientconnected, .status-scanning { background: #fff4e0; color: #a86400; }
-.status-interrupted, .status-expired { background: #fde8e8; color: #b42318; }
-
-.live-progress {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-left: 10px;
-  font-size: 0.8rem;
-  color: var(--muted);
-}
-.live-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--avenge-red);
-  animation: live-pulse 1.2s ease-in-out infinite;
-}
-@keyframes live-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
-}
-
-/* ── result page ── */
-.verdict-card {
-  text-align: center;
-}
-.verdict-label {
-  font-size: 1.6rem;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 16px;
-  color: white;
-}
-.verdict-legit .verdict-label { background: #1e7d34; }
-.verdict-unlegit .verdict-label { background: var(--avenge-red-dark); }
-.verdict-inconclusive .verdict-label { background: #a86400; }
-
-.info-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  text-align: left;
-}
-.info-list li {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 0.9rem;
-}
-.info-list li span:first-child {
-  color: var(--muted);
-  flex-shrink: 0;
-}
-.info-list li span:last-child {
-  /* flex gyerekek alapból nem zsugorodnának a tartalom szélessége alá (min-width:
-     auto), ami vízszintes túlcsordulást okozott hosszú HWID/elérési út értékeknél -
-     ez kényszeríti ki a tördelést a kártya szélességén belül. */
-  min-width: 0;
-  overflow-wrap: break-word;
-  text-align: right;
-}
-
-.finding-group { margin-top: 20px; }
-.finding-group h3 { margin-bottom: 8px; font-size: 1rem; }
-
-.severity-badge {
-  padding: 2px 8px;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: white;
-}
-.severity-info { background: #6b7280; }
-.severity-low { background: #4a90d9; }
-.severity-medium { background: #a86400; }
-.severity-high { background: #d9534f; }
-.severity-critical { background: #8b0000; }
-
-/* ── Account / Changelogs (egyszerű belső oldalak) ── */
-.page-title { margin: 0 0 4px 0; font-size: 1.8rem; }
-.page-subtitle { margin: 0 0 24px 0; color: var(--muted); }
-
-.account-card .info-list li span:first-child { flex-shrink: 0; }
-.field-disabled-group {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin: 12px 0 20px 0;
-}
-.field-disabled-group input:disabled { background: var(--bg); color: var(--muted); }
-@media (max-width: 600px) {
-  .field-disabled-group { grid-template-columns: 1fr; }
-}
-
-.changelog-list { display: flex; flex-direction: column; gap: 16px; }
-.changelog-entry-header {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  margin-bottom: 10px;
-}
-.changelog-version { color: var(--avenge-red); font-weight: 800; font-size: 1.1rem; }
-.changelog-entry ul { margin: 0; padding-left: 20px; }
-.changelog-entry li { margin-bottom: 6px; line-height: 1.4; }
-
-/* ── Home (marketing / előfizetés oldal) ── */
-.home-page { width: 100%; overflow-x: hidden; }
-
-.home-hero {
-  text-align: center;
-  padding: 80px 24px 40px 24px;
-  max-width: 1100px;
-  margin: 0 auto;
-}
-.hero-logo { width: 220px; height: auto; margin-bottom: 32px; }
-.hero-quote {
-  color: var(--muted);
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  font-size: 1.1rem;
-  margin: 0 0 24px 0;
-}
-.hero-actions { display: flex; justify-content: center; gap: 12px; }
-.hero-btn, .hero-btn-secondary {
-  width: auto;
-  margin-top: 0;
-  padding: 12px 24px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-width: 170px;
-  /* A .btn-secondary alap flex:1-et ad (hogy PL. a Panel generálás-gombjait
-     egyenlő szélesre nyújtsa) - itt viszont a hero két gombjának a SAJÁT
-     tartalma alapján, egyformán, DE NEM nyújtva kell méreteződnie, különben
-     a "Learn more" (rövidebb szöveg) szélesebbre nő a "Get started"-nél,
-     mert egyedül ő örökölte a nyújtást. */
-  flex: none;
-  box-sizing: border-box;
-}
-
-.admin-cta-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 18px;
-  padding: 8px 16px;
-  border-radius: 999px;
-  background: #fdeceb;
-  color: var(--avenge-red);
-  font-weight: 600;
-  font-size: 0.85rem;
-}
-.admin-cta-link:hover { background: #fbdada; text-decoration: none; }
-
-.mini-pricing-row {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(220px, 1fr));
-  gap: 20px;
-  margin-top: 72px;
-  text-align: left;
-}
-.mini-pricing-card {
-  position: relative;
-  background: var(--card-bg);
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-}
-.mini-pricing-card h3 { margin: 4px 0 10px 0; }
-.mini-pricing-badge {
-  position: absolute;
-  top: -14px;
-  right: 16px;
-  background: var(--avenge-red);
-  color: white;
-  font-size: 0.78rem;
-  font-weight: 700;
-  padding: 4px 10px;
-  border-radius: 999px;
-}
-.mini-pricing-link {
-  background: none;
-  border: none;
-  color: var(--avenge-red);
-  font-weight: 700;
-  padding: 0;
-  margin-top: 12px;
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-.mini-pricing-link:hover { text-decoration: underline; }
-@media (max-width: 800px) {
-  .mini-pricing-row { grid-template-columns: 1fr; }
-}
-
-.home-analytics {
-  max-width: 1100px;
-  margin: 60px auto;
-  padding: 0 24px;
-  text-align: center;
-}
-.home-analytics h2 { font-size: 2rem; margin-bottom: 6px; }
-
-.stats-strip {
-  margin-top: 40px;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  background: var(--card-bg);
-  border-top: 3px solid var(--avenge-red);
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-}
-.stat-cell {
-  padding: 28px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  border-right: 1px solid var(--border);
-}
-.stat-cell:last-child { border-right: none; }
-.stat-cell strong { font-size: 1.8rem; }
-.stat-cell span { color: var(--muted); font-size: 0.85rem; }
-@media (max-width: 700px) {
-  .stats-strip { grid-template-columns: repeat(2, 1fr); }
-  .stat-cell:nth-child(2) { border-right: none; }
-}
-
-.chart-wrap {
-  margin-top: 40px;
-  display: grid;
-  grid-template-columns: auto 1fr;
-  text-align: left;
-}
-.chart-y-labels {
-  grid-row: 1;
-  grid-column: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 0 10px 24px 0;
-  color: var(--muted);
-  font-size: 0.78rem;
-}
-.area-chart { grid-row: 1; grid-column: 2; width: 100%; height: 260px; display: block; }
-.chart-x-labels {
-  grid-row: 2;
-  grid-column: 2;
-  display: flex;
-  justify-content: space-between;
-  color: var(--muted);
-  font-size: 0.72rem;
-  margin-top: 6px;
-}
-
-.home-features {
-  max-width: 1100px;
-  margin: 60px auto;
-  padding: 0 24px;
-  text-align: center;
-}
-.eyebrow {
-  color: var(--muted);
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-}
-.features-grid {
-  margin-top: 24px;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 48px 40px;
-  text-align: center;
-}
-.feature-card { display: flex; flex-direction: column; align-items: center; }
-.feature-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: #fdeceb;
-  color: var(--avenge-red);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 14px;
-}
-.feature-card h3 { margin: 0 0 8px 0; }
-.feature-card p { margin: 0; line-height: 1.5; }
-@media (max-width: 800px) {
-  .features-grid { grid-template-columns: 1fr; }
-}
-
-.home-plans {
-  position: relative;
-  background: #212a45;
-  color: white;
-  padding: 90px 24px 100px 24px;
-  text-align: center;
-  margin-top: 40px;
-  overflow: hidden;
-}
-.plans-wave {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 60px;
-  display: block;
-}
-.plans-wave-path { fill: var(--bg); }
-.home-plans h2 { font-size: 2rem; margin-bottom: 6px; }
-.plans-subtitle { color: #a9b0c9; margin: 0 0 32px 0; }
-
-.billing-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  margin-bottom: 40px;
-  color: #a9b0c9;
-  font-weight: 600;
-}
-.billing-toggle .toggle-active { color: white; }
-.toggle-switch {
-  width: 40px;
-  height: 22px;
-  border-radius: 999px;
-  background: #3a4468;
-  border: none;
-  cursor: pointer;
-  position: relative;
-  padding: 0;
-}
-.toggle-switch-on { background: var(--avenge-red); }
-.toggle-knob {
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: white;
-  transition: left 0.15s ease;
-}
-.toggle-switch-on .toggle-knob { left: 21px; }
-
-.plans-grid {
-  max-width: 1100px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  align-items: start;
-}
-.plan-card {
-  background: var(--card-bg);
-  color: var(--text);
-  border-radius: 14px;
-  padding: 32px 28px;
-  text-align: left;
-}
-.plan-card-highlight { padding-top: 40px; padding-bottom: 40px; box-shadow: 0 12px 30px rgba(0,0,0,0.35); }
-.plan-badge {
-  display: inline-block;
-  background: #fdeceb;
-  color: var(--avenge-red);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  padding: 3px 10px;
-  border-radius: 999px;
-  margin-bottom: 14px;
-}
-.plan-price { font-size: 2.6rem; font-weight: 700; margin-bottom: 20px; }
-.plan-price-currency { font-size: 1.4rem; vertical-align: top; margin-right: 2px; }
-.plan-features { list-style: none; padding: 0; margin: 0 0 24px 0; }
-.plan-features li {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 6px 0;
-  font-size: 0.92rem;
-}
-.check-dot {
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  background: #d6f0dd;
-  color: #1e7d34;
-  font-size: 0.7rem;
-  font-weight: 900;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.plan-card button { width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; }
-@media (max-width: 800px) {
-  .plans-grid { grid-template-columns: 1fr; }
-}
-
-.home-footer-cta {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 60px 24px 40px 24px;
-}
-.footer-cta-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  flex-wrap: wrap;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 32px;
-}
-.footer-cta-row h3 { margin: 0 0 4px 0; }
-.footer-cta-actions { display: flex; gap: 12px; }
-.footer-cta-actions a { width: auto; padding: 12px 22px; }
-.footer-legal { text-align: center; margin-top: 24px; }
-
-/* ── Panel / Scan Result (a kepek/panel*.png alapjan, teljes szelesseguu hero) ── */
-.panel-hero {
-  background: var(--avenge-red);
-  color: white;
-  padding: 56px 24px;
-  text-align: left;
-}
-.panel-hero h1 { margin: 0 0 6px 0; font-size: 2.2rem; }
-.panel-hero .subtitle { margin: 0; opacity: 0.9; color: white; }
-
-.panel-content {
-  max-width: 1100px;
-  margin: -32px auto 0 auto;
-  padding: 0 24px 48px 24px;
-  position: relative;
-}
-/* A panel-content felső ~32px-e (a negatív margin miatt) még a piros hero
-   fölött jelenik meg - ha ide kerül tartalom (pl. a Scan Result "vissza"
-   linkje), az a sima .back-link szürke színével gyakorlatilag olvashatatlan
-   lenne piroson. Ez a variáns kifejezetten erre az esetre készült. */
-.back-link-hero {
-  color: rgba(255,255,255,0.9);
-  font-weight: 700;
-}
-.back-link-hero:hover { color: white; text-decoration: none; }
-
-.simple-table th:nth-child(3), .simple-table td:nth-child(3) { text-align: right; }
-.simple-table th:nth-child(3) { text-align: right; }
-
-.pagination {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 16px;
-}
-.page-pill {
-  padding: 8px 16px;
-  border-radius: 8px;
-  background: #fdeceb;
-  color: var(--avenge-red);
-  font-weight: 600;
-  font-size: 0.85rem;
-  border: none;
-  cursor: pointer;
-}
-.page-pill:hover:not(:disabled) { background: #fbdada; }
-.page-pill:disabled { opacity: 0.4; cursor: default; }
-.page-pill.active { background: var(--avenge-red); color: white; cursor: default; }
-
-.generated-code-display {
-  text-align: center;
-  padding: 12px;
-  margin-bottom: 12px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-family: 'Cascadia Code', Consolas, monospace;
-  font-size: 1.3rem;
-  letter-spacing: 0.15em;
-  color: var(--muted);
-}
-.generate-pill-row {
-  display: flex;
-  gap: 10px;
-  margin-top: 14px;
-}
-.generate-pill-row .btn-secondary { flex: 1; padding: 10px; font-size: 0.85rem; }
-
-/* Scan Result / Scan Info bal oldali toggle kartya - a szín a verdikttől
-   függ (lásd Finding.Verdict), NEM mindig piros: LEGIT zöld, UNLEGIT piros,
-   NEM EGYÉRTELMŰ borostyán - ugyanaz a szín-nyelv, mint a többi verdikt-
-   jelzésnél (.verdict-badge, .status-badge) az egész appban. */
-.scan-toggle-card {
-  background: var(--avenge-red);
-  color: white;
-  text-align: center;
-  padding: 28px 24px;
-  transition: background 0.2s ease;
-}
-.scan-toggle-card.verdict-legit { background: #1e8a3c; }
-.scan-toggle-card.verdict-unlegit { background: var(--avenge-red); }
-.scan-toggle-card.verdict-inconclusive { background: #b5750a; }
-
-.scan-toggle-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-weight: 700;
-  font-size: 1.05rem;
-  margin-bottom: 20px;
-}
-.toggle-arrow {
-  background: rgba(255,255,255,0.18);
-  border: none;
-  color: white;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.25s ease, background 0.15s ease;
-}
-.toggle-arrow:hover { background: rgba(255,255,255,0.3); }
-.toggle-arrow-flipped { transform: rotate(180deg); }
-
-.scan-toggle-body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-  animation: fade-slide-in 0.3s ease both;
-}
-.fingerprint-icon {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.16);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.verdict-label-plain { font-size: 1.4rem; font-weight: 800; letter-spacing: 0.06em; }
-.btn-outline-white {
-  background: rgba(255,255,255,0.08);
-  border: 1.5px solid rgba(255,255,255,0.75);
-  color: white;
-  padding: 10px 24px;
-  border-radius: 8px;
-  font-weight: 700;
-  cursor: pointer;
-}
-.btn-outline-white:hover { background: rgba(255,255,255,0.2); }
-
-/* Scan Info nézet - a felhasználó kifejezett kérésére sokkal olvashatóbbra
-   véve: nagyobb, félkövér címkék + fehér (nem áttetsző) háttéren piros
-   szöveg az értékeknél, ahelyett hogy fehér-a-fehéren-áttetszőn próbálna
-   olvasható lenni piros háttér fölött. */
-.info-list-white {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  text-align: left;
-  animation: fade-slide-in 0.3s ease both;
-}
-.info-list-white li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 0;
-  font-size: 0.98rem;
-  font-weight: 700;
-  color: white;
-}
-.pill-value {
-  background: white;
-  color: var(--avenge-red-dark);
-  padding: 4px 14px;
-  border-radius: 999px;
-  font-size: 0.85rem;
-  font-weight: 700;
-}
-@keyframes fade-slide-in {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: none; }
-}
-
-/* Jobb oldali accordion-ok (Alts / Recording Software / XRay Texture Packs) */
-.accordion-stack { display: flex; flex-direction: column; gap: 14px; }
-.accordion-item {
-  background: var(--card-bg);
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-  overflow: hidden;
-}
-.accordion-trigger {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 18px 20px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1rem;
-  text-align: left;
-}
-.accordion-icon { color: var(--avenge-red); display: flex; }
-.accordion-label { font-weight: 600; flex: 1; }
-.accordion-chevron { display: flex; color: var(--muted); }
-.accordion-chevron .chevron-svg { transition: transform 0.2s ease; transform: rotate(90deg); }
-.accordion-chevron-open .chevron-svg { transform: rotate(-90deg); }
-/* Tiszta CSS lenyíló animáció (nincs JS-animációs könyvtár): a wrapper
-   grid-template-rows-a 0fr-ról 1fr-re animál, a belső elem overflow:hidden-
-   je vágja a köztes állapotokat - a tartalom emiatt MINDIG a DOM-ban marad
-   (nem feltételes render), hogy legyen mit animálni mindkét irányban. */
-.accordion-panel-wrapper {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.25s ease;
-}
-.accordion-panel-wrapper-open { grid-template-rows: 1fr; }
-.accordion-panel-inner { overflow: hidden; min-height: 0; }
-.accordion-panel { padding: 4px 20px 18px 20px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-.accordion-finding { display: flex; align-items: center; gap: 10px; min-width: 0; }
-.accordion-finding .mono { flex: 1; min-width: 0; }
-.accordion-finding-thumb {
-  width: 32px;
-  height: 32px;
-  flex-shrink: 0;
-  border-radius: 6px;
-  background: var(--bg);
-  color: var(--avenge-red);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-@media (prefers-reduced-motion: reduce) {
-  .accordion-panel-wrapper, .toggle-arrow { transition: none; }
-}
-
-/* Details modal */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-  padding: 24px;
-  animation: overlay-fade-in 0.18s ease both;
-}
-.modal-card {
-  background: var(--card-bg);
-  border-radius: 14px;
-  max-width: 720px;
-  width: 100%;
-  max-height: 85vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.35);
-  animation: modal-pop-in 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-@keyframes overlay-fade-in { from { opacity: 0; } to { opacity: 1; } }
-@keyframes modal-pop-in {
-  from { opacity: 0; transform: scale(0.96) translateY(8px); }
-  to { opacity: 1; transform: none; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .modal-overlay, .modal-card { animation: none; }
-}
-.modal-header {
-  background: var(--avenge-red);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  border-radius: 14px 14px 0 0;
-}
-.modal-header-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: white;
-  color: var(--avenge-red);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.modal-body { padding: 24px; }
-.modal-stats-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-bottom: 24px;
-}
-.modal-stat {
-  background: var(--bg);
-  border-radius: 10px;
-  padding: 14px;
-}
-.modal-stat-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--muted);
-  font-size: 0.82rem;
-  margin-bottom: 8px;
-}
-.modal-stat-value { display: flex; align-items: center; gap: 6px; font-weight: 700; }
-.type-pill {
-  display: inline-block;
-  background: #fdeceb;
-  color: var(--avenge-red-dark);
-  padding: 3px 10px;
-  border-radius: 999px;
-  font-size: 0.78rem;
-  font-weight: 700;
-}
-.modal-findings-table th:nth-child(3), .modal-findings-table td:nth-child(3) { width: 55%; }
-@media (max-width: 700px) {
-  .modal-stats-row { grid-template-columns: 1fr; }
-}
-
-/* ── Admin (tulajdonos) panel ── */
-.admin-users-table th:last-child, .admin-users-table td:last-child { width: 1%; white-space: nowrap; }
-.row-selected { background: var(--bg); }
-.admin-actions { display: flex; gap: 6px; }
-.btn-tiny { padding: 6px 10px; font-size: 0.78rem; flex: none; }
-.btn-danger { background: var(--avenge-red-dark); color: white; border-color: var(--avenge-red-dark); }
-.btn-danger:hover { background: #a52d2d; }
-.role-select {
-  padding: 4px 8px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  font-size: 0.85rem;
-  background: white;
-}
-.role-select-full { width: 100%; margin: 0 0 4px 0; }
-.generate-card form { display: flex; flex-direction: column; }
-.generate-card form .btn-primary { margin-top: 20px; }
-
-.home-toast {
-  position: fixed;
-  left: 50%;
-  bottom: 28px;
-  transform: translateX(-50%);
-  background: #222;
-  color: white;
-  padding: 12px 20px;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-  z-index: 50;
-}
-
-/* ════════════════════════════════════════════════════════════════════════
-   Motion system
-   Minden animáció csak transform/opacity-t (ritkán box-shadow-t egy-egy kis
-   elemen) mozgat, hogy GPU-n komponálódjon és akadásmentes maradjon. A
-   belépő animációk "backwards" kitöltést használnak: lefutás után az elem
-   visszakapja a saját stílusait, így a hover-effektek nem ütköznek velük.
-   ════════════════════════════════════════════════════════════════════════ */
-:root {
-  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-html { scroll-behavior: smooth; }
-section[id] { scroll-margin-top: 72px; }
-
-@keyframes stagger-in { from { opacity: 0; transform: translateY(18px); } }
-@keyframes fade-in { to { opacity: 1; } }
-@keyframes spin { to { transform: rotate(360deg); } }
-@keyframes orb-drift {
-  0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(60px, -40px); }
-}
-@keyframes shimmer-sweep {
-  from { transform: translateX(-100%); }
-  to { transform: translateX(100%); }
-}
-
-.stagger-in { animation: stagger-in 0.8s var(--ease-out-expo) backwards; }
-
-/* ── oldalváltás ── */
-.route-progress {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  z-index: 200;
-  background: linear-gradient(90deg, var(--avenge-red), #ff8f8f);
-  box-shadow: 0 0 10px rgba(225, 75, 75, 0.6);
-  transform-origin: left;
-  transform: scaleX(0);
-  pointer-events: none;
-  animation:
-    route-progress 0.75s var(--ease-out-expo) forwards,
-    route-progress-fade 0.35s 0.75s ease forwards;
-}
-@keyframes route-progress { to { transform: scaleX(1); } }
-@keyframes route-progress-fade { to { opacity: 0; } }
-
-.page-transition { animation: page-enter 0.5s var(--ease-out-expo) backwards; }
-@keyframes page-enter { from { opacity: 0; transform: translateY(12px); } }
-
-/* ── navigáció ── */
-.top-nav {
-  position: sticky;
-  top: 0;
-  z-index: 90;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-}
-.top-nav-scrolled {
-  /* Elég átlátszatlan ahhoz, hogy a sötét "Plans" szekció fehér szövege ne
-     ütközzön át rajta - a blur így csak finom mélységet ad. */
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: saturate(180%) blur(14px);
-  -webkit-backdrop-filter: saturate(180%) blur(14px);
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.07);
-  border-bottom-color: transparent;
-}
-.nav-link {
-  position: relative;
-  padding: 4px 0;
-  transition: color 0.2s ease;
-}
-.nav-link::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -5px;
-  height: 2px;
-  border-radius: 2px;
-  background: var(--avenge-red);
-  transform: scaleX(0);
-  transition: transform 0.35s var(--ease-out-expo);
-}
-.nav-link:hover::after, .nav-link.nav-active::after { transform: scaleX(1); }
-.btn-support, .btn-login { transition: background-color 0.2s ease, transform 0.25s var(--ease-spring), opacity 0.2s ease; }
-.btn-support:hover { transform: translateY(-1px); }
-
-/* ── gombok ── */
-.btn-primary, .btn-secondary, .page-pill, .btn-outline-white, .mini-pricing-link {
-  position: relative;
-  overflow: hidden;
-  transition:
-    transform 0.25s var(--ease-out-expo),
-    box-shadow 0.3s ease,
-    background-color 0.2s ease,
-    color 0.2s ease,
-    opacity 0.2s ease;
-}
-.btn-primary:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 24px rgba(225, 75, 75, 0.35);
-}
-.btn-secondary:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 18px rgba(225, 75, 75, 0.14);
-}
-.btn-primary:active:not(:disabled), .btn-secondary:active:not(:disabled), .page-pill:active:not(:disabled) {
-  transform: translateY(0) scale(0.97);
-  box-shadow: none;
-  transition-duration: 0.08s;
-}
-/* fényes "végigsöprés" a fő gombokon hoverre */
-.btn-primary::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 55%;
-  height: 100%;
-  background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.35), transparent);
-  transform: translateX(-150%) skewX(-20deg);
-  pointer-events: none;
-}
-.btn-primary:hover:not(:disabled)::before { animation: btn-shine 0.8s ease; }
-@keyframes btn-shine { to { transform: translateX(260%) skewX(-20deg); } }
-
-.btn-arrow { display: inline-block; transition: transform 0.3s var(--ease-spring); }
-.hero-btn:hover .btn-arrow { transform: translateX(5px); }
-
-.btn-spinner {
-  width: 14px;
-  height: 14px;
-  margin-right: 8px;
-  display: inline-block;
-  vertical-align: -2px;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.4);
-  border-top-color: white;
-  animation: spin 0.7s linear infinite;
-}
-.page-pill:hover:not(:disabled):not(.active) { transform: translateY(-1px); }
-.mini-pricing-link:hover { transform: translateX(3px); }
-.toggle-knob { transition: left 0.35s var(--ease-spring); }
-.toggle-switch { transition: background-color 0.3s ease; }
-
-/* ── űrlapmezők ── */
-input[type="email"], input[type="password"], input[type="text"], .role-select {
-  transition: border-color 0.2s ease, box-shadow 0.25s ease;
-}
-input:focus, .role-select:focus {
-  outline: none;
-  border-color: var(--avenge-red);
-  box-shadow: 0 0 0 4px rgba(225, 75, 75, 0.14);
-}
-.error-in { animation: fade-slide-in 0.3s ease both; }
-
-/* ── kártyák ── */
-.card {
-  animation: card-fade-up 0.6s var(--ease-out-expo) backwards;
-  transition: box-shadow 0.3s ease;
-}
-.card:hover { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07); }
-@keyframes card-fade-up { from { opacity: 0; transform: translateY(14px); } }
-
-.hover-lift { transition: transform 0.4s var(--ease-out-expo), box-shadow 0.4s ease; }
-.hover-lift:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
-}
-
-/* ── görgetéses beúszás (lásd components/motion.tsx Reveal) ── */
-.reveal:not(.is-visible) { opacity: 0; }
-.reveal.is-visible { animation: reveal-up 0.85s var(--ease-out-expo) backwards; }
-.reveal-fade.is-visible { animation-name: reveal-fade; }
-.reveal-scale.is-visible { animation-name: reveal-scale; }
-.reveal-left.is-visible { animation-name: reveal-left; }
-.reveal-right.is-visible { animation-name: reveal-right; }
-@keyframes reveal-up { from { opacity: 0; transform: translateY(30px); } }
-@keyframes reveal-fade { from { opacity: 0; } }
-@keyframes reveal-scale { from { opacity: 0; transform: translateY(16px) scale(0.92); } }
-@keyframes reveal-left { from { opacity: 0; transform: translateX(-30px); } }
-@keyframes reveal-right { from { opacity: 0; transform: translateX(30px); } }
-
-.skeleton {
-  display: block;
-  background: linear-gradient(90deg, #ececec 25%, #f7f7f7 37%, #ececec 63%);
-  background-size: 400% 100%;
-  animation: skeleton-shimmer 1.4s ease infinite;
-}
-@keyframes skeleton-shimmer {
-  from { background-position: 100% 50%; }
-  to { background-position: 0 50%; }
-}
-
-/* ── Home hero ── */
-.home-hero { position: relative; }
-.home-hero > *:not(.hero-glow) { position: relative; z-index: 1; }
-.hero-glow {
-  position: absolute;
-  top: 10px;
-  left: 50%;
-  width: 560px;
-  height: 560px;
-  margin-left: -280px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(225, 75, 75, 0.2), transparent 65%);
-  pointer-events: none;
-  z-index: 0;
-  animation: glow-breathe 7s ease-in-out infinite;
-}
-@keyframes glow-breathe {
-  0%, 100% { opacity: 0.65; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.1); }
-}
-.hero-logo-wrap { display: inline-block; }
-.hero-logo {
-  animation: logo-float 6s ease-in-out infinite;
-  filter: drop-shadow(0 14px 26px rgba(225, 75, 75, 0.25));
-}
-@keyframes logo-float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-.admin-cta-link { transition: background-color 0.2s ease, transform 0.3s var(--ease-spring); }
-.admin-cta-link:hover { transform: translateY(-2px); }
-
-/* ── statisztika + grafikon ── */
-.stat-cell { transition: background-color 0.3s ease; }
-.stat-cell:hover { background: #fff6f6; }
-.count-up { font-variant-numeric: tabular-nums; }
-.chart-line { stroke-dasharray: 1; stroke-dashoffset: 1; }
-.chart-area { opacity: 0; }
-.chart-drawn .chart-line { animation: draw-line 2s var(--ease-out-expo) forwards; }
-.chart-drawn .chart-area { animation: fade-in 1.2s 0.6s ease forwards; }
-@keyframes draw-line { to { stroke-dashoffset: 0; } }
-
-/* ── funkciók ── */
-.feature-icon {
-  transition:
-    transform 0.5s var(--ease-spring),
-    background-color 0.3s ease,
-    color 0.3s ease,
-    box-shadow 0.3s ease;
-}
-.feature-card:hover .feature-icon {
-  transform: translateY(-4px) rotate(-8deg) scale(1.1);
-  background: var(--avenge-red);
-  color: white;
-  box-shadow: 0 10px 24px rgba(225, 75, 75, 0.35);
-}
-
-/* ── csomagok ── */
-.home-plans > *:not(.plans-orb):not(.plans-wave) { position: relative; z-index: 1; }
-.plans-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(70px);
-  opacity: 0.35;
-  pointer-events: none;
-  z-index: 0;
-}
-.plans-orb-a {
-  width: 380px;
-  height: 380px;
-  top: 12%;
-  left: -140px;
-  background: var(--avenge-red);
-  animation: orb-drift 14s ease-in-out infinite;
-}
-.plans-orb-b {
-  width: 320px;
-  height: 320px;
-  bottom: -90px;
-  right: -110px;
-  background: #4f63c9;
-  animation: orb-drift 18s ease-in-out infinite reverse;
-}
-
-@property --border-angle {
+/* ─────────────────────────────────────────────────────────────────────────
+   Avenge - vizuális rendszer
+   Az alapötlet a logó tőre: acél, éles sarkok, vörös jelzőszín. Minden keret
+   ferdén levágott sarkú ("--cut"), a kiemelt gombok szélén fénycsík fut körbe.
+   Mozgás: csak transform/opacity/egyedi szögtulajdonság, hogy akadásmentes legyen.
+   ───────────────────────────────────────────────────────────────────────── */
+
+@property --beam-angle {
   syntax: '<angle>';
   inherits: false;
   initial-value: 0deg;
 }
-.plan-card-highlight {
-  border: 2px solid transparent;
-  background:
-    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
-    conic-gradient(from var(--border-angle), var(--avenge-red), #ffb0a0, #f5c542, #ff7a7a, var(--avenge-red)) border-box;
-}
-.plan-card-highlight.is-visible {
-  animation:
-    reveal-up 0.85s var(--ease-out-expo) backwards,
-    border-spin 5s linear infinite;
-}
-@keyframes border-spin { to { --border-angle: 360deg; } }
 
-.plan-price-value { display: inline-block; animation: price-flip 0.55s var(--ease-spring) backwards; }
-@keyframes price-flip { from { opacity: 0; transform: translateY(-14px) scale(0.8); } }
-.plan-card.is-visible .plan-features li { animation: li-in 0.55s var(--ease-out-expo) backwards; }
-@keyframes li-in { from { opacity: 0; transform: translateX(-10px); } }
-.check-dot { transition: transform 0.3s var(--ease-spring); }
-.plan-features li:hover .check-dot { transform: scale(1.2); }
+:root {
+  color-scheme: dark;
 
-.home-toast { animation: toast-in 0.45s var(--ease-spring) both; }
-@keyframes toast-in {
-  from { opacity: 0; transform: translate(-50%, 20px) scale(0.95); }
-  to { opacity: 1; transform: translate(-50%, 0); }
+  --void: #08060a;
+  --ink-1: #110e11;
+  --ink-2: #181417;
+  --ink-3: #221c1f;
+  --line: rgba(255, 232, 226, 0.1);
+  --line-strong: rgba(255, 232, 226, 0.2);
+
+  --text: #f6f0ed;
+  --text-2: #bcb1ae;
+  --text-3: #85797a;
+
+  --signal: #ff2d37;
+  --signal-hot: #ff6a4d;
+  --signal-deep: #a50f1a;
+  --legit: #35e0a1;
+  --warn: #ffb02e;
+  --info: #7cb8ff;
+
+  --font-display: 'Chakra Petch', 'Bahnschrift', 'Segoe UI', sans-serif;
+  --font-body: 'Manrope Variable', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', 'Cascadia Mono', Consolas, monospace;
+
+  --cut: 14px;
+  --chamfer: polygon(
+    var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)),
+    calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut)
+  );
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --nav-height: 62px;
+  --page-width: 1180px;
 }
 
-/* ── piros fejlécek (Panel / Scan Result / Admin) ── */
-.panel-hero, .panel-header {
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; scroll-padding-top: 110px; }
+
+body {
+  margin: 0;
+  background: var(--void);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15.5px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+::selection { background: var(--signal); color: #fff; }
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.12;
+  margin: 0;
+  letter-spacing: 0.002em;
+}
+
+p { margin: 0; }
+a { color: inherit; text-decoration: none; }
+dl, dd, ul, ol { margin: 0; padding: 0; }
+
+:focus-visible { outline: 2px solid var(--signal-hot); outline-offset: 2px; }
+
+.mono { font-family: var(--font-mono); font-feature-settings: 'zero' 1; }
+.small { font-size: 13px; }
+.muted { color: var(--text-2); }
+.align-right { text-align: right; }
+.flip-x { transform: scaleX(-1); }
+
+.eyebrow {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--signal-hot);
+}
+
+/* ── Oldal háttere ─────────────────────────────────────────────────────── */
+
+.app-shell {
   position: relative;
-  overflow: hidden;
-  background: linear-gradient(120deg, #c53a3a, var(--avenge-red) 45%, #ef6f5e);
-  background-size: 220% 220%;
-  animation: hero-gradient 14s ease infinite;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
-.panel-hero::before, .panel-hero::after, .panel-header::before {
-  content: '';
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
+
+.page-transition { flex: 1; animation: page-in 0.5s var(--ease-out) both; }
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
   pointer-events: none;
 }
-.panel-hero::before, .panel-header::before {
-  width: 420px;
-  height: 420px;
-  right: -120px;
-  top: -190px;
-  animation: orb-drift 16s ease-in-out infinite;
+
+.backdrop-grid {
+  position: absolute;
+  inset: -2px;
+  background-image:
+    linear-gradient(rgba(255, 232, 226, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 232, 226, 0.035) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 18%, #000 20%, transparent 78%);
 }
-.panel-hero::after {
-  width: 260px;
-  height: 260px;
-  left: 30%;
-  bottom: -180px;
-  animation: orb-drift 21s ease-in-out infinite reverse;
+
+.backdrop-ember {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  will-change: transform;
 }
-.panel-hero h1, .panel-hero .subtitle, .panel-header h1, .panel-header .subtitle {
+
+.backdrop-ember-a {
+  width: 620px;
+  height: 620px;
+  top: -240px;
+  left: -120px;
+  background: rgba(255, 45, 55, 0.17);
+  animation: ember-drift-a 26s ease-in-out infinite alternate;
+}
+
+.backdrop-ember-b {
+  width: 520px;
+  height: 520px;
+  top: 34%;
+  right: -180px;
+  background: rgba(165, 15, 26, 0.2);
+  animation: ember-drift-b 32s ease-in-out infinite alternate;
+}
+
+.backdrop-scan {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 170px;
+  background: linear-gradient(180deg, transparent, rgba(255, 60, 60, 0.05) 88%, rgba(255, 110, 90, 0.2) 100%);
+  animation: scan-down 11s linear infinite;
+  will-change: transform;
+}
+
+.route-sweep {
+  position: fixed;
+  z-index: 90;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--signal) 30%, #fff 50%, var(--signal) 70%, transparent);
+  box-shadow: 0 0 22px 3px rgba(255, 60, 60, 0.7);
+  pointer-events: none;
+  animation: route-sweep 0.62s var(--ease-out) forwards;
+}
+
+/* ── Navbar: a tőr ─────────────────────────────────────────────────────── */
+
+.blade-nav {
+  position: fixed;
+  z-index: 80;
+  top: 14px;
+  left: 50%;
+  width: min(1240px, calc(100% - 28px));
+  height: var(--nav-height);
+  transform: translateX(-50%);
+  display: flex;
+  align-items: stretch;
+  transition: height 0.35s var(--ease-out), top 0.35s var(--ease-out);
+  animation: blade-draw 0.9s var(--ease-out) both;
+  filter: drop-shadow(0 12px 26px rgba(0, 0, 0, 0.6));
+}
+
+.blade-nav-compact { height: 52px; top: 8px; }
+
+.blade {
   position: relative;
-  animation: stagger-in 0.7s var(--ease-out-expo) backwards;
-}
-.panel-hero .subtitle, .panel-header .subtitle { animation-delay: 90ms; }
-/* A referencia-képek (images/panel.png) szerint a cím és az alcím is balra
-   zárt, a tartalom-oszloppal (max 1100px) egy vonalban. */
-.panel-hero {
-  padding-left: max(24px, calc((100% - 1100px) / 2 + 24px));
-  padding-right: max(24px, calc((100% - 1100px) / 2 + 24px));
-}
-.panel-hero .subtitle { text-align: left; }
-.panel-content .card:not(.scan-toggle-card) { border-top: 3px solid var(--avenge-red); }
-@keyframes hero-gradient {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 0 18px 0 62px;
 }
 
-/* ── táblák ── */
-.row-in { animation: row-in 0.5s var(--ease-out-expo) backwards; }
-@keyframes row-in { from { opacity: 0; transform: translateX(-10px); } }
-.sessions-table tbody tr td, .findings-table tbody tr td { transition: background-color 0.2s ease; }
-.sessions-table tbody tr:hover td, .findings-table tbody tr:hover td { background: #fafafa; }
-.row-new td { animation: row-flash 2s ease-out; }
-@keyframes row-flash {
-  0%, 35% { background: #fdeceb; }
-  100% { background: transparent; }
-}
-
-.verdict-badge, .status-badge, .severity-badge { animation: badge-pop 0.5s var(--ease-spring) backwards; }
-@keyframes badge-pop { from { opacity: 0; transform: scale(0.6); } }
-.status-badge.status-scanning, .status-badge.status-clientconnected {
-  background: linear-gradient(90deg, #fff4e0 0%, #ffe0a8 50%, #fff4e0 100%);
-  background-size: 200% 100%;
-  animation: badge-pop 0.5s var(--ease-spring) backwards, badge-shimmer 1.6s linear infinite;
-}
-@keyframes badge-shimmer {
-  from { background-position: 100% 0; }
-  to { background-position: -100% 0; }
-}
-
-/* élő scan-progress a session-listában */
-.live-dot { animation: live-ring 1.4s ease-out infinite; }
-@keyframes live-ring {
-  0% { box-shadow: 0 0 0 0 rgba(225, 75, 75, 0.55); }
-  100% { box-shadow: 0 0 0 8px rgba(225, 75, 75, 0); }
-}
-.live-bar {
-  position: relative;
-  display: inline-block;
-  width: 72px;
-  height: 6px;
-  border-radius: 999px;
-  background: #f3e3e3;
-  overflow: hidden;
-}
-.live-bar-fill {
+/* Maga az acél külön rétegen van: így a telefonos alsó dokkot (ami a pengén belül
+   él a DOM-ban) nem vágja le a penge alakja. */
+.blade-steel {
   position: absolute;
   inset: 0;
-  border-radius: inherit;
-  transform-origin: left;
-  background: linear-gradient(90deg, var(--avenge-red), #ff8f8f);
-  transition: transform 0.7s var(--ease-out-expo);
   overflow: hidden;
+  /* Balra hegyesedő penge. */
+  clip-path: polygon(0 52%, 54px 0, 100% 0, 100% 100%, 54px 100%);
+  /* Két élszög: a felső fele világosabb, az alsó sötétebb, mint egy csiszolt pengén. */
+  background:
+    linear-gradient(180deg, rgba(255, 244, 240, 0.075) 0, rgba(255, 244, 240, 0.03) 49%, rgba(0, 0, 0, 0.24) 50%, rgba(0, 0, 0, 0.05) 100%),
+    linear-gradient(90deg, #2b2629 0%, #1a1619 22%, #151215 100%);
 }
-.live-bar-fill::after {
+
+/* A penge hossza mentén végigfutó fénycsík */
+.blade-glint {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 240px;
+  background: linear-gradient(100deg, transparent 0%, rgba(255, 255, 255, 0.04) 28%, rgba(255, 255, 255, 0.28) 50%, rgba(255, 255, 255, 0.04) 72%, transparent 100%);
+  transform: translateX(-280px) skewX(-18deg);
+  animation: blade-glint 7s ease-in-out infinite;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.blade-brand {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  display: block;
+  transition: transform 0.3s var(--ease-spring), filter 0.3s;
+}
+
+.blade-brand img { display: block; height: 38px; width: auto; }
+.blade-nav-compact .blade-brand img { height: 32px; }
+.blade-brand:hover { transform: translateX(-3px) scale(1.04); filter: drop-shadow(0 0 10px rgba(255, 60, 60, 0.6)); }
+
+.blade-links {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.blade-link {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text-2);
+  white-space: nowrap;
+  transition: color 0.2s;
+}
+
+.blade-link:hover, .blade-link-active { color: #fff; }
+.blade-link-icon { display: none; }
+
+/* A célkereszt: a négy sarok rugóval ugrik a kiválasztott menüpontra. */
+.blade-reticle {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  height: 36px;
+  margin-top: -18px;
+  pointer-events: none;
+  background: rgba(255, 45, 55, 0.09);
+}
+
+.blade-reticle-idle { opacity: 0; }
+.blade-links:hover .blade-reticle-idle { opacity: 1; }
+
+.blade-reticle i {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border: 1.75px solid var(--signal-hot);
+  filter: drop-shadow(0 0 4px rgba(255, 70, 60, 0.9));
+}
+
+.blade-reticle i:nth-child(1) { left: 0; top: 0; border-right: 0; border-bottom: 0; }
+.blade-reticle i:nth-child(2) { right: 0; top: 0; border-left: 0; border-bottom: 0; }
+.blade-reticle i:nth-child(3) { right: 0; bottom: 0; border-left: 0; border-top: 0; }
+.blade-reticle i:nth-child(4) { left: 0; bottom: 0; border-right: 0; border-top: 0; }
+
+/* A penge fogazott alsó éle (vászonra rajzolva, lásd BladeNav). */
+.blade-teeth {
+  position: absolute;
+  left: 54px;
+  right: 0;
+  bottom: 0;
+  width: calc(100% - 54px);
+  height: 13px;
+  pointer-events: none;
+}
+
+.blade-guard {
+  position: relative;
+  z-index: 2;
+  flex: none;
+  width: 11px;
+  margin: -7px 0;
+  background: linear-gradient(90deg, #4a4347, #8d8388 45%, #2c2629 100%);
+  clip-path: polygon(0 5px, 50% 0, 100% 5px, 100% calc(100% - 5px), 50% 100%, 0 calc(100% - 5px));
+}
+
+/* A markolat: vörös bőrbevonat ferde tekeréssel. */
+.blade-grip {
+  position: relative;
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 14px 0 16px;
+  background:
+    repeating-linear-gradient(112deg, rgba(0, 0, 0, 0.3) 0 2px, transparent 2px 15px),
+    linear-gradient(180deg, #b01521 0%, #7f0e18 52%, #5d0a12 100%);
+}
+
+.blade-grip::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
-  animation: shimmer-sweep 1.2s ease-in-out infinite;
-}
-.live-percent { font-variant-numeric: tabular-nums; min-width: 32px; }
-
-/* generált session-kód */
-.generated-code-display { transition: color 0.3s ease, border-color 0.3s ease, box-shadow 0.4s ease; }
-.generated-code-display.has-code {
-  color: var(--avenge-red);
-  font-weight: 700;
-  border-color: rgba(225, 75, 75, 0.45);
-  box-shadow: 0 0 0 4px rgba(225, 75, 75, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), transparent 42%);
+  pointer-events: none;
 }
 
-/* ── Scan Result ── */
-.scan-toggle-card { transition: background-color 0.4s ease, box-shadow 0.3s ease; }
-.fingerprint-scanning {
+.blade-pommel {
+  flex: none;
+  width: 15px;
+  margin: 5px 0;
+  background: linear-gradient(90deg, #6f676b, #2c2629);
+  clip-path: polygon(0 0, 55% 0, 100% 30%, 100% 70%, 55% 100%, 0 100%);
+}
+
+.grip-ping {
   position: relative;
-  overflow: hidden;
-  animation: fp-pulse 2.4s ease-out infinite;
-}
-.fingerprint-scanline {
-  position: absolute;
-  left: 10px;
-  right: 10px;
-  top: 0;
-  height: 2px;
-  border-radius: 2px;
-  background: linear-gradient(90deg, transparent, white, transparent);
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.9);
-  animation: scanline 2.4s ease-in-out infinite;
-}
-@keyframes scanline {
-  0% { transform: translateY(8px); opacity: 0; }
-  15%, 85% { opacity: 1; }
-  100% { transform: translateY(54px); opacity: 0; }
-}
-@keyframes fp-pulse {
-  0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.45); }
-  70%, 100% { box-shadow: 0 0 0 16px rgba(255, 255, 255, 0); }
-}
-.verdict-reveal { animation: verdict-reveal 0.8s 0.2s var(--ease-spring) backwards; }
-@keyframes verdict-reveal { from { opacity: 0; transform: scale(0.6); filter: blur(6px); } }
-
-.accordion-item { transition: box-shadow 0.3s ease; }
-.accordion-item:hover { box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08); }
-.accordion-item-open { box-shadow: 0 12px 30px rgba(225, 75, 75, 0.12); }
-.accordion-trigger { transition: background-color 0.2s ease; }
-.accordion-trigger:hover { background: #fffafa; }
-.accordion-icon { transition: transform 0.45s var(--ease-spring); }
-.accordion-item-open .accordion-icon { transform: scale(1.18) rotate(-6deg); }
-.accordion-chevron .chevron-svg { transition: transform 0.35s var(--ease-out-expo); }
-.accordion-panel-wrapper { transition: grid-template-rows 0.4s var(--ease-out-expo); }
-.accordion-finding {
-  opacity: 0;
-  transform: translateY(-6px);
-  transition: opacity 0.35s ease, transform 0.4s var(--ease-out-expo);
-}
-.accordion-panel-wrapper-open .accordion-finding { opacity: 1; transform: none; }
-.count-chip {
-  min-width: 26px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: var(--bg);
-  color: var(--muted);
-  font-size: 0.78rem;
-  font-weight: 700;
-  text-align: center;
-}
-.count-chip-hot {
-  background: #fdeceb;
-  color: var(--avenge-red);
-  animation: chip-pulse 2.2s ease-out infinite;
-}
-@keyframes chip-pulse {
-  0% { box-shadow: 0 0 0 0 rgba(225, 75, 75, 0.35); }
-  70%, 100% { box-shadow: 0 0 0 7px rgba(225, 75, 75, 0); }
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: #ffe9e4;
+  white-space: nowrap;
 }
 
-.modal-header-icon { animation: badge-pop 0.6s 0.1s var(--ease-spring) backwards; }
-.modal-stat { animation: stagger-in 0.5s var(--ease-out-expo) backwards; }
-.modal-stat:nth-child(2) { animation-delay: 70ms; }
-.modal-stat:nth-child(3) { animation-delay: 140ms; }
-.skeleton-card { animation: none; }
-
-/* ── Login ── */
-.login-page { position: relative; overflow: hidden; }
-.login-bg { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
-.login-blob {
-  position: absolute;
+.grip-ping-dot {
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.4;
+  background: var(--legit);
+  box-shadow: 0 0 0 0 rgba(53, 224, 161, 0.7);
+  animation: ping-dot 2.4s ease-out infinite;
 }
-.login-blob-a {
-  width: 440px;
-  height: 440px;
-  top: -140px;
-  left: -90px;
-  background: var(--avenge-red);
-  animation: orb-drift 14s ease-in-out infinite;
+
+.grip-ping-down .grip-ping-dot { background: #fff; animation: none; opacity: 0.6; }
+.blade-nav-compact .grip-ping-text { display: none; }
+
+.grip-account { position: relative; display: flex; align-items: center; gap: 6px; }
+
+.grip-avatar {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.38);
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  transition: background 0.2s, transform 0.25s var(--ease-spring);
 }
-.login-blob-b {
-  width: 380px;
-  height: 380px;
-  bottom: -150px;
-  right: -70px;
-  background: #ff9f7a;
-  animation: orb-drift 17s ease-in-out infinite reverse;
+
+.grip-avatar:hover { background: rgba(0, 0, 0, 0.62); transform: scale(1.07); }
+
+.grip-logout {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #ffd9d3;
+  cursor: pointer;
+  transition: color 0.2s, transform 0.25s var(--ease-spring);
 }
-.login-grid {
+
+.grip-logout:hover { color: #fff; transform: translateX(2px); }
+
+/* Acél gomb fénycsíkkal - a vörös markolaton is jól elválik. */
+.btn-steel {
+  --cut: 8px;
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 15px;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #fff;
+  white-space: nowrap;
+  clip-path: var(--chamfer);
+  background: conic-gradient(from var(--beam-angle), rgba(255, 255, 255, 0.1) 0 62%, #ffb3a6 76%, #fff 84%, #ff8066 92%, rgba(255, 255, 255, 0.1) 100%);
+  animation: beam-spin 3.2s linear infinite;
+  transition: transform 0.25s var(--ease-spring);
+}
+
+.btn-steel::before {
+  content: '';
+  position: absolute;
+  inset: 1.5px;
+  z-index: -1;
+  clip-path: var(--chamfer);
+  background: linear-gradient(180deg, #1d181b, #0e0b0d);
+  transition: background 0.25s;
+}
+
+.btn-steel:hover { transform: translateY(-1px) scale(1.03); }
+.btn-steel:hover::before { background: linear-gradient(180deg, #2b2327, #161114); }
+.grip-admin-active::before { background: linear-gradient(180deg, #3a2024, #1e0f12); }
+
+/* ── Gombok ─────────────────────────────────────────────────────────────── */
+
+button { font-family: inherit; }
+
+.btn-primary, .btn-secondary, .btn-ghost {
+  --cut: 10px;
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 10px 22px;
+  border: 0;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #fff;
+  cursor: pointer;
+  clip-path: var(--chamfer);
+  transition: transform 0.25s var(--ease-spring), filter 0.25s, opacity 0.2s;
+}
+
+.btn-primary:active, .btn-secondary:active, .btn-ghost:active { transform: scale(0.97); }
+
+/* Fő gomb: a szélén körbefutó fénycsík + a felületén átsuhanó csillanás. */
+.btn-primary {
+  background: conic-gradient(from var(--beam-angle), rgba(255, 150, 130, 0.35) 0 58%, #ffd2c7 74%, #fff 82%, #ff7a5c 90%, rgba(255, 150, 130, 0.35) 100%);
+  animation: beam-spin 2.8s linear infinite;
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 1.5px;
+  z-index: -2;
+  clip-path: var(--chamfer);
+  background: linear-gradient(180deg, #ff3f46 0%, #e01923 55%, #b20f1a 100%);
+  transition: filter 0.25s;
+}
+
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 42%;
+  z-index: -1;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  transform: translateX(-130%) skewX(-18deg);
+  animation: sheen 3.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.btn-primary:hover:not(:disabled) { transform: translateY(-2px); filter: drop-shadow(0 8px 20px rgba(255, 45, 55, 0.55)); }
+.btn-primary:hover::before { filter: brightness(1.12); }
+.btn-primary:hover::after { animation-duration: 1.3s; }
+.btn-primary:disabled, .btn-primary[aria-disabled='true'] { opacity: 0.62; cursor: default; pointer-events: none; animation-play-state: paused; }
+.btn-primary:disabled::after { animation: none; }
+
+.btn-secondary {
+  background: linear-gradient(135deg, rgba(255, 232, 226, 0.34), rgba(255, 232, 226, 0.12));
+}
+
+.btn-secondary::before {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  z-index: -1;
+  clip-path: var(--chamfer);
+  background: var(--ink-2);
+  transition: background 0.25s;
+}
+
+.btn-secondary:hover { transform: translateY(-2px); }
+.btn-secondary:hover::before { background: var(--ink-3); }
+
+.btn-ghost {
+  background: var(--line);
+  color: var(--text-2);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.btn-ghost::before {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  z-index: -1;
+  clip-path: var(--chamfer);
+  background: var(--ink-1);
+  transition: background 0.2s;
+}
+
+.btn-ghost:hover:not(:disabled) { color: #fff; }
+.btn-ghost:hover:not(:disabled)::before { background: var(--ink-3); }
+.btn-ghost:disabled { opacity: 0.4; cursor: default; }
+
+.btn-tiny { --cut: 6px; min-height: 30px; padding: 4px 10px; font-size: 12.5px; }
+.btn-danger { color: #ff8d86; }
+.btn-danger:hover:not(:disabled) { color: #fff; }
+.btn-danger:hover:not(:disabled)::before { background: var(--signal-deep); }
+
+.btn-large { min-height: 52px; padding: 13px 28px; font-size: 16.5px; --cut: 12px; }
+.btn-block { display: flex; width: 100%; }
+.btn-arrow { transition: transform 0.25s var(--ease-spring); }
+.btn-primary:hover .btn-arrow { transform: translateX(5px); }
+
+.btn-spinner {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  animation: spin 0.7s linear infinite;
+}
+
+.icon-button {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-3);
+  cursor: pointer;
+  transition: color 0.2s, transform 0.25s var(--ease-spring);
+}
+
+.icon-button:hover { color: #fff; transform: rotate(90deg); }
+
+.text-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--signal-hot);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.text-action:hover { color: #fff; }
+.text-action:hover svg { animation: dice-roll 0.5s var(--ease-out); }
+
+/* ── Kártyák ────────────────────────────────────────────────────────────── */
+
+.card {
+  --cut: 16px;
+  position: relative;
+  isolation: isolate;
+  padding: 26px;
+  clip-path: var(--chamfer);
+  background: linear-gradient(145deg, rgba(255, 232, 226, 0.22), rgba(255, 232, 226, 0.07) 40%, rgba(255, 232, 226, 0.05));
+  min-width: 0;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  z-index: -2;
+  clip-path: var(--chamfer);
+  background: linear-gradient(170deg, #171316, #100d10);
+}
+
+/* A kurzort követő fényfolt */
+.spot::after {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  z-index: -1;
+  clip-path: var(--chamfer);
+  background: radial-gradient(340px circle at var(--spot-x, 50%) var(--spot-y, 50%), rgba(255, 60, 60, 0.13), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.spot:hover::after { opacity: 1; }
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 14px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.card-title svg { color: var(--signal-hot); flex: none; }
+
+/* ── Oldalkeret ─────────────────────────────────────────────────────────── */
+
+.page {
+  width: min(var(--page-width), calc(100% - 40px));
+  margin: 0 auto;
+  padding: 122px 0 60px;
+}
+
+.page-narrow { width: min(820px, calc(100% - 40px)); }
+
+.page-head { margin-bottom: 30px; }
+.page-head h1 { font-size: clamp(36px, 5vw, 52px); margin: 6px 0 8px; }
+
+.section-gap { margin-top: 24px; }
+
+.panel-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 350px;
+  gap: 22px;
+  align-items: start;
+}
+
+.side-stack { display: grid; gap: 22px; }
+.side-stack > * { min-width: 0; }
+
+.site-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 26px 20px 32px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.site-footer-sep { width: 22px; height: 1px; background: var(--line-strong); }
+
+/* ── Űrlapok ────────────────────────────────────────────────────────────── */
+
+.field-label {
+  display: block;
+  margin: 15px 0 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--text-2);
+}
+
+.field-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+input, select {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 13px;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--text);
+  outline: none;
+  background-color: rgba(0, 0, 0, 0.32);
+  /* Fókusznál balról végigfut egy vörös vonal az alsó élen. */
+  background-image: linear-gradient(90deg, var(--signal), var(--signal-hot));
+  background-repeat: no-repeat;
+  background-size: 0% 2px;
+  background-position: 0 100%;
+  transition: border-color 0.2s, background-size 0.38s var(--ease-out), background-color 0.2s;
+}
+
+input:hover, select:hover { border-color: var(--line-strong); }
+input:focus, select:focus { background-size: 100% 2px; border-color: var(--line-strong); background-color: rgba(0, 0, 0, 0.5); }
+input::placeholder { color: var(--text-3); }
+
+select { appearance: none; cursor: pointer; padding-right: 30px; }
+select {
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--text-2) 50%),
+    linear-gradient(135deg, var(--text-2) 50%, transparent 50%);
+  background-size: 5px 5px, 5px 5px;
+  background-position: calc(100% - 15px) 50%, calc(100% - 10px) 50%;
+}
+select option { background: var(--ink-2); color: var(--text); }
+
+.role-select { min-height: 32px; padding: 4px 28px 4px 9px; font-size: 13px; width: auto; }
+.role-select-full { width: 100%; min-height: 44px; padding: 10px 30px 10px 13px; font-size: 15px; }
+
+.input-with-action { position: relative; }
+.input-with-action input { padding-right: 46px; }
+
+.input-action {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 44px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-3);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.input-action:hover { color: #fff; }
+
+.generate-card form .btn-primary, .password-form .btn-primary { margin-top: 20px; }
+
+.strength {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 22px;
+  margin-top: 8px;
+  color: var(--text-3);
+}
+
+.strength-bars { display: flex; gap: 4px; flex: 1; }
+
+.strength-bars i {
+  flex: 1;
+  height: 3px;
+  background: var(--line);
+  transform-origin: left;
+  transition: background 0.3s;
+}
+
+.strength-1 { color: var(--signal-hot); }
+.strength-1 .strength-bars i:nth-child(-n + 1) { background: var(--signal); }
+.strength-2 { color: var(--warn); }
+.strength-2 .strength-bars i:nth-child(-n + 2) { background: var(--warn); }
+.strength-3 { color: #a8e06a; }
+.strength-3 .strength-bars i:nth-child(-n + 3) { background: #a8e06a; }
+.strength-4 { color: var(--legit); }
+.strength-4 .strength-bars i { background: var(--legit); }
+
+.error-text { margin-top: 12px; font-size: 14px; font-weight: 600; color: #ff8d86; }
+.error-in { animation: slide-in 0.3s var(--ease-out) both; }
+
+.success-text, .notice-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  animation: slide-in 0.35s var(--ease-out) both;
+}
+
+.success-text { color: var(--legit); }
+.notice-text { color: var(--warn); }
+
+/* ── Táblázatok, jelvények ──────────────────────────────────────────────── */
+
+.table-scroll { overflow-x: auto; margin: 0 -6px; padding: 0 6px; }
+
+.data-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+
+.data-table th {
+  padding: 8px 12px;
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  border-bottom: 1px solid var(--line-strong);
+  white-space: nowrap;
+}
+
+.data-table th.align-right { text-align: right; }
+
+.data-table td {
+  position: relative;
+  padding: 12px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+
+.data-table tbody tr {
+  /* Hovernél balról végigsöprő halvány vörös sáv. */
+  background-image: linear-gradient(90deg, rgba(255, 45, 55, 0.12), rgba(255, 45, 55, 0.02));
+  background-repeat: no-repeat;
+  background-size: 0% 100%;
+  transition: background-size 0.4s var(--ease-out);
+}
+
+.data-table tbody tr:hover { background-size: 100% 100%; }
+.data-table a { color: var(--signal-hot); font-weight: 700; transition: color 0.2s; }
+.data-table a:hover { color: #fff; }
+
+.row-in { animation: row-in 0.45s var(--ease-out) both; }
+.row-new { background-size: 100% 100% !important; }
+.row-selected { background-size: 100% 100% !important; }
+.empty-row { text-align: center; padding: 34px 12px !important; }
+
+.admin-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.status-badge, .verdict-badge, .severity-badge, .role-chip, .type-pill {
+  --cut: 5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  clip-path: var(--chamfer);
+}
+
+.status-badge { background: rgba(255, 232, 226, 0.09); color: var(--text-2); }
+.status-pending { color: var(--info); background: rgba(124, 184, 255, 0.13); }
+.status-clientconnected, .status-scanning { color: var(--warn); background: rgba(255, 176, 46, 0.14); }
+.status-completed { color: var(--legit); background: rgba(53, 224, 161, 0.13); }
+.status-interrupted { color: #ff8d86; background: rgba(255, 45, 55, 0.14); }
+.status-expired { color: var(--text-3); }
+
+.verdict-badge { font-family: var(--font-display); letter-spacing: 0.04em; }
+.verdict-legit { color: #06291c; background: var(--legit); }
+.verdict-unlegit { color: #fff; background: var(--signal); }
+.verdict-inconclusive { color: #2c1b00; background: var(--warn); }
+.verdict-pop { animation: pop-in 0.5s var(--ease-spring) both; }
+
+.severity-critical { color: #fff; background: var(--signal); }
+.severity-high { color: #fff; background: #c9202b; }
+.severity-medium { color: #2c1b00; background: var(--warn); }
+.severity-low { color: #ffd98f; background: rgba(255, 176, 46, 0.14); }
+.severity-info { color: var(--text-2); background: rgba(255, 232, 226, 0.09); }
+
+.type-pill { color: var(--text); background: rgba(255, 232, 226, 0.09); }
+
+.role-chip { color: var(--signal-hot); background: rgba(255, 45, 55, 0.14); }
+
+.live-progress { display: inline-flex; align-items: center; gap: 8px; margin-left: 10px; }
+
+.live-bar, .scan-meter-bar, .code-timer-bar {
+  position: relative;
+  display: block;
+  height: 4px;
+  overflow: hidden;
+  background: var(--line);
+}
+
+.live-bar { width: 72px; }
+
+.live-bar > span, .scan-meter-bar > span, .code-timer-bar > span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--signal-deep), var(--signal), var(--signal-hot));
+  transform-origin: left;
+  transition: transform 0.5s var(--ease-out);
+}
+
+.pager { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 18px; }
+.pager-page { min-width: 28px; text-align: center; color: var(--signal-hot); font-weight: 700; }
+
+.skeleton {
+  display: inline-block;
+  background: linear-gradient(90deg, rgba(255, 232, 226, 0.06), rgba(255, 232, 226, 0.14), rgba(255, 232, 226, 0.06));
+  background-size: 200% 100%;
+  animation: skeleton 1.4s linear infinite;
+}
+
+/* ── Főoldal ────────────────────────────────────────────────────────────── */
+
+.home { overflow: hidden; }
+
+.hero {
+  width: min(var(--page-width), calc(100% - 40px));
+  margin: 0 auto;
+  padding: 138px 0 46px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: 34px;
+  align-items: center;
+}
+
+.hero-logo {
+  position: relative;
+  width: min(270px, 62%);
+  margin-bottom: 22px;
+  filter: drop-shadow(0 6px 26px rgba(255, 40, 50, 0.3));
+  animation-duration: 0.9s;
+}
+
+.hero-logo img { display: block; width: 100%; height: auto; }
+
+/* A logó fölött áthaladó fénycsík - a maszk a logó saját alakja. */
+.hero-logo-glint {
   position: absolute;
   inset: 0;
-  background-image:
-    linear-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
-  background-size: 36px 36px;
-  -webkit-mask-image: radial-gradient(circle at center, black, transparent 70%);
-  mask-image: radial-gradient(circle at center, black, transparent 70%);
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+  background: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, 0.92) 50%, transparent 62%);
+  background-size: 300% 100%;
+  background-position: 130% 0;
+  animation: logo-glint 5.5s ease-in-out infinite;
+  pointer-events: none;
 }
-.login-card {
+
+.hero-title {
+  font-size: clamp(46px, 7.2vw, 88px);
+  line-height: 1.02;
+  letter-spacing: -0.012em;
+}
+
+.line-mask { display: block; overflow: hidden; padding-bottom: 0.08em; margin-bottom: -0.06em; }
+.line-mask > span { display: block; animation: line-up 0.95s var(--ease-out) both; }
+
+.hero-title em {
+  position: relative;
+  font-style: normal;
+  color: transparent;
+  background: linear-gradient(100deg, var(--signal) 0%, var(--signal-hot) 42%, #fff 50%, var(--signal-hot) 58%, var(--signal) 100%);
+  background-size: 260% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  animation: text-shine 6s linear infinite;
+}
+
+.hero-sub { max-width: 560px; margin-top: 22px; font-size: 17px; color: var(--text-2); }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 30px; }
+
+.hero-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+.hero-scope { position: relative; width: 100%; max-width: 520px; justify-self: end; }
+.radar-scope { display: block; width: 100%; aspect-ratio: 1; }
+
+.scope-corner { position: absolute; width: 34px; height: 34px; border: 1.5px solid rgba(255, 232, 226, 0.25); }
+.scope-corner-a { left: 0; top: 0; border-right: 0; border-bottom: 0; }
+.scope-corner-b { right: 0; bottom: 0; border-left: 0; border-top: 0; }
+
+.ticker {
+  overflow: hidden;
+  padding: 13px 0;
+  border-block: 1px solid var(--line);
+  background: rgba(0, 0, 0, 0.26);
+  mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+}
+
+.ticker-track { display: flex; width: max-content; animation: ticker 46s linear infinite; }
+
+.ticker-track span {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.ticker-track span::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  margin: 0 26px;
+  background: var(--signal);
+  transform: rotate(45deg);
+}
+
+.stats-band {
+  width: min(var(--page-width), calc(100% - 40px));
+  margin: 0 auto;
+  padding: 58px 0 22px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.stat { position: relative; padding-left: 18px; border-left: 1px solid var(--line-strong); }
+.stat strong { display: block; font-family: var(--font-display); font-size: clamp(42px, 5vw, 62px); line-height: 1; color: #fff; }
+.stat-label { display: block; margin-top: 8px; font-family: var(--font-display); font-weight: 600; font-size: 16px; }
+.stat-note { display: block; font-size: 13px; color: var(--text-3); }
+
+.steps, .capabilities, .verdicts {
+  width: min(var(--page-width), calc(100% - 40px));
+  margin: 0 auto;
+  padding-top: 76px;
+}
+
+.section-head { margin-bottom: 34px; }
+.section-head h2 { margin-top: 8px; font-size: clamp(30px, 4.2vw, 44px); max-width: 780px; }
+
+.steps-rail {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 26px;
+}
+
+/* Az állomásokat összekötő sín, rajta végigfutó fénycsík. */
+.steps-rail::before {
+  content: '';
+  position: absolute;
+  left: 25px;
+  right: 25px;
+  top: 25px;
+  height: 1px;
+  background: var(--line-strong);
+}
+
+.steps-beam {
+  position: absolute;
+  top: 24px;
+  left: 0;
+  width: 160px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--signal), #fff);
+  box-shadow: 0 0 14px rgba(255, 60, 60, 0.9);
+  animation: rail-beam 5.5s linear infinite;
+  will-change: transform;
+}
+
+.step { position: relative; }
+
+.step-node {
   position: relative;
   z-index: 1;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.12);
-  animation: login-card-in 0.8s var(--ease-out-expo) backwards;
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: var(--signal-deep);
+  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+  transition: transform 0.3s var(--ease-spring), background 0.3s;
 }
-@keyframes login-card-in { from { opacity: 0; transform: translateY(26px) scale(0.97); } }
-.login-card.shake { animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+
+.step:hover .step-node { transform: scale(1.1) rotate(-3deg); background: var(--signal); }
+
+.step-index {
+  display: block;
+  margin-top: 18px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--text-3);
+}
+
+.step h3 { margin: 6px 0 8px; font-size: 21px; }
+.step p { font-size: 14.5px; color: var(--text-2); }
+
+.bento {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.bento-card { overflow: hidden; min-height: 200px; transition: transform 0.35s var(--ease-out); }
+.bento-card:hover { transform: translateY(-4px); }
+.bento-wide { grid-column: span 2; }
+.bento-tall { grid-row: span 2; }
+
+.bento-icon {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 16px;
+  color: var(--signal-hot);
+  background: rgba(255, 45, 55, 0.12);
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+}
+
+.bento-card h3 { font-size: 21px; margin-bottom: 8px; }
+.bento-card p { font-size: 14.5px; color: var(--text-2); max-width: 560px; }
+
+.bento-fx { position: absolute; pointer-events: none; z-index: -1; }
+
+/* Lefelé pörgő fájllista-sávok */
+.bento-fx-rows {
+  right: -10px;
+  top: 0;
+  bottom: 0;
+  width: 42%;
+  opacity: 0.5;
+  background-image: repeating-linear-gradient(180deg, rgba(255, 232, 226, 0.13) 0 2px, transparent 2px 14px);
+  background-size: 100% 112px;
+  mask-image: linear-gradient(90deg, transparent, #000 70%);
+  animation: rows-scroll 7s linear infinite;
+}
+
+/* Táguló gyűrűk */
+.bento-fx-pulse { left: 50%; bottom: -80px; width: 280px; height: 280px; margin-left: -140px; }
+.bento-fx-pulse::before, .bento-fx-pulse::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 60, 60, 0.55);
+  animation: ring-out 3.6s ease-out infinite;
+}
+.bento-fx-pulse::after { animation-delay: 1.8s; }
+
+/* Végigfutó hex-oszlopok */
+.bento-fx-hex {
+  right: 14px;
+  top: 14px;
+  width: 92px;
+  height: 58px;
+  opacity: 0.32;
+  background-image:
+    repeating-linear-gradient(90deg, var(--signal-hot) 0 10px, transparent 10px 16px),
+    repeating-linear-gradient(180deg, #000 0 2px, transparent 2px 9px);
+  mask-image: linear-gradient(180deg, #000, transparent);
+  animation: hex-flicker 2.4s steps(6) infinite;
+}
+
+.verdict-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+
+.verdict-tile { transition: transform 0.35s var(--ease-out); }
+.verdict-tile:hover { transform: translateY(-4px); }
+
+.verdict-tile-label {
+  display: block;
+  margin-bottom: 10px;
+  font-family: var(--font-display);
+  font-size: 25px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.verdict-tile-legit .verdict-tile-label { color: var(--legit); }
+.verdict-tile-inconclusive .verdict-tile-label { color: var(--warn); }
+.verdict-tile-unlegit .verdict-tile-label { color: var(--signal); }
+.verdict-tile p { font-size: 14.5px; color: var(--text-2); }
+
+.closing { padding: 96px 20px 50px; text-align: center; }
+.closing-inner { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.closing h2 { font-size: clamp(30px, 4.5vw, 48px); }
+.closing p { max-width: 560px; color: var(--text-2); margin-bottom: 8px; }
+
+/* ── Belépés ────────────────────────────────────────────────────────────── */
+
+.login {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 104px 20px 30px;
+}
+
+/* A teljes kártya szélén futó fénycsík */
+.login-frame {
+  --cut: 20px;
+  position: relative;
+  width: min(440px, 100%);
+  padding: 1.5px;
+  clip-path: var(--chamfer);
+  background: conic-gradient(from var(--beam-angle), rgba(255, 232, 226, 0.13) 0 66%, rgba(255, 90, 70, 0.8) 78%, #fff 84%, rgba(255, 90, 70, 0.8) 90%, rgba(255, 232, 226, 0.13) 100%);
+  animation: beam-spin 5s linear infinite, card-rise 0.8s var(--ease-out) both;
+}
+
+.login-frame-wide { width: min(520px, 100%); }
+
+.login-card {
+  --cut: 20px;
+  padding: 34px 32px 32px;
+  clip-path: var(--chamfer);
+  background: linear-gradient(170deg, #181417, #0f0c0f);
+}
+
+.login-card h1 { font-size: 30px; margin-bottom: 4px; }
+.login-logo { width: 190px; margin: 0 auto 20px; }
+.login-card form .btn-primary { margin-top: 24px; }
+
+.shake { animation: shake 0.45s ease both, beam-spin 5s linear infinite; }
+
+.player-code {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 16px 0 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.player-code-copy {
+  flex-basis: 100%;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-3);
+  transition: color 0.2s;
+}
+
+.player-code:hover .player-code-copy { color: #fff; }
+
+.player-steps { list-style: none; display: grid; gap: 9px; margin: 18px 0 22px; }
+.player-steps li { display: flex; align-items: center; gap: 12px; font-size: 14.5px; color: var(--text-2); }
+
+.player-step-num {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  color: #fff;
+  background: var(--signal-deep);
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+}
+
+/* ── Panel ──────────────────────────────────────────────────────────────── */
+
+.console-grid {
+  display: grid;
+  grid-template-columns: 400px minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.code-cells { display: flex; justify-content: center; gap: 7px; margin: 8px 0 16px; }
+
+.code-cell {
+  --cut: 7px;
+  flex: 1;
+  max-width: 54px;
+  height: 68px;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-mono);
+  font-size: 29px;
+  font-weight: 700;
+  color: var(--text-3);
+  clip-path: var(--chamfer);
+  background: rgba(255, 232, 226, 0.06);
+  transition: background 0.3s, color 0.3s;
+}
+
+.player-code .code-cell, .code-cells-live .code-cell {
+  color: #fff;
+  background: linear-gradient(180deg, rgba(255, 45, 55, 0.3), rgba(165, 15, 26, 0.22));
+  animation: cell-in 0.5s var(--ease-spring) both;
+}
+
+.player-code .code-cell { flex: 0 0 52px; }
+
+.code-cell:nth-child(2) { animation-delay: 40ms; }
+.code-cell:nth-child(3) { animation-delay: 80ms; }
+.code-cell:nth-child(4) { animation-delay: 120ms; }
+.code-cell:nth-child(5) { animation-delay: 160ms; }
+.code-cell:nth-child(6) { animation-delay: 200ms; }
+
+.code-timer { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; color: var(--text-2); }
+.code-timer-bar { flex: 1; }
+.code-timer-bar > span { transition: transform 1s linear; }
+
+.code-live { display: grid; justify-items: center; gap: 10px; margin-bottom: 16px; text-align: center; }
+.code-live a.verdict-badge { font-size: 15px; padding: 6px 14px; }
+
+.scan-meter {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px 10px;
+}
+
+.scan-meter-text { grid-column: 1 / -1; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.console-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+.console-actions .btn-secondary { padding: 9px 10px; font-size: 14px; }
+.console-hint { margin-top: 12px; text-align: center; }
+.console-divider { height: 1px; margin: 20px 0; background: var(--line); }
+
+/* ── Eredmény ───────────────────────────────────────────────────────────── */
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  font-weight: 700;
+  color: var(--text-2);
+  transition: color 0.2s, transform 0.25s var(--ease-spring);
+}
+
+.back-link:hover { color: #fff; transform: translateX(-4px); }
+
+.result-top { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px; }
+
+.verdict-card { display: flex; align-items: center; gap: 22px; }
+.verdict-card-legit { --verdict: var(--legit); }
+.verdict-card-unlegit { --verdict: var(--signal); }
+.verdict-card-inconclusive { --verdict: var(--warn); }
+
+.verdict-card::before {
+  background:
+    radial-gradient(420px circle at 0% 50%, color-mix(in srgb, var(--verdict) 22%, transparent), transparent 72%),
+    linear-gradient(170deg, #171316, #100d10);
+}
+
+.verdict-print {
+  position: relative;
+  flex: none;
+  width: 84px;
+  height: 84px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: var(--verdict);
+  background: color-mix(in srgb, var(--verdict) 12%, transparent);
+  clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
+}
+
+.verdict-print-scan {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 2px;
+  background: var(--verdict);
+  box-shadow: 0 0 12px var(--verdict);
+  animation: print-scan 2.4s ease-in-out infinite;
+}
+
+.verdict-stamp {
+  margin: 3px 0 6px;
+  font-family: var(--font-display);
+  font-size: clamp(30px, 4vw, 46px);
+  font-weight: 700;
+  line-height: 1.05;
+  color: var(--verdict);
+  animation: stamp 0.65s var(--ease-spring) both 0.2s;
+}
+
+.fact-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 22px; }
+.fact-grid dt { font-size: 12px; font-weight: 700; color: var(--text-3); }
+.fact-grid dd { font-size: 14.5px; font-weight: 600; overflow-wrap: anywhere; }
+
+.tally-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 22px; }
+
+.tally {
+  --cut: 12px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 2px 12px;
+  padding: 16px 20px;
+  clip-path: var(--chamfer);
+  background: rgba(255, 232, 226, 0.05);
+  color: var(--text-3);
+}
+
+.tally strong { font-family: var(--font-display); font-size: 32px; line-height: 1; color: #fff; }
+.tally span:last-child { grid-column: 1 / -1; font-size: 13px; font-weight: 600; }
+.tally-hot { background: rgba(255, 45, 55, 0.16); color: var(--signal-hot); }
+.tally-warm { background: rgba(255, 176, 46, 0.11); color: var(--warn); }
+
+.finding-row { cursor: pointer; }
+.finding-row td:last-child { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.finding-row-text { overflow-wrap: anywhere; }
+.finding-row-chevron { flex: none; color: var(--text-3); transition: transform 0.3s var(--ease-out); }
+.finding-row-chevron-open { transform: rotate(90deg); color: var(--signal-hot); }
+
+.finding-detail { padding: 6px 4px 8px; animation: slide-in 0.35s var(--ease-out) both; }
+.finding-detail-label { margin-bottom: 10px; font-weight: 700; }
+.finding-detail-grid { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 6px 14px; font-size: 13.5px; }
+.finding-detail-grid dt { color: var(--text-3); font-weight: 600; }
+.finding-detail-grid dd { overflow-wrap: anywhere; color: var(--text-2); }
+.finding-detail-hash { font-size: 12px; }
+
+.accordion-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 22px;
+  align-items: start;
+}
+
+.accordion-item { padding: 0; --cut: 12px; }
+
+.accordion-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 18px;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 15.5px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.accordion-icon { display: grid; color: var(--signal-hot); }
+.accordion-label { flex: 1; }
+
+.count-chip {
+  min-width: 26px;
+  padding: 1px 8px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-3);
+  background: rgba(255, 232, 226, 0.08);
+}
+
+.count-chip-hot { color: #fff; background: var(--signal); }
+.accordion-chevron { display: grid; color: var(--text-3); transition: transform 0.3s var(--ease-out); }
+.accordion-item-open .accordion-chevron { transform: rotate(90deg); }
+
+.accordion-panel-wrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.38s var(--ease-out);
+}
+
+.accordion-item-open .accordion-panel-wrapper { grid-template-rows: 1fr; }
+.accordion-panel-inner { overflow: hidden; }
+.accordion-panel { padding: 0 18px 16px; }
+.accordion-finding { padding: 6px 0; border-top: 1px solid var(--line); overflow-wrap: anywhere; }
+
+/* ── Fiók ───────────────────────────────────────────────────────────────── */
+
+.profile-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px 18px;
+  margin-bottom: 22px;
+}
+
+.profile-avatar {
+  width: 62px;
+  height: 62px;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(145deg, var(--signal), var(--signal-deep));
+  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+}
+
+.profile-main { display: grid; justify-items: start; gap: 5px; min-width: 0; }
+.profile-email { font-family: var(--font-display); font-size: 21px; overflow-wrap: anywhere; }
+
+.profile-facts {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.profile-facts dt { font-size: 12px; font-weight: 700; color: var(--text-3); }
+.profile-facts dd { font-size: 14px; font-weight: 600; }
+
+.password-form { max-width: 460px; }
+
+/* ── Admin ──────────────────────────────────────────────────────────────── */
+
+.credentials-card { animation: card-rise 0.55s var(--ease-out) both; }
+.credentials-card .card-title svg { color: var(--legit); }
+.credentials-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+
+.credentials-list { display: grid; gap: 10px; margin: 14px 0; }
+.credentials-list dt { font-size: 12px; font-weight: 700; color: var(--text-3); }
+.credentials-list dd { font-size: 14.5px; font-weight: 600; overflow-wrap: anywhere; }
+
+/* ── Újdonságok ─────────────────────────────────────────────────────────── */
+
+.timeline { position: relative; padding-left: 30px; }
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  bottom: 8px;
+  width: 1px;
+  background: var(--line-strong);
+}
+
+.timeline-beam {
+  position: absolute;
+  left: 7px;
+  top: 0;
+  width: 3px;
+  height: 130px;
+  background: linear-gradient(180deg, transparent, var(--signal), #fff);
+  box-shadow: 0 0 14px rgba(255, 60, 60, 0.9);
+  animation: timeline-beam 7s linear infinite;
+  will-change: transform;
+}
+
+.timeline-entry { position: relative; margin-bottom: 18px; }
+
+.timeline-node {
+  position: absolute;
+  left: -27px;
+  top: 28px;
+  width: 11px;
+  height: 11px;
+  background: var(--ink-3);
+  border: 1px solid var(--line-strong);
+  transform: rotate(45deg);
+}
+
+.timeline-entry-latest .timeline-node { background: var(--signal); border-color: var(--signal-hot); box-shadow: 0 0 12px var(--signal); }
+
+.timeline-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 10px; }
+.timeline-version { font-family: var(--font-display); font-size: 21px; font-weight: 700; }
+.timeline-entry-latest .timeline-version { color: var(--signal-hot); }
+
+.timeline-card ul { list-style: none; display: grid; gap: 7px; }
+
+.timeline-card li {
+  position: relative;
+  padding-left: 16px;
+  font-size: 14.5px;
+  color: var(--text-2);
+}
+
+.timeline-card li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 9px;
+  width: 6px;
+  height: 2px;
+  background: var(--signal);
+}
+
+/* ── Belépő animációk ───────────────────────────────────────────────────── */
+
+.stagger-in { animation: rise-in 0.7s var(--ease-out) both; }
+
+.reveal { opacity: 0; }
+.reveal.is-visible { opacity: 1; animation-duration: 0.8s; animation-timing-function: var(--ease-out); animation-fill-mode: backwards; }
+.reveal-up.is-visible { animation-name: rise-in; }
+.reveal-fade.is-visible { animation-name: fade-in; }
+.reveal-scale.is-visible { animation-name: scale-in; }
+.reveal-left.is-visible { animation-name: from-left; }
+.reveal-right.is-visible { animation-name: from-right; }
+
+@keyframes beam-spin { to { --beam-angle: 360deg; } }
+@keyframes sheen {
+  0%, 62% { transform: translateX(-130%) skewX(-18deg); }
+  100% { transform: translateX(340%) skewX(-18deg); }
+}
+@keyframes blade-glint {
+  0%, 55% { transform: translateX(-280px) skewX(-18deg); }
+  100% { transform: translateX(1400px) skewX(-18deg); }
+}
+@keyframes blade-draw {
+  from { opacity: 0; transform: translateX(calc(-50% + 90px)); clip-path: inset(0 0 0 100%); }
+  to { opacity: 1; transform: translateX(-50%); clip-path: inset(-20px -20px -20px -20px); }
+}
+@keyframes ping-dot {
+  0% { box-shadow: 0 0 0 0 rgba(53, 224, 161, 0.7); }
+  70%, 100% { box-shadow: 0 0 0 9px rgba(53, 224, 161, 0); }
+}
+@keyframes page-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes rise-in { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes scale-in { from { opacity: 0; transform: scale(0.94); } to { opacity: 1; transform: none; } }
+@keyframes from-left { from { opacity: 0; transform: translateX(-26px); } to { opacity: 1; transform: none; } }
+@keyframes from-right { from { opacity: 0; transform: translateX(26px); } to { opacity: 1; transform: none; } }
+@keyframes line-up { from { transform: translateY(108%); } to { transform: none; } }
+@keyframes slide-in { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: none; } }
+@keyframes row-in { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: none; } }
+@keyframes pop-in { from { opacity: 0; transform: scale(0.72); } to { opacity: 1; transform: none; } }
+@keyframes cell-in { from { opacity: 0; transform: translateY(10px) scale(0.9); } to { opacity: 1; transform: none; } }
+@keyframes stamp { from { opacity: 0; transform: scale(1.5); letter-spacing: 0.08em; } to { opacity: 1; transform: none; } }
+@keyframes card-rise { from { opacity: 0; transform: translateY(22px) scale(0.98); } to { opacity: 1; transform: none; } }
 @keyframes shake {
   10%, 90% { transform: translateX(-2px); }
   20%, 80% { transform: translateX(4px); }
   30%, 50%, 70% { transform: translateX(-7px); }
   40%, 60% { transform: translateX(7px); }
 }
-.brand-letter { display: inline-block; animation: letter-drop 0.65s var(--ease-spring) backwards; }
-@keyframes letter-drop { from { opacity: 0; transform: translateY(-20px) rotate(-10deg); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes dice-roll { from { transform: rotate(0) scale(1); } 50% { transform: rotate(180deg) scale(1.2); } to { transform: rotate(360deg) scale(1); } }
+@keyframes skeleton { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+@keyframes text-shine { from { background-position: 130% 0; } to { background-position: -130% 0; } }
+@keyframes logo-glint { 0%, 60% { background-position: 130% 0; } 100% { background-position: -30% 0; } }
+@keyframes ticker { to { transform: translateX(-50%); } }
+@keyframes rail-beam { from { transform: translateX(-160px); opacity: 0; } 8% { opacity: 1; } 92% { opacity: 1; } to { transform: translateX(1180px); opacity: 0; } }
+@keyframes timeline-beam { from { transform: translateY(-130px); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } to { transform: translateY(1100px); opacity: 0; } }
+@keyframes rows-scroll { to { background-position: 0 112px; } }
+@keyframes ring-out { from { transform: scale(0.25); opacity: 0.9; } to { transform: scale(1.2); opacity: 0; } }
+@keyframes hex-flicker { to { background-position: 96px 0, 0 54px; } }
+@keyframes print-scan { 0%, 100% { transform: translateY(6px); } 50% { transform: translateY(76px); } }
+@keyframes route-sweep { from { transform: translateY(0); opacity: 1; } to { transform: translateY(100vh); opacity: 0; } }
+@keyframes scan-down { from { transform: translateY(-180px); } to { transform: translateY(100vh); } }
+@keyframes ember-drift-a { from { transform: translate(0, 0) scale(1); } to { transform: translate(180px, 90px) scale(1.2); } }
+@keyframes ember-drift-b { from { transform: translate(0, 0) scale(1.1); } to { transform: translate(-200px, -120px) scale(0.9); } }
 
-/* ── Details modal: lenyitható találat-sorok (miért jelzett a scanner) ── */
-.finding-row { cursor: pointer; }
-.finding-row td:last-child { position: relative; padding-right: 28px; }
-.finding-row-text { display: block; }
-.finding-row-chevron {
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  display: flex;
-  color: var(--muted);
-  transform: translateY(-50%) rotate(90deg);
-  transition: transform 0.3s var(--ease-out-expo), color 0.2s ease;
-}
-.finding-row:hover .finding-row-chevron { color: var(--avenge-red); }
-.finding-row-chevron-open { transform: translateY(-50%) rotate(-90deg); color: var(--avenge-red); }
-.finding-row-open td { background: #fff6f6; }
-.finding-detail-row td { padding: 0; border-bottom: 1px solid var(--border); background: #fffafa; }
-.finding-detail {
-  padding: 14px 16px 16px 16px;
-  animation: fade-slide-in 0.3s var(--ease-out-expo) both;
-}
-.finding-detail-label { margin: 0 0 10px 0; font-weight: 700; font-size: 0.9rem; }
-.finding-detail-grid {
-  display: grid;
-  grid-template-columns: max-content minmax(0, 1fr);
-  gap: 6px 14px;
-  margin: 0;
-  font-size: 0.85rem;
-}
-.finding-detail-grid dt { color: var(--muted); font-weight: 600; }
-.finding-detail-grid dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
-.finding-detail-hash { font-size: 0.78rem; color: var(--muted); }
-@media (max-width: 600px) {
-  .finding-detail-grid { grid-template-columns: 1fr; }
-  .finding-detail-grid dt { margin-top: 6px; }
+/* ── Reszponzív ─────────────────────────────────────────────────────────── */
+
+@media (max-width: 1080px) {
+  .grip-admin-label { display: none; }
+  .grip-admin { padding: 8px 11px; }
+  .console-grid, .panel-grid { grid-template-columns: minmax(0, 1fr); }
+  .hero { grid-template-columns: minmax(0, 1fr); padding-top: 118px; }
+  .hero-scope { justify-self: center; max-width: 440px; }
+  .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .bento-tall { grid-row: auto; }
+  .steps-rail { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .steps-rail::before, .steps-beam { display: none; }
 }
 
-/* ── mozgáscsökkentés (rendszerbeállítás) ── */
+/* Telefonon a penge csak márkát tart, a menü alsó dokkba költözik. */
+@media (max-width: 820px) {
+  /* A transform és a filter a "fixed" dokkot a navbarhoz kötné, ezért itt nincsenek. */
+  .blade-nav, .blade-nav-compact {
+    left: 10px;
+    width: calc(100% - 20px);
+    height: 54px;
+    top: 8px;
+    transform: none;
+    filter: none;
+    animation: none;
+  }
+
+  .blade { padding-left: 42px; }
+  .blade-steel { clip-path: polygon(0 52%, 34px 0, 100% 0, 100% 100%, 34px 100%); }
+  .blade-teeth { display: none; }
+  .blade-brand img, .blade-nav-compact .blade-brand img { height: 32px; }
+  .blade-links-single { display: none; }
+
+  .blade-links {
+    position: fixed;
+    z-index: 85;
+    left: 50%;
+    bottom: 10px;
+    width: min(440px, calc(100% - 20px));
+    transform: translateX(-50%);
+    justify-content: space-around;
+    gap: 0;
+    padding: 6px;
+    background: linear-gradient(180deg, #221d20, #120f12);
+    clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+  }
+
+  .blade-link { flex: 1; flex-direction: column; justify-content: center; gap: 2px; padding: 6px 2px; font-size: 11.5px; }
+  .blade-link-icon { display: block; }
+  .blade-reticle { height: 50px; margin-top: -25px; }
+
+  .blade-glint { display: none; }
+  .grip-ping-text { display: none; }
+  .blade-grip { gap: 9px; padding: 0 8px 0 11px; }
+  .site-footer { padding-bottom: 96px; }
+  .page { padding-top: 104px; }
+  .result-top, .verdict-row, .accordion-grid { grid-template-columns: minmax(0, 1fr); }
+  .stats-band { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 16px; }
+  .bento { grid-template-columns: minmax(0, 1fr); }
+  .bento-wide { grid-column: auto; }
+  .profile-facts { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 520px) {
+  .card { padding: 20px; }
+  .login-card { padding: 28px 20px 24px; }
+  .steps-rail { grid-template-columns: minmax(0, 1fr); }
+  .tally-row { grid-template-columns: minmax(0, 1fr); }
+  .console-actions { grid-template-columns: minmax(0, 1fr); }
+  .code-cell { height: 58px; font-size: 24px; }
+  .player-code .code-cell { flex: 0 0 42px; }
+  .fact-grid { grid-template-columns: minmax(0, 1fr); }
+  .finding-detail-grid { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .finding-detail-grid dd { margin-bottom: 8px; }
+  .btn-steel.grip-login { padding: 8px 11px; }
+  .hero-actions .btn-large { flex: 1 1 100%; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
     transition-duration: 0.001ms !important;
-    scroll-behavior: auto !important;
   }
-  .reveal:not(.is-visible), .accordion-finding { opacity: 1; transform: none; }
+  html { scroll-behavior: auto; }
+  .backdrop-scan, .steps-beam, .timeline-beam, .blade-glint { display: none; }
 }

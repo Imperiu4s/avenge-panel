@@ -1,10 +1,14 @@
 import type {
   AdminUserView,
   BannedHwidView,
+  ClientReleaseView,
   CreateBannedHwidRequest,
   CreateSessionResponse,
   CreateSignatureRequest,
   CreateUserRequest,
+  CurrentUserView,
+  DownloadStatusView,
+  DownloadTicketView,
   LoginResponse,
   ScanResultView,
   SessionListItem,
@@ -15,6 +19,11 @@ import type {
 import { API_BASE } from './config';
 
 const TOKEN_STORAGE_KEY = 'avenge_staff_token';
+
+/// A szerver 401-et adott egy tokennel küldött kérésre (lejárt a 8 órás
+/// munkamenet, vagy közben jelszót váltottak) - az AuthContext erre kilépteti
+/// a felhasználót, különben az oldal bent ragadna, és minden gomb 401-et kapna.
+export const SESSION_EXPIRED_EVENT = 'avenge:session-expired';
 
 export class ApiError extends Error {
   status: number;
@@ -43,11 +52,9 @@ async function request<T>(
 ): Promise<T> {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
 
-  if (options.auth !== false) {
-    const token = getStoredToken();
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
+  const token = options.auth !== false ? getStoredToken() : null;
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
   }
 
   const response = await fetch(`${API_BASE}${path}`, {
@@ -57,8 +64,10 @@ async function request<T>(
   });
 
   if (!response.ok) {
-    if (response.status === 401) {
+    if (response.status === 401 && token) {
       clearStoredToken();
+      window.dispatchEvent(new Event(SESSION_EXPIRED_EVENT));
+      throw new ApiError(401, 'A munkameneted lejárt, jelentkezz be újra.');
     }
     let message = `Hiba (${response.status})`;
     try {
@@ -81,12 +90,28 @@ export const api = {
   login: (email: string, password: string) =>
     request<LoginResponse>('/api/auth/login', { method: 'POST', body: { email, password }, auth: false }),
 
+  me: () => request<CurrentUserView>('/api/auth/me'),
+
+  changePassword: (currentPassword: string, newPassword: string) =>
+    request<LoginResponse>('/api/auth/change-password', {
+      method: 'POST',
+      body: { currentPassword, newPassword }
+    }),
+
   createSession: () => request<CreateSessionResponse>('/api/sessions', { method: 'POST', body: {} }),
 
   listSessions: (page = 1, pageSize = 20) =>
     request<SessionListItem[]>(`/api/sessions?page=${page}&pageSize=${pageSize}`),
 
   getScanResult: (resultId: string) => request<ScanResultView>(`/api/scan-results/${encodeURIComponent(resultId)}`),
+
+  getLatestRelease: () => request<ClientReleaseView>('/api/client/latest', { auth: false }),
+
+  createDownloadTicket: () =>
+    request<DownloadTicketView>('/api/client/download-ticket', { method: 'POST', body: {} }),
+
+  getDownloadStatus: (code: string) =>
+    request<DownloadStatusView>(`/api/client/download-status?code=${encodeURIComponent(code)}`, { auth: false }),
 
   listAdminUsers: () => request<AdminUserView[]>('/api/admin/users'),
 
@@ -98,6 +123,12 @@ export const api = {
 
   deleteAdminUser: (id: string) =>
     request<void>(`/api/admin/users/${encodeURIComponent(id)}`, { method: 'DELETE' }),
+
+  resetAdminUserPassword: (id: string, newPassword: string) =>
+    request<void>(`/api/admin/users/${encodeURIComponent(id)}/reset-password`, {
+      method: 'POST',
+      body: { newPassword }
+    }),
 
   listAdminUserSessions: (id: string, page = 1, pageSize = 20) =>
     request<SessionListItem[]>(
@@ -123,3 +154,12 @@ export const api = {
   deleteAdminBannedHwid: (id: string) =>
     request<void>(`/api/admin/banned-hwids/${encodeURIComponent(id)}`, { method: 'DELETE' })
 };
+
+/// A böngésző natív letöltőjének szánt URL - a Panel letöltési jegyével, vagy a
+/// játékos esetén a staff által generált session kóddal.
+export function clientDownloadUrl(access: { ticket: string } | { code: string }): string {
+  const query = 'ticket' in access
+    ? `ticket=${encodeURIComponent(access.ticket)}`
+    : `code=${encodeURIComponent(access.code)}`;
+  return `${API_BASE}/api/client/download?${query}`;
+}

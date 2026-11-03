@@ -64,17 +64,17 @@ export function BannedHwidsSection() {
   }
 
   return (
-    <div className="panel-grid" style={{ marginTop: 24 }}>
+    <div className="panel-grid section-gap">
       <div className="card">
-        <h2 style={{ marginTop: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Icon name="ban" size={20} /> HWID-feketelista
+        <h2 className="card-title">
+          <Icon name="ban" size={18} /> HWID-feketelista
         </h2>
-        <p className="muted small" style={{ marginTop: -8 }}>
+        <p className="muted small">
           Ha egy vizsgálat egy itt szereplő HWID-ről érkezik, a rendszer automatikusan UNLEGIT-re állítja - más
           Minecraft-fiókkal sem lehet "tisztán" átmenni ugyanarról a gépről.
         </p>
         <div className="table-scroll">
-          <table className="sessions-table">
+          <table className="data-table">
             <thead>
               <tr>
                 <th>HWID</th>
@@ -90,7 +90,7 @@ export function BannedHwidsSection() {
                   <td>{b.reason ?? <span className="muted">-</span>}</td>
                   <td>{new Date(b.createdAt).toLocaleString('hu-HU')}</td>
                   <td className="admin-actions">
-                    <button className="btn-secondary btn-tiny btn-danger" onClick={() => handleDelete(b)}>
+                    <button className="btn-ghost btn-tiny btn-danger" onClick={() => handleDelete(b)}>
                       Törlés
                     </button>
                   </td>
@@ -98,7 +98,7 @@ export function BannedHwidsSection() {
               ))}
               {!isLoading && banned.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="muted">Nincs kitiltott HWID.</td>
+                  <td colSpan={4} className="muted empty-row">Nincs kitiltott HWID.</td>
                 </tr>
               )}
             </tbody>
@@ -108,7 +108,7 @@ export function BannedHwidsSection() {
       </div>
 
       <div className="card generate-card">
-        <h2><Icon name="plus" size={18} /> HWID kitiltása</h2>
+        <h2 className="card-title"><Icon name="plus" size={18} /> HWID kitiltása</h2>
         <form onSubmit={handleCreate}>
           <label className="field-label">HWID</label>
           <input type="text" value={hwid} onChange={(e) => setHwid(e.target.value)} required />
@@ -116,7 +116,7 @@ export function BannedHwidsSection() {
           <label className="field-label">Indoklás (opcionális)</label>
           <input type="text" value={reason} onChange={(e) => setReason(e.target.value)} />
 
-          <button className="btn-primary" type="submit" disabled={isCreating}>
+          <button className="btn-primary btn-block" type="submit" disabled={isCreating}>
             {isCreating ? 'Hozzáadás...' : 'Kitiltás'}
           </button>
           {createError && <p className="error-text">{createError}</p>}

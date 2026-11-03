@@ -2,7 +2,6 @@ import { Fragment, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api, ApiError } from '../api/client';
 import type { FindingDto, ScanResultView } from '../api/types';
-import { Layout } from '../components/Layout';
 import { Icon, type IconName } from '../components/Icon';
 import { CountUp, Skeleton } from '../components/motion';
 
@@ -12,25 +11,36 @@ const VERDICT_LABELS: Record<string, string> = {
   Inconclusive: 'NEM EGYÉRTELMŰ'
 };
 
-// Jobb oldali, lenyitható szekciók - csak "identitás/média" jellegű
-// kategóriák, pontosan a referencia-képek szerint (Alts / Recording Software
-// / XRay Texture Packs). A többi kategória (cheat-jel, gyanús fájlok, stb.)
-// a bal oldali kártya "Details" gombja mögötti modálban jelenik meg - lásd
-// MODAL_TYPE_LABELS.
+const VERDICT_TEXT: Record<string, string> = {
+  Legit: 'Nem volt komoly találat ezen a gépen.',
+  Unlegit: 'Magas vagy kritikus súlyú találat, vagy kitiltott gép.',
+  Inconclusive: 'Közepes súlyú találat. Nézd át a részleteket, és döntsd el.'
+};
+
+// Identitás/média jellegű kategóriák: külön, lenyitható szekciókban. Minden más
+// (csalásnyom, gyanús fájl stb.) a fő találati listába kerül.
 const ACCORDION_CATEGORIES: { category: FindingDto['category']; label: string; icon: IconName }[] = [
-  { category: 'AltAccount', label: 'Alts', icon: 'users' },
-  { category: 'RecordingSoftware', label: 'Recording Software', icon: 'video' },
-  { category: 'XrayTexturePack', label: 'XRay Texture Packs', icon: 'gamepad' },
-  { category: 'VpnOrProxy', label: 'VPN / Proxy', icon: 'globe' }
+  { category: 'AltAccount', label: 'Másodfiókok', icon: 'users' },
+  { category: 'RecordingSoftware', label: 'Felvevő szoftverek', icon: 'video' },
+  { category: 'XrayTexturePack', label: 'X-ray textúracsomagok', icon: 'gamepad' },
+  { category: 'VpnOrProxy', label: 'VPN / proxy', icon: 'globe' }
 ];
 
-const MODAL_TYPE_LABELS: Record<string, string> = {
-  CheatSignature: 'Cheat',
-  SuspiciousSavedFile: 'Suspicious Files',
-  SuspiciousDeletedFile: 'Suspicious Files',
-  Injector: 'Injector',
-  VmSandbox: 'VM / Sandbox',
-  TamperAttempt: 'Tamper'
+const TYPE_LABELS: Record<string, string> = {
+  CheatSignature: 'Csalás',
+  SuspiciousSavedFile: 'Gyanús fájl',
+  SuspiciousDeletedFile: 'Törölt fájl',
+  Injector: 'Injektor',
+  VmSandbox: 'VM / sandbox',
+  TamperAttempt: 'Nyomeltüntetés'
+};
+
+const SEVERITY_LABELS: Record<string, string> = {
+  Critical: 'Kritikus',
+  High: 'Magas',
+  Medium: 'Közepes',
+  Low: 'Alacsony',
+  Info: 'Info'
 };
 
 const SEVERITY_ORDER: FindingDto['severity'][] = ['Critical', 'High', 'Medium', 'Low', 'Info'];
@@ -43,13 +53,21 @@ function groupByCategory(findings: FindingDto[]): Record<string, FindingDto[]> {
 }
 
 function formatRelativeToNow(iso: string | null): string {
-  if (!iso) return '-';
+  if (!iso) return 'nincs adat';
   const diffMs = Date.now() - new Date(iso).getTime();
-  if (diffMs < 0) return '-';
+  if (diffMs < 0) return 'nincs adat';
   const minutes = Math.floor(diffMs / 60000);
-  const seconds = Math.floor((diffMs % 60000) / 1000);
-  if (minutes <= 0) return `${seconds}s ago`;
-  return `${minutes}m, ${seconds}s ago`;
+  if (minutes < 1) return 'most';
+  if (minutes < 60) return `${minutes} perce`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 48) return `${hours} órája`;
+  return `${Math.floor(hours / 24)} napja`;
+}
+
+function formatDuration(ms: number): string {
+  const totalSeconds = Math.round(ms / 1000);
+  if (totalSeconds < 60) return `${totalSeconds} mp`;
+  return `${Math.floor(totalSeconds / 60)} p ${totalSeconds % 60} mp`;
 }
 
 export function ResultPage() {
@@ -57,10 +75,7 @@ export function ResultPage() {
   const [result, setResult] = useState<ScanResultView | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
-  const [leftView, setLeftView] = useState<'result' | 'info'>('result');
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [expandedFinding, setExpandedFinding] = useState<number | null>(null);
 
   useEffect(() => {
@@ -73,7 +88,7 @@ export function ResultPage() {
         if (e instanceof ApiError && e.status === 403) {
           setError('Ez a vizsgálat nem a te szervezetedhez tartozik.');
         } else if (e instanceof ApiError && e.status === 404) {
-          setError('Nincs ilyen Result ID.');
+          setError('Nincs ilyen vizsgálat.');
         } else {
           setError('Nem sikerült betölteni az eredményt.');
         }
@@ -83,244 +98,202 @@ export function ResultPage() {
 
   if (isLoading) {
     return (
-      <Layout fullBleed>
-        <div className="panel-hero">
-          <h1>Scan Result</h1>
-          <p className="subtitle">View your scan details</p>
+      <main className="page">
+        <header className="page-head">
+          <span className="eyebrow">Eredmény</span>
+          <h1>Vizsgálat</h1>
+        </header>
+        <div className="result-top">
+          <div className="card"><Skeleton width="60%" height={40} style={{ marginBottom: 16 }} /><Skeleton width="80%" /></div>
+          <div className="card"><Skeleton width="100%" /><Skeleton width="70%" style={{ marginTop: 14 }} /></div>
         </div>
-        <div className="panel-content">
-          <div className="panel-grid result-grid" style={{ marginTop: 32 }}>
-            <div className="card skeleton-card">
-              <Skeleton width={64} height={64} radius={999} style={{ margin: '0 auto 16px' }} />
-              <Skeleton width="60%" height={22} style={{ margin: '0 auto 16px' }} />
-              <Skeleton width={110} height={38} style={{ margin: '0 auto' }} />
-            </div>
-            <div className="accordion-stack">
-              {[0, 1, 2, 3].map((i) => (
-                <div className="accordion-item skeleton-card" key={i} style={{ padding: 20 }}>
-                  <Skeleton width={`${45 + i * 10}%`} />
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </Layout>
+      </main>
     );
   }
 
   if (error || !result) {
     return (
-      <Layout>
-        <Link to="/panel" className="back-link">&larr; Vissza a Panelre</Link>
+      <main className="page">
+        <Link to="/panel" className="back-link"><Icon name="arrow-right" size={15} className="flip-x" /> Vissza a Panelre</Link>
         <p className="error-text">{error ?? 'Ismeretlen hiba.'}</p>
-      </Layout>
+      </main>
     );
   }
 
   const grouped = groupByCategory(result.findings);
-  const modalFindings = result.findings
+  const mainFindings = result.findings
     .filter((f) => !ACCORDION_CATEGORIES.some((a) => a.category === f.category))
     .sort((a, b) => SEVERITY_ORDER.indexOf(a.severity) - SEVERITY_ORDER.indexOf(b.severity));
   const savedCount = (grouped.SuspiciousSavedFile ?? []).length;
   const deletedCount = (grouped.SuspiciousDeletedFile ?? []).length;
   const cheatCount = (grouped.CheatSignature ?? []).length + (grouped.Injector ?? []).length;
+  const verdictKey = result.verdict.toLowerCase();
 
   return (
-    <Layout fullBleed>
-      <div className="panel-hero">
-        <h1>Scan Result</h1>
-        <p className="subtitle">View your scan details</p>
+    <main className="page">
+      <Link to="/panel" className="back-link"><Icon name="arrow-right" size={15} className="flip-x" /> Vissza a Panelre</Link>
+
+      <div className="result-top">
+        <section className={`card verdict-card verdict-card-${verdictKey} stagger-in`}>
+          <span className="verdict-print" aria-hidden="true">
+            <Icon name="fingerprint" size={46} />
+            <span className="verdict-print-scan" />
+          </span>
+          <div>
+            <span className="eyebrow">Verdikt</span>
+            <div className="verdict-stamp">{VERDICT_LABELS[result.verdict] ?? result.verdict}</div>
+            <p className="muted">{VERDICT_TEXT[result.verdict]}</p>
+          </div>
+        </section>
+
+        <section className="card stagger-in" style={{ animationDelay: '90ms' }}>
+          <h2 className="card-title"><Icon name="cpu" size={18} /> A gép adatai</h2>
+          <dl className="fact-grid">
+            {result.minecraftUsername && (
+              <div><dt>Minecraft név</dt><dd>{result.minecraftUsername}</dd></div>
+            )}
+            <div><dt>Gépnév</dt><dd>{result.system.hostname}</dd></div>
+            <div><dt>Operációs rendszer</dt><dd>{result.system.osVersion}</dd></div>
+            <div><dt>Lomtár utoljára ürítve</dt><dd>{formatRelativeToNow(result.system.recycleBinLastEmptiedAt)}</dd></div>
+            <div><dt>Vizsgálat ideje</dt><dd>{new Date(result.createdAt).toLocaleString('hu-HU')}</dd></div>
+            <div><dt>Időtartam</dt><dd>{formatDuration(result.scanDurationMs)}</dd></div>
+            <div><dt>Kliens verzió</dt><dd className="mono">{result.clientVersion}</dd></div>
+          </dl>
+        </section>
       </div>
 
-      <div className="panel-content">
-        <Link to="/panel" className="back-link back-link-hero">&larr; Vissza a Panelre</Link>
-
-        <div className="panel-grid result-grid">
-          <div className={`card scan-toggle-card verdict-${result.verdict.toLowerCase()}`}>
-            <div className="scan-toggle-header">
-              <span>{leftView === 'result' ? 'Scan Result' : 'Scan Info'}</span>
-              <button
-                className={`toggle-arrow ${leftView === 'info' ? 'toggle-arrow-flipped' : ''}`}
-                onClick={() => setLeftView((v) => (v === 'result' ? 'info' : 'result'))}
-                aria-label="Váltás Scan Result és Scan Info között"
-              >
-                <Icon name="arrow-right" size={16} />
-              </button>
-            </div>
-
-            {leftView === 'result' ? (
-              <div className="scan-toggle-body" key="result">
-                <span className="fingerprint-icon fingerprint-scanning">
-                  <Icon name="fingerprint" size={40} />
-                  <span className="fingerprint-scanline" aria-hidden="true" />
-                </span>
-                <div className="verdict-label-plain verdict-reveal">{VERDICT_LABELS[result.verdict] ?? result.verdict}</div>
-                <button className="btn-outline-white" onClick={() => setIsDetailsOpen(true)}>
-                  Details
-                </button>
-              </div>
-            ) : (
-              <ul className="info-list-white" key="info">
-                {result.minecraftUsername && (
-                  <li><span>Minecraft Username:</span><span className="pill-value">{result.minecraftUsername}</span></li>
-                )}
-                <li><span>Recycle Bin:</span><span className="pill-value">{formatRelativeToNow(result.system.recycleBinLastEmptiedAt)}</span></li>
-                <li><span>Operating System:</span><span className="pill-value">{result.system.osVersion}</span></li>
-                <li><span>Scan Time:</span><span className="pill-value">{new Date(result.createdAt).toLocaleString('hu-HU')}</span></li>
-                <li><span>Scan Speed:</span><span className="pill-value">{result.scanDurationMs}ms</span></li>
-              </ul>
-            )}
-          </div>
-
-          <div className="accordion-stack">
-            {ACCORDION_CATEGORIES.map(({ category, label, icon }, index) => {
-              const items = grouped[category] ?? [];
-              const isOpen = openAccordion === category;
-              return (
-                <div
-                  className={`accordion-item stagger-in ${isOpen ? 'accordion-item-open' : ''}`}
-                  key={category}
-                  style={{ animationDelay: `${120 + index * 80}ms` }}
-                >
-                  <button
-                    className="accordion-trigger"
-                    onClick={() => setOpenAccordion(isOpen ? null : category)}
-                  >
-                    <span className="accordion-icon"><Icon name={icon} size={19} /></span>
-                    <span className="accordion-label">{label}</span>
-                    <span className={`count-chip ${items.length > 0 ? 'count-chip-hot' : ''}`}>{items.length}</span>
-                    <span className={`accordion-chevron ${isOpen ? 'accordion-chevron-open' : ''}`}>
-                      <Icon name="arrow-right" size={14} className="chevron-svg" />
-                    </span>
-                  </button>
-                  <div className={`accordion-panel-wrapper ${isOpen ? 'accordion-panel-wrapper-open' : ''}`}>
-                    <div className="accordion-panel-inner">
-                      <div className="accordion-panel">
-                        {items.length === 0 && <p className="muted small">Nincs találat ebben a kategóriában.</p>}
-                        {items.map((f, i) => (
-                          <div className="accordion-finding" key={i} style={{ transitionDelay: isOpen ? `${80 + i * 45}ms` : '0ms' }}>
-                            <span className="accordion-finding-thumb"><Icon name={icon} size={16} /></span>
-                            <span className="mono small">{f.filePath ?? f.label}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+      <div className="tally-row stagger-in" style={{ animationDelay: '150ms' }}>
+        <div className={`tally ${cheatCount > 0 ? 'tally-hot' : ''}`}>
+          <Icon name="bug" size={20} />
+          <strong><CountUp value={cheatCount} duration={700} /></strong>
+          <span>Csalásnyom</span>
+        </div>
+        <div className={`tally ${savedCount > 0 ? 'tally-warm' : ''}`}>
+          <Icon name="file" size={20} />
+          <strong><CountUp value={savedCount} duration={700} /></strong>
+          <span>Gyanús fájl</span>
+        </div>
+        <div className={`tally ${deletedCount > 0 ? 'tally-warm' : ''}`}>
+          <Icon name="trash" size={20} />
+          <strong><CountUp value={deletedCount} duration={700} /></strong>
+          <span>Törölt fájl nyoma</span>
         </div>
       </div>
 
-      {isDetailsOpen && (
-        <div className="modal-overlay" onClick={() => setIsDetailsOpen(false)}>
-          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <span className="modal-header-icon"><Icon name="info" size={22} /></span>
-            </div>
-            <div className="modal-body">
-              <div className="modal-stats-row">
-                <div className="modal-stat">
-                  <div className="modal-stat-label"><Icon name="save" size={15} /> Suspicious Saved Files</div>
-                  <div className="modal-stat-value"><Icon name="search" size={15} /> <CountUp value={savedCount} duration={700} /></div>
-                </div>
-                <div className="modal-stat">
-                  <div className="modal-stat-label"><Icon name="trash" size={15} /> Suspicious Deleted Files</div>
-                  <div className="modal-stat-value"><Icon name="search" size={15} /> <CountUp value={deletedCount} duration={700} /></div>
-                </div>
-                <div className="modal-stat">
-                  <div className="modal-stat-label"><Icon name="bug" size={15} /> Cheats Found</div>
-                  <div className="modal-stat-value"><Icon name="search" size={15} /> <CountUp value={cheatCount} duration={700} /></div>
-                </div>
-              </div>
-
-              <div className="table-scroll">
-                <table className="sessions-table modal-findings-table">
-                  <thead>
-                    <tr>
-                      <th>Type</th>
-                      <th>Details</th>
-                      <th>Found</th>
+      <section className="card section-gap stagger-in" style={{ animationDelay: '210ms' }}>
+        <h2 className="card-title"><Icon name="search" size={18} /> Találatok</h2>
+        <div className="table-scroll">
+          <table className="data-table findings-table">
+            <thead>
+              <tr>
+                <th>Típus</th>
+                <th>Súly</th>
+                <th>Részlet</th>
+              </tr>
+            </thead>
+            <tbody>
+              {mainFindings.map((f, i) => {
+                const isExpanded = expandedFinding === i;
+                return (
+                  <Fragment key={i}>
+                    <tr
+                      className={`row-in finding-row ${isExpanded ? 'finding-row-open' : ''}`}
+                      style={{ animationDelay: `${Math.min(i, 20) * 30}ms` }}
+                      onClick={() => setExpandedFinding(isExpanded ? null : i)}
+                      title="Kattints a részletekért"
+                    >
+                      <td><span className="type-pill">{TYPE_LABELS[f.category] ?? f.category}</span></td>
+                      <td><span className={`severity-badge severity-${f.severity.toLowerCase()}`}>{SEVERITY_LABELS[f.severity] ?? f.severity}</span></td>
+                      <td className="mono small">
+                        <span className="finding-row-text">{f.filePath ?? f.label}</span>
+                        <span className={`finding-row-chevron ${isExpanded ? 'finding-row-chevron-open' : ''}`}>
+                          <Icon name="arrow-right" size={12} />
+                        </span>
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {modalFindings.map((f, i) => {
-                      const isExpanded = expandedFinding === i;
-                      return (
-                        <Fragment key={i}>
-                          <tr
-                            className={`row-in finding-row ${isExpanded ? 'finding-row-open' : ''}`}
-                            style={{ animationDelay: `${150 + Math.min(i, 20) * 35}ms` }}
-                            onClick={() => setExpandedFinding(isExpanded ? null : i)}
-                            title="Kattints a részletekért"
-                          >
-                            <td>
-                              <span className="type-pill">{MODAL_TYPE_LABELS[f.category] ?? f.category}</span>
-                            </td>
-                            <td>
-                              <span className={`severity-badge severity-${f.severity.toLowerCase()}`}>{f.severity}</span>
-                            </td>
-                            <td className="mono small">
-                              <span className="finding-row-text">{f.filePath ?? f.label}</span>
-                              <span className={`finding-row-chevron ${isExpanded ? 'finding-row-chevron-open' : ''}`}>
-                                <Icon name="arrow-right" size={12} />
-                              </span>
-                            </td>
-                          </tr>
-                          {isExpanded && (
-                            <tr className="finding-detail-row">
-                              <td colSpan={3}>
-                                <div className="finding-detail">
-                                  <p className="finding-detail-label">{f.label}</p>
-                                  <dl className="finding-detail-grid">
-                                    <dt>Forrás</dt>
-                                    <dd>{f.source}</dd>
-                                    {f.foundAt && (
-                                      <>
-                                        <dt>Időpont</dt>
-                                        <dd>{new Date(f.foundAt).toLocaleString('hu-HU')}</dd>
-                                      </>
-                                    )}
-                                    {f.filePath && (
-                                      <>
-                                        <dt>Elérési út</dt>
-                                        <dd className="mono">{f.filePath}</dd>
-                                      </>
-                                    )}
-                                    {f.details &&
-                                      Object.entries(f.details).map(([key, value]) => (
-                                        <Fragment key={key}>
-                                          <dt>{key}</dt>
-                                          <dd>{value}</dd>
-                                        </Fragment>
-                                      ))}
-                                    {f.fileHashSha256 && (
-                                      <>
-                                        <dt>SHA-256</dt>
-                                        <dd className="mono finding-detail-hash">{f.fileHashSha256}</dd>
-                                      </>
-                                    )}
-                                  </dl>
-                                </div>
-                              </td>
-                            </tr>
-                          )}
-                        </Fragment>
-                      );
-                    })}
-                    {modalFindings.length === 0 && (
-                      <tr>
-                        <td colSpan={3} className="muted">Nincs további találat.</td>
+                    {isExpanded && (
+                      <tr className="finding-detail-row">
+                        <td colSpan={3}>
+                          <div className="finding-detail">
+                            <p className="finding-detail-label">{f.label}</p>
+                            <dl className="finding-detail-grid">
+                              <dt>Forrás</dt>
+                              <dd>{f.source}</dd>
+                              {f.foundAt && (
+                                <>
+                                  <dt>Időpont</dt>
+                                  <dd>{new Date(f.foundAt).toLocaleString('hu-HU')}</dd>
+                                </>
+                              )}
+                              {f.filePath && (
+                                <>
+                                  <dt>Elérési út</dt>
+                                  <dd className="mono">{f.filePath}</dd>
+                                </>
+                              )}
+                              {f.details &&
+                                Object.entries(f.details).map(([key, value]) => (
+                                  <Fragment key={key}>
+                                    <dt>{key}</dt>
+                                    <dd>{value}</dd>
+                                  </Fragment>
+                                ))}
+                              {f.fileHashSha256 && (
+                                <>
+                                  <dt>SHA-256</dt>
+                                  <dd className="mono finding-detail-hash">{f.fileHashSha256}</dd>
+                                </>
+                              )}
+                            </dl>
+                          </div>
+                        </td>
                       </tr>
                     )}
-                  </tbody>
-                </table>
+                  </Fragment>
+                );
+              })}
+              {mainFindings.length === 0 && (
+                <tr>
+                  <td colSpan={3} className="muted empty-row">Nincs találat ezekben a kategóriákban.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div className="accordion-grid">
+        {ACCORDION_CATEGORIES.map(({ category, label, icon }, index) => {
+          const items = grouped[category] ?? [];
+          const isOpen = openAccordion === category;
+          return (
+            <div
+              className={`card accordion-item stagger-in ${isOpen ? 'accordion-item-open' : ''}`}
+              key={category}
+              style={{ animationDelay: `${260 + index * 60}ms` }}
+            >
+              <button className="accordion-trigger" onClick={() => setOpenAccordion(isOpen ? null : category)} aria-expanded={isOpen}>
+                <span className="accordion-icon"><Icon name={icon} size={19} /></span>
+                <span className="accordion-label">{label}</span>
+                <span className={`count-chip ${items.length > 0 ? 'count-chip-hot' : ''}`}>{items.length}</span>
+                <span className="accordion-chevron"><Icon name="arrow-right" size={14} /></span>
+              </button>
+              <div className="accordion-panel-wrapper">
+                <div className="accordion-panel-inner">
+                  <div className="accordion-panel">
+                    {items.length === 0 && <p className="muted small">Nincs találat ebben a kategóriában.</p>}
+                    {items.map((f, i) => (
+                      <div className="accordion-finding" key={i}>
+                        <span className="mono small">{f.filePath ?? f.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      )}
-    </Layout>
+          );
+        })}
+      </div>
+    </main>
   );
 }
