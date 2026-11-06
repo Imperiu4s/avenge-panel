@@ -5,6 +5,8 @@ import type { FindingDto, ScanResultView } from '../api/types';
 import { Icon, type IconName } from '../components/Icon';
 import { CountUp, Skeleton } from '../components/motion';
 import { MouseSoftwareSection } from '../components/MouseSoftwareSection';
+import { ScanTimeline } from '../components/ScanTimeline';
+import { actionTone, beforeScan, eventTiming, formatSecond, parseEvents } from '../components/timeline';
 
 const VERDICT_LABELS: Record<string, string> = {
   Legit: 'LEGIT',
@@ -159,7 +161,7 @@ export function ResultPage() {
             <div><dt>Gépnév</dt><dd>{result.system.hostname}</dd></div>
             <div><dt>Operációs rendszer</dt><dd>{result.system.osVersion}</dd></div>
             <div><dt>Lomtár utoljára ürítve</dt><dd>{formatRelativeToNow(result.system.recycleBinLastEmptiedAt)}</dd></div>
-            <div><dt>Vizsgálat ideje</dt><dd>{new Date(result.createdAt).toLocaleString('hu-HU')}</dd></div>
+            <div><dt>Vizsgálat ideje</dt><dd>{formatSecond(result.createdAt)}</dd></div>
             <div><dt>Időtartam</dt><dd>{formatDuration(result.scanDurationMs)}</dd></div>
             <div><dt>Kliens verzió</dt><dd className="mono">{result.clientVersion}</dd></div>
           </dl>
@@ -231,7 +233,7 @@ export function ResultPage() {
                               {f.foundAt && (
                                 <>
                                   <dt>Időpont</dt>
-                                  <dd>{new Date(f.foundAt).toLocaleString('hu-HU')}</dd>
+                                  <dd>{formatSecond(f.foundAt)}</dd>
                                 </>
                               )}
                               {f.filePath && (
@@ -241,12 +243,14 @@ export function ResultPage() {
                                 </>
                               )}
                               {f.details &&
-                                Object.entries(f.details).map(([key, value]) => (
-                                  <Fragment key={key}>
-                                    <dt>{key}</dt>
-                                    <dd>{value}</dd>
-                                  </Fragment>
-                                ))}
+                                Object.entries(f.details)
+                                  .filter(([key]) => key !== 'Események')
+                                  .map(([key, value]) => (
+                                    <Fragment key={key}>
+                                      <dt>{key}</dt>
+                                      <dd>{value}</dd>
+                                    </Fragment>
+                                  ))}
                               {f.fileHashSha256 && (
                                 <>
                                   <dt>SHA-256</dt>
@@ -254,6 +258,20 @@ export function ResultPage() {
                                 </>
                               )}
                             </dl>
+                            {parseEvents(f.details?.['Események']).length > 0 && (
+                              <ol className="finding-events">
+                                {parseEvents(f.details?.['Események']).map((event, index) => (
+                                  <li key={`${event.time}-${index}`}>
+                                    <time className="mono">{eventTiming(event).text}</time>
+                                    <span className={`tl-action ${actionTone(event.action)}`}>{event.action}</span>
+                                    <span className="finding-event-text">
+                                      {event.text}
+                                      <small> · {beforeScan(event.time, result.createdAt)} · {event.source}</small>
+                                    </span>
+                                  </li>
+                                ))}
+                              </ol>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -272,6 +290,8 @@ export function ResultPage() {
       </section>
 
       <MouseSoftwareSection findings={mouseFindings} scanTime={result.createdAt} clientVersion={result.clientVersion} />
+
+      <ScanTimeline findings={result.findings} scanTime={result.createdAt} />
 
       <div className="accordion-grid">
         {ACCORDION_CATEGORIES.map(({ category, label, icon }, index) => {

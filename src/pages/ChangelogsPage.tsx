@@ -8,6 +8,17 @@ interface ChangelogEntry {
 
 const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '2.2.0',
+    date: '2026-11-06',
+    items: [
+      'Egérprogramok: gombonként látszik, mire van kiosztva, és pontosan mi változott: melyik gombra melyik makró került, melyik makró melyik lépése íródott át, melyik profil lett aktív.',
+      'A korábbi állapotokat a program saját mentéseiből (SQLite WAL, biztonsági másolatok) és a Windows visszaállítási pontjaiból állítja vissza.',
+      'Minden változásnál látszik, mennyire biztos az ideje: másodpercre pontos, időablak, vagy legkésőbb egy adott pillanatig.',
+      'Minden találat saját idővonalat kapott: létrehozás, letöltés forrása, indítások, átnevezés (a régi névvel), törlés, Defender-észlelés - másodpercre.',
+      'Új, közös idővonal az eredményoldalon, szűrhető indításokra, fájlműveletekre, törlésekre és egérváltozásokra.'
+    ]
+  },
+  {
     version: '2.1.0',
     date: '2026-11-04',
     items: [

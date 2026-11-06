@@ -1,25 +1,21 @@
 import { useState } from 'react';
 import type { FindingDto } from '../api/types';
 import { Icon } from './Icon';
+import {
+  actionTone,
+  beforeScan,
+  changeTiming,
+  eventTiming,
+  formatSecond,
+  parseChanges,
+  parseEvents,
+  type TimedChange
+} from './timeline';
 
 // A detektor (client: MouseSoftwareDetector) és a szerver (MouseSoftwareComparison) közös
-// megállapodása: a találat fajtáját a Details kulcsai jelölik, a "Változások" pedig
-// tabulátorral tagolt sorokból áll (időpont, művelet, szerepkör, szöveg).
-interface TimelineItem {
-  time: string;
-  action: string;
-  role: string;
-  text: string;
-}
-
-const ACTION_CLASS: Record<string, string> = {
-  Törölve: 'tl-action-danger',
-  Létrehozva: 'tl-action-warm',
-  Átnevezve: 'tl-action-warm',
-  Módosult: 'tl-action-info',
-  Elindítva: 'tl-action-ok',
-  Napló: 'tl-action-muted'
-};
+// megállapodása: a találat fajtáját a Details kulcsai jelölik. A "Változások" a fájlszintű
+// idővonal, a "Tartalmi változások" a gombonkénti/makrónkénti különbség, a "Gombkiosztás" a
+// jelenlegi kiosztás (profil, gomb, művelet) - mind tabulátorral tagolt sorok.
 
 const SEVERITY_LABELS: Record<string, string> = {
   Critical: 'Kritikus',
@@ -31,7 +27,7 @@ const SEVERITY_LABELS: Record<string, string> = {
 
 const SEVERITY_RANK: Record<string, number> = { Critical: 4, High: 3, Medium: 2, Low: 1, Info: 0 };
 
-const CHANGE_META_KEYS = new Set(['Kapcsolódó program', 'Előző vizsgálat']);
+const KIND_ORDER: Record<string, number> = { Gomb: 0, Makró: 1, Profil: 2, Beállítás: 3, Összesítés: 4 };
 
 function detail(finding: FindingDto, key: string): string | null {
   return finding.details?.[key] ?? null;
@@ -45,25 +41,58 @@ function splitNames(value: string | null): string[] {
   return value ? value.split(', ').filter(Boolean) : [];
 }
 
-function parseTimeline(value: string | null): TimelineItem[] {
+interface Binding {
+  profile: string;
+  button: string;
+  action: string;
+}
+
+function parseBindings(value: string | null): Binding[] {
   return splitLines(value).flatMap((line) => {
-    const [time, action, role, ...rest] = line.split('\t');
-    return time && action ? [{ time, action, role: role ?? '', text: rest.join(' ') }] : [];
+    const [profile, button, action] = line.split('\t');
+    return button && action ? [{ profile: profile ?? '', button, action }] : [];
   });
 }
 
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleString('hu-HU');
+/** A 2.1.0 előtti kliensek még nem nézték az egérprogramokat: náluk a hiány nem jelent semmit. */
+function checksMouseSoftware(clientVersion: string): boolean {
+  const [major, minor] = clientVersion.split('.').map(Number);
+  return major > 2 || (major === 2 && minor >= 1);
 }
 
-/** Az esemény a vizsgálathoz képest: ez a lényeg, nem a naptári időpont. */
-function beforeScan(eventIso: string, scanIso: string): string {
-  const minutes = Math.round((new Date(scanIso).getTime() - new Date(eventIso).getTime()) / 60000);
-  if (minutes <= 1) return 'közvetlenül a vizsgálat előtt';
-  if (minutes < 60) return `${minutes} perccel a vizsgálat előtt`;
-  const hours = Math.round(minutes / 60);
-  if (hours < 48) return `${hours} órával a vizsgálat előtt`;
-  return `${Math.round(hours / 24)} nappal a vizsgálat előtt`;
+function ChangeList({ changes, scanTime, limit = 12 }: { changes: TimedChange[]; scanTime: string; limit?: number }) {
+  const [showAll, setShowAll] = useState(false);
+  const sorted = [...changes].sort((a, b) => (KIND_ORDER[a.kind] ?? 9) - (KIND_ORDER[b.kind] ?? 9));
+  const visible = showAll ? sorted : sorted.slice(0, limit);
+
+  return (
+    <>
+      <ul className="change-list">
+        {visible.map((change, i) => {
+          const timing = changeTiming(change);
+          return (
+            <li key={`${change.text}-${i}`} className={`change-item change-${change.kind === 'Gomb' || change.kind === 'Makró' ? 'hot' : 'calm'}`}>
+              <span className="change-kind">{change.kind}</span>
+              <div className="change-body">
+                <p>{change.text}</p>
+                <small>
+                  <span className={`timing-badge timing-${timing.tone}`}>{timing.badge}</span>
+                  {timing.text}
+                  {change.exact && ` · ${beforeScan(change.exact, scanTime)}`}
+                </small>
+                {change.basis && <small className="change-basis">{change.basis}{change.file ? ` · ${change.file}` : ''}</small>}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+      {sorted.length > limit && (
+        <button className="text-action change-more" onClick={() => setShowAll((v) => !v)}>
+          {showAll ? 'Kevesebb' : `Mind a ${sorted.length} változás`}
+        </button>
+      )}
+    </>
+  );
 }
 
 function ProductCard({
@@ -86,19 +115,25 @@ function ProductCard({
   const warnings = splitLines(detail(product, 'Figyelmeztetések'));
   const notes = splitLines(detail(product, 'Megjegyzések'));
   const folders = splitLines(detail(product, 'Mappák'));
-  const timeline = parseTimeline(detail(product, 'Változások'));
+  const timeline = parseEvents(detail(product, 'Változások'));
+  const contentChanges = parseChanges(detail(product, 'Tartalmi változások'));
+  const bindings = parseBindings(detail(product, 'Gombkiosztás'));
+  const compareChanges = change ? parseChanges(detail(change, 'Tartalmi változások')) : [];
   const bundled = detail(product, 'Gyári makrók');
   const started = detail(product, 'Indult');
   const lastRun = detail(product, 'Utolsó futás');
   const suspiciousNames = new Set(macros.map((m) => detail(m, 'Makró neve')));
+  const bindingProfiles = [...new Set(bindings.map((b) => b.profile))];
 
   const facts: [string, string][] = [];
   if (detail(product, 'Verzió')) facts.push(['Verzió', detail(product, 'Verzió')!]);
-  if (started) facts.push(['Most futó példány indult', formatDate(started)]);
-  if (lastRun) facts.push(['Utolsó futás', formatDate(lastRun)]);
+  if (started) facts.push(['Most futó példány indult', formatSecond(started)]);
+  if (lastRun) facts.push(['Utolsó futás', formatSecond(lastRun)]);
   if (detail(product, 'Futtatások száma')) facts.push(['Futtatások száma', detail(product, 'Futtatások száma')!]);
   if (bundled) facts.push(['Gyári mintamakrók', `${bundled} db (nem számítanak)`]);
   if (detail(product, 'Felderítve')) facts.push(['Honnan tudjuk', detail(product, 'Felderítve')!]);
+
+  const latestContent = contentChanges.find((c) => c.exact);
 
   return (
     <div className={`mouse-card ${isOpen ? 'mouse-card-open' : ''}`}>
@@ -112,8 +147,12 @@ function ProductCard({
         </span>
         <span className="mouse-card-summary">
           {activeProfiles.length > 0 && <span>Aktív profil: <b>{activeProfiles.join(', ')}</b></span>}
+          {bindings.length > 0 && <span>{bindings.length} gombkiosztás</span>}
           {macroNames.length > 0 && <span className={macros.length > 0 ? 'mouse-hot' : ''}>{macroNames.length} makró</span>}
-          {timeline.length > 0 && <span>Utolsó változás: {beforeScan(timeline[0].time, scanTime)}</span>}
+          {contentChanges.length > 0 && <span className="mouse-hot">{contentChanges.length} tartalmi változás</span>}
+          {latestContent?.exact
+            ? <span>Utolsó átállítás: <b>{formatSecond(latestContent.exact)}</b></span>
+            : timeline.length > 0 && <span>Utolsó változás: {beforeScan(timeline[0].time, scanTime)}</span>}
         </span>
         {product.severity !== 'Info' && (
           <span className={`severity-badge severity-${product.severity.toLowerCase()}`}>
@@ -132,21 +171,45 @@ function ProductCard({
               </ul>
             )}
 
+            {contentChanges.length > 0 && (
+              <div className="mouse-block">
+                <h4>Pontosan mi változott</h4>
+                <ChangeList changes={contentChanges} scanTime={scanTime} />
+              </div>
+            )}
+
             {change && (
               <div className="mouse-compare">
-                <h4><Icon name="history" size={15} /> Az előző vizsgálat óta ({formatDate(detail(change, 'Előző vizsgálat') ?? scanTime)})</h4>
-                <dl>
-                  {Object.entries(change.details ?? {})
-                    .filter(([key]) => !CHANGE_META_KEYS.has(key))
-                    .map(([key, value]) => (
-                      <div key={key}><dt>{key}</dt><dd>{value}</dd></div>
-                    ))}
-                </dl>
+                <h4><Icon name="history" size={15} /> Az előző vizsgálat óta ({formatSecond(detail(change, 'Előző vizsgálat') ?? scanTime)})</h4>
+                {compareChanges.length > 0
+                  ? <ChangeList changes={compareChanges} scanTime={scanTime} limit={8} />
+                  : <p className="muted small">{change.label}</p>}
               </div>
             )}
 
             <div className="mouse-columns">
               <div>
+                {bindings.length > 0 && (
+                  <>
+                    <h4>Gombkiosztás most</h4>
+                    {bindingProfiles.map((profile) => (
+                      <div className="binding-group" key={profile || 'nincs'}>
+                        {profile && <span className={`binding-profile ${activeProfiles.includes(profile) ? 'binding-profile-active' : ''}`}>{profile}</span>}
+                        <table className="binding-table">
+                          <tbody>
+                            {bindings.filter((b) => b.profile === profile).map((b) => (
+                              <tr key={`${b.profile}-${b.button}`}>
+                                <td className="mono">{b.button}</td>
+                                <td className={suspiciousNames.has(b.action) || macroNames.includes(b.action) ? 'mouse-hot' : ''}>{b.action}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ))}
+                  </>
+                )}
+
                 <h4>Profilok</h4>
                 {profiles.length === 0 && <p className="muted small">Nem olvasható ki a programból.</p>}
                 <div className="mouse-chips">
@@ -193,19 +256,22 @@ function ProductCard({
               </div>
 
               <div>
-                <h4>Mi változott (az elmúlt 30 napban)</h4>
+                <h4>Idővonal (másodpercre, az elmúlt 30 napból)</h4>
                 {timeline.length === 0 && <p className="muted small">Nem látszik változás ebben az időszakban.</p>}
                 {timeline.length > 0 && (
                   <ol className="mouse-timeline">
-                    {timeline.map((item, i) => (
-                      <li key={`${item.time}-${i}`}>
-                        <span className={`tl-action ${ACTION_CLASS[item.action] ?? 'tl-action-muted'}`}>{item.action}</span>
-                        <div>
-                          <p>{item.text}</p>
-                          <small>{beforeScan(item.time, scanTime)} · {formatDate(item.time)}{item.role ? ` · ${item.role}` : ''}</small>
-                        </div>
-                      </li>
-                    ))}
+                    {timeline.map((item, i) => {
+                      const timing = eventTiming(item);
+                      return (
+                        <li key={`${item.time}-${i}`}>
+                          <span className={`tl-action ${actionTone(item.action)}`}>{item.action}</span>
+                          <div>
+                            <p>{item.text}</p>
+                            <small>{timing.text} · {beforeScan(item.time, scanTime)}{item.source ? ` · ${item.source}` : ''}</small>
+                          </div>
+                        </li>
+                      );
+                    })}
                   </ol>
                 )}
               </div>
@@ -215,12 +281,6 @@ function ProductCard({
       </div>
     </div>
   );
-}
-
-/** A 2.1.0 előtti kliensek még nem nézték az egérprogramokat: náluk a hiány nem jelent semmit. */
-function checksMouseSoftware(clientVersion: string): boolean {
-  const [major, minor] = clientVersion.split('.').map(Number);
-  return major > 2 || (major === 2 && minor >= 1);
 }
 
 export function MouseSoftwareSection({
