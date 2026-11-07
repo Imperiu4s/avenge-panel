@@ -8,6 +8,17 @@ interface ChangelogEntry {
 
 const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '2.5.0',
+    date: '2026-11-07',
+    items: [
+      'Önmegsemmisítés ("self destruct") után is: a törölt jar-t visszaolvassa a lemezről (NTFS fájltábla) és a Windows visszaállítási pontjaiból, és ujjlenyomattal azonosítja.',
+      'Felismeri a DoomsDay önmegsemmisítésének mintáját (a jar törlése és a helyén azonnal létrehozott, majd törölt mappa). Ha a Java futtatta is, ez már kritikus találat.',
+      'A futó Minecraft memóriájában is megtalálja a DoomsDay betöltőjét, akkor is, ha a csalást kikapcsolták és a fájlját törölték.',
+      'A takarítás nyomai: tömegesen törölt vagy hiányzó Prefetch, újra létrehozott NTFS-napló, törölt eseménynapló, tömegesen törölt Legutóbbi elemek és ugrólisták.',
+      'Amit a takarítás ritkán ér el: a megnyitott jar-ok listája, az Explorer ugrólistái, a böngészők letöltései (csak csaló-oldalakra szűrve) és a DNS-gyorsítótár.'
+    ]
+  },
+  {
     version: '2.4.0',
     date: '2026-11-07',
     items: [
