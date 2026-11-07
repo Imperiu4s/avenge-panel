@@ -13,6 +13,10 @@ export interface CurrentUserView {
   organizationName: string;
   createdAt: string;
   lastLoginAt: string | null;
+  /// Az Admin beállításaiból: törölheti-e a saját vizsgálatait, készíthet-e megosztó linket.
+  canDeleteOwnScans?: boolean;
+  canShareResults?: boolean;
+  seesOnlyOwnScans?: boolean;
 }
 
 export interface ClientReleaseView {
@@ -54,6 +58,7 @@ export interface SessionListItem {
   createdAt: string;
   completedAt: string | null;
   verdict: ScanVerdict | null;
+  createdByMe?: boolean;
 }
 
 export interface SystemFingerprintDto {
@@ -104,6 +109,8 @@ export interface ScanResultView {
   createdAt: string;
   findings: FindingDto[];
   minecraftUsername: string | null;
+  /// A megosztott nézetben nincs (null).
+  sessionCode?: string | null;
 }
 
 // ── Admin (tulajdonos) ──
@@ -163,4 +170,148 @@ export interface BannedHwidView {
 export interface CreateBannedHwidRequest {
   hwid: string;
   reason?: string;
+}
+
+// ── Megosztó link (bejelentkezés nélkül, 3 napig érvényes) ──
+export interface CreateShareLinkResponse {
+  id: string;
+  token: string;
+  expiresAt: string;
+}
+
+export interface ShareLinkView {
+  id: string;
+  createdAt: string;
+  expiresAt: string;
+  createdByEmail: string | null;
+  viewCount: number;
+  lastViewedAt: string | null;
+}
+
+export interface SharedResultView {
+  result: ScanResultView;
+  expiresAt: string;
+  organizationName: string;
+}
+
+// ── Admin: áttekintés, vizsgálatok, beállítások, napló ──
+export interface DailyCount {
+  date: string;
+  scans: number;
+  legit: number;
+  inconclusive: number;
+  unlegit: number;
+}
+
+export interface StaffActivity {
+  userId: string;
+  email: string;
+  scans: number;
+  unlegit: number;
+  lastScanAt: string | null;
+}
+
+export interface AdminOverviewView {
+  users: number;
+  activeUsers: number;
+  admins: number;
+  totalScans: number;
+  completed: number;
+  legit: number;
+  unlegit: number;
+  inconclusive: number;
+  unfinished: number;
+  last24Hours: number;
+  last7Days: number;
+  last30Days: number;
+  activeShareLinks: number;
+  bannedHwids: number;
+  daily: DailyCount[];
+  staff: StaffActivity[];
+}
+
+export interface AdminSessionView {
+  code: string;
+  resultIdHash: string | null;
+  status: SessionStatus;
+  verdict: ScanVerdict | null;
+  createdAt: string;
+  completedAt: string | null;
+  createdByUserId: string;
+  createdByEmail: string | null;
+  minecraftUsername: string | null;
+  hostname: string | null;
+  findingCount: number;
+}
+
+export interface AdminSessionPage {
+  items: AdminSessionView[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+export interface AdminSessionQuery {
+  page?: number;
+  pageSize?: number;
+  userId?: string;
+  verdict?: ScanVerdict | '';
+  status?: string;
+  q?: string;
+}
+
+export interface PurgeHistoryRequest {
+  userId?: string;
+  olderThanDays?: number;
+  verdict?: ScanVerdict;
+  onlyUnfinished?: boolean;
+  all?: boolean;
+}
+
+export interface DeletedCountView {
+  deleted: number;
+}
+
+export interface OrganizationSettingsView {
+  organizationName: string;
+  sessionCodeMinutes: number;
+  retentionDays: number;
+  shareLinksEnabled: boolean;
+  staffCanShare: boolean;
+  staffCanDeleteOwnScans: boolean;
+  staffSeesOnlyOwnScans: boolean;
+  shareLinkDays: number;
+  updatedAt: string;
+}
+
+export type UpdateOrganizationSettingsRequest = Partial<Omit<OrganizationSettingsView, 'shareLinkDays' | 'updatedAt'>>;
+
+export interface AuditEntryView {
+  id: string;
+  createdAt: string;
+  action: string;
+  userEmail: string | null;
+  targetType: string;
+  target: string | null;
+  ipAddress: string | null;
+  details: string | null;
+}
+
+export interface AuditPage {
+  items: AuditEntryView[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+export interface AdminShareLinkView {
+  id: string;
+  resultIdHash: string | null;
+  sessionCode: string | null;
+  verdict: ScanVerdict | null;
+  createdAt: string;
+  expiresAt: string;
+  createdByEmail: string | null;
+  viewCount: number;
+  lastViewedAt: string | null;
 }

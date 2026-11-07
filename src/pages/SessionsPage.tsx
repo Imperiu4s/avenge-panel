@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api, ApiError, clientDownloadUrl } from '../api/client';
 import type { CreateSessionResponse, SessionListItem } from '../api/types';
+import { useAuth } from '../auth/AuthContext';
 import { Icon } from '../components/Icon';
 import { ScrambleText, Skeleton, useCopyFeedback, useNow } from '../components/motion';
 import { onScanProgress, onSessionStatusChanged, type ScanProgressEvent } from '../realtime/scanHub';
@@ -46,6 +47,10 @@ export function SessionsPage() {
 
   const { copiedKey, copy } = useCopyFeedback();
   const now = useNow();
+  const { user, isAdmin } = useAuth();
+
+  const canDeleteRow = (s: SessionListItem) =>
+    isAdmin || (user?.canDeleteOwnScans === true && s.createdByMe === true);
 
   const loadSessions = useCallback(async (targetPage: number) => {
     setIsLoadingList(true);
@@ -120,6 +125,16 @@ export function SessionsPage() {
       offProgress();
     };
   }, [loadSessions, page]);
+
+  async function handleDelete(s: SessionListItem) {
+    if (!window.confirm(`Törlöd a #${s.code} vizsgálatot az eredményével együtt? Ez nem vonható vissza.`)) return;
+    try {
+      await api.deleteSession(s.code);
+      setSessions((prev) => prev.filter((item) => item.code !== s.code));
+    } catch (err) {
+      setListError(err instanceof ApiError ? err.message : 'Nem sikerült törölni a vizsgálatot.');
+    }
+  }
 
   async function handleGenerate() {
     setIsGenerating(true);
@@ -299,6 +314,17 @@ export function SessionsPage() {
                             </span>
                             <span className="mono small">{progress.percent}%</span>
                           </span>
+                        )}
+                        {canDeleteRow(s) && (
+                          <button
+                            type="button"
+                            className="icon-button row-delete"
+                            onClick={() => handleDelete(s)}
+                            aria-label={`#${s.code} törlése`}
+                            title="Vizsgálat törlése"
+                          >
+                            <Icon name="trash" size={14} />
+                          </button>
                         )}
                       </td>
                     </tr>

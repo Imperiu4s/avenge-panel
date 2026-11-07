@@ -16,7 +16,7 @@ const SOURCES: Omit<Blip, 'hitAt'>[] = [
   { angle: 0.5, radius: 0.72, label: 'PREFETCH' },
   { angle: 1.25, radius: 0.46, label: 'BAM' },
   { angle: 2.05, radius: 0.8, label: 'USERASSIST' },
-  { angle: 2.8, radius: 0.55, label: 'NTFS MFT' },
+  { angle: 2.8, radius: 0.55, label: 'LOMTÁR' },
   { angle: 3.6, radius: 0.76, label: 'DEFENDER' },
   { angle: 4.35, radius: 0.38, label: 'MUICACHE' },
   { angle: 5.05, radius: 0.68, label: 'JAR' },

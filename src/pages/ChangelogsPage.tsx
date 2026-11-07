@@ -8,6 +8,17 @@ interface ChangelogEntry {
 
 const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '2.3.0',
+    date: '2026-11-07',
+    items: [
+      'Új „Mire jelzett” blokk az eredmény tetején: a vizsgálat legerősebb találata (csalás vagy autoclicker), a nevével, a helyével, az okával és az idejével.',
+      'Megosztó link: bárki megnyithatja bejelentkezés nélkül, 3 napig érvényes, és bármikor visszavonható.',
+      'Az Admin Panel fülekre bontva: áttekintés napi grafikonnal, összes vizsgálat kereséssel és törléssel, előzmények tömeges törlése, beállítások, tevékenységnapló.',
+      'Új beállítások: a kód érvényessége, a vizsgálatok automatikus törlése, a megosztás és a törlés joga, és hogy a Staff csak a saját vizsgálatait lássa.',
+      'Felhasználónként: előzmények törlése és kijelentkeztetés minden eszközön.'
+    ]
+  },
+  {
     version: '2.2.0',
     date: '2026-11-06',
     items: [
@@ -33,7 +44,7 @@ const CHANGELOG: ChangelogEntry[] = [
     version: '2.0.0',
     date: '2026-11-03',
     items: [
-      'Teljes gép vizsgálata: az NTFS fájltáblából minden meghajtó minden fájlja látszik, a gyanús fájlok tartalmát is ellenőrzi.',
+      'Alaposabb fájlellenőrzés: a gyanús fájlok tartalmát is ellenőrzi, így az átnevezett csalóprogramok is lebuknak.',
       'Új futtatási előzmények: Prefetch, BAM, UserAssist, MuiCache és PCA. A már törölt programok is lebuknak.',
       'Új Defender-vizsgálat: korábbi észlelések és gyanús kivételek.',
       'Az exe a saját szerverünkről frissül, és csak aláírt frissítést fogad el.',

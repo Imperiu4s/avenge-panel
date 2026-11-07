@@ -6,7 +6,7 @@ import { RadarScope } from '../components/RadarScope';
 import avengeLogo from '../assets/avenge-logo-crop.png';
 
 const SOURCES = [
-  'Prefetch', 'BAM', 'UserAssist', 'MuiCache', 'PCA', 'AppSwitched', 'NTFS MFT', 'Lomtár',
+  'Prefetch', 'BAM', 'UserAssist', 'MuiCache', 'PCA', 'AppSwitched', 'Letöltési előzmények', 'Lomtár',
   'Microsoft Defender', 'Authenticode', 'PE-elemzés', 'JAR-elemzés', 'AutoHotkey', 'Futó folyamatok',
   'Minecraft mods', 'Egérprogramok', 'Makrók', 'Registry', 'VPN / proxy', 'Virtuális gép'
 ];
@@ -31,8 +31,8 @@ const STEPS: { icon: IconName; title: string; text: string }[] = [
   },
   {
     icon: 'radar',
-    title: 'Átvizsgálja a gépet',
-    text: 'A haladást élőben látod a Panelen. A kliens végigmegy a teljes gépen, a futtatási előzményeken és a törölt fájlok nyomain.'
+    title: 'Elvégzi a vizsgálatot',
+    text: 'A haladást élőben látod a Panelen: a kliens átnézi a gyanús fájlokat, a futtatási előzményeket és a törölt fájlok nyomait.'
   },
   {
     icon: 'fingerprint',
@@ -44,8 +44,8 @@ const STEPS: { icon: IconName; title: string; text: string }[] = [
 const CAPABILITIES: { icon: IconName; title: string; text: string; size: 'wide' | 'tall' | 'std'; fx: string }[] = [
   {
     icon: 'drive',
-    title: 'Teljes gép, nem csak a játékmappa',
-    text: 'Közvetlenül az NTFS fájltáblát olvassa, így minden meghajtó minden fájlnevét látja, a rejtett és átnevezett mappákban is. A gyanús fájlokat a tartalmuk alapján is ellenőrzi.',
+    title: 'Átnevezve is lebukik',
+    text: 'Nem csak a fájlnév számít: a gyanús programokat a tartalmuk alapján is ellenőrzi, így egy átnevezett csalóprogram vagy autoclicker is lebukik.',
     size: 'wide',
     fx: 'rows'
   },
@@ -122,8 +122,8 @@ export function HomePage() {
             <span className="line-mask"><span style={{ animationDelay: '240ms' }}><em>nyomot</em> hagy.</span></span>
           </h1>
           <p className="hero-sub stagger-in" style={{ animationDelay: '380ms' }}>
-            Az Avenge átvizsgálja a teljes gépet: a fájlokat, a futtatási előzményeket és a törölt programok
-            nyomait. Az eredményt élőben, részletesen a staff elé teszi.
+            Az Avenge megkeresi a csalások nyomait: a gyanús fájlokat, a futtatási előzményeket és a törölt
+            programokat. Az eredményt élőben, részletesen a staff elé teszi.
           </p>
           <div className="hero-actions stagger-in" style={{ animationDelay: '480ms' }}>
             <Link to={isAuthenticated ? '/panel' : '/login'} className="btn-primary btn-large">

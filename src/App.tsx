@@ -11,6 +11,7 @@ import { AccountPage } from './pages/AccountPage';
 import { ChangelogsPage } from './pages/ChangelogsPage';
 import { AdminPage } from './pages/AdminPage';
 import { PlayerDownloadPage } from './pages/PlayerDownloadPage';
+import { SharedResultPage } from './pages/SharedResultPage';
 
 export default function App() {
   return (
@@ -22,6 +23,8 @@ export default function App() {
           <Route path="/home" element={<HomePage />} />
           {/* A vizsgált játékos oldala: nincs fiókja, a staff által generált kóddal tölt le. */}
           <Route path="/d/:code" element={<PlayerDownloadPage />} />
+          {/* Megosztó link: bárki megnyithatja bejelentkezés nélkül, 3 napig. */}
+          <Route path="/s/:token" element={<SharedResultPage />} />
           <Route path="/account" element={<ProtectedRoute><AccountPage /></ProtectedRoute>} />
           <Route path="/changelogs" element={<ProtectedRoute><ChangelogsPage /></ProtectedRoute>} />
           <Route path="/panel" element={<ProtectedRoute><SessionsPage /></ProtectedRoute>} />

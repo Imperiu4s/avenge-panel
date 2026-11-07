@@ -23,6 +23,8 @@ interface AuthContextValue {
   logout: () => void;
   /// Jelszóváltás után a szerver új tokent ad - a munkamenet ezzel folytatódik.
   replaceToken: (token: string) => void;
+  /// Újratölti a fiók adatait (pl. az Admin beállításai után a jogosultságokat).
+  refreshUser: () => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -122,6 +124,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(next);
   }, []);
 
+  const refreshUser = useCallback(() => {
+    api.me().then(setUser).catch(() => { /* nem blokkoló */ });
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
@@ -133,7 +139,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         login,
         logout,
-        replaceToken
+        replaceToken,
+        refreshUser
       }}
     >
       {children}
