@@ -8,6 +8,17 @@ interface ChangelogEntry {
 
 const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '2.4.0',
+    date: '2026-11-07',
+    items: [
+      'DoomsDay felismerése akkor is, ha a fájl neve és mérete minden letöltésnél más: a jar belső szerkezete, a titkosított betöltő és a visszafejtő rutin bájtkódja alapján.',
+      'Kiterjesztéstől függetlenül: egy .txt-re vagy .dat-ra átnevezett jar is lebukik a Letöltések, az Asztal, a Temp és a .minecraft mappákban.',
+      'Letöltési forrás: ha egy fájlt a DoomsDay oldaláról töltöttek le, az magában is jelzés.',
+      'Futó Minecraft: jelzi, ha menet közben Java-ügynököt töltöttek bele (injektálás), és ellenőrzi a -jar / -javaagent argumentumokat és a launcherek indítási beállításait.',
+      'Törölt nyomok: a Java által futtatott, azóta törölt, véletlen nevű jar-ok a Prefetch és az NTFS-napló alapján.'
+    ]
+  },
+  {
     version: '2.3.0',
     date: '2026-11-07',
     items: [

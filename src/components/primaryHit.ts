@@ -98,6 +98,11 @@ function fileName(path: string | null): string | null {
 
 function displayName(f: FindingDto): string {
   const details = f.details ?? {};
+  // Név szerint felismert csalás (pl. DoomsDay): a csalás neve, mellette a fájl.
+  if (details['Csalás']) {
+    const file = fileName(f.filePath);
+    return file ? `${details['Csalás']} (${file})` : details['Csalás'];
+  }
   if (f.category === 'MouseSoftware') {
     if (details['Makró neve']) {
       return details['Program'] ? `${details['Makró neve']} (${details['Program']})` : details['Makró neve'];
