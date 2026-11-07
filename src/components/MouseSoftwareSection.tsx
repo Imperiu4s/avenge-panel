@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import type { FindingDto } from '../api/types';
 import { Icon } from './Icon';
+import { MacroCard } from './MacroCard';
+import { parseDeviceSettings, parseMacroDetails, parseProgramSettings } from './mouseDetails';
 import {
   actionTone,
   beforeScan,
@@ -124,6 +126,13 @@ function ProductCard({
   const lastRun = detail(product, 'Utolsó futás');
   const suspiciousNames = new Set(macros.map((m) => detail(m, 'Makró neve')));
   const bindingProfiles = [...new Set(bindings.map((b) => b.profile))];
+  const macroDetails = parseMacroDetails(detail(product, 'Makrók részletesen'));
+  const deviceSettings = parseDeviceSettings(detail(product, 'Eszközbeállítások'));
+  const programSettings = parseProgramSettings(detail(product, 'Program beállításai'));
+  const knownDevices = splitLines(detail(product, 'Eszközök'));
+  const detailedNames = new Set(macroDetails.map((m) => m.name.toLowerCase()));
+  const isMacroAction = (action: string) =>
+    suspiciousNames.has(action) || macroNames.includes(action) || detailedNames.has(action.toLowerCase());
 
   const facts: [string, string][] = [];
   if (detail(product, 'Verzió')) facts.push(['Verzió', detail(product, 'Verzió')!]);
@@ -147,7 +156,9 @@ function ProductCard({
         </span>
         <span className="mouse-card-summary">
           {activeProfiles.length > 0 && <span>Aktív profil: <b>{activeProfiles.join(', ')}</b></span>}
+          {knownDevices.length > 0 && <span>{knownDevices.join(', ')}</span>}
           {bindings.length > 0 && <span>{bindings.length} gombkiosztás</span>}
+          {deviceSettings.some((s) => s.warning) && <span className="mouse-hot">beállítás-figyelmeztetés</span>}
           {macroNames.length > 0 && <span className={macros.length > 0 ? 'mouse-hot' : ''}>{macroNames.length} makró</span>}
           {contentChanges.length > 0 && <span className="mouse-hot">{contentChanges.length} tartalmi változás</span>}
           {latestContent?.exact
@@ -178,6 +189,48 @@ function ProductCard({
               </div>
             )}
 
+            {macroDetails.length > 0 && (
+              <div className="mouse-block">
+                <h4>Makrók pontosan ({macroDetails.length})</h4>
+                <div className="macro-grid">
+                  {macroDetails.map((macro) => <MacroCard key={`${macro.name}-${macro.source}`} macro={macro} />)}
+                </div>
+              </div>
+            )}
+
+            {deviceSettings.length > 0 && (
+              <div className="mouse-block">
+                <h4>Az egér beállításai</h4>
+                <table className="setting-table">
+                  <tbody>
+                    {deviceSettings.map((setting, i) => (
+                      <tr key={`${setting.path}-${i}`} className={setting.warning ? 'setting-warn' : ''}>
+                        <td>{setting.group}<small className="mono">{setting.path}</small></td>
+                        <td className="mono setting-value">{setting.value}</td>
+                        <td className="small">{setting.warning ?? ''}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {programSettings.length > 0 && (
+              <div className="mouse-block">
+                <h4>A program saját beállításai</h4>
+                <table className="setting-table">
+                  <tbody>
+                    {programSettings.map((setting, i) => (
+                      <tr key={`${setting.name}-${i}`} className={setting.name.includes('számolt') ? 'setting-warn' : ''}>
+                        <td className="mono small">{setting.name}</td>
+                        <td className="mono setting-value">{setting.value}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
             {change && (
               <div className="mouse-compare">
                 <h4><Icon name="history" size={15} /> Az előző vizsgálat óta ({formatSecond(detail(change, 'Előző vizsgálat') ?? scanTime)})</h4>
@@ -200,13 +253,25 @@ function ProductCard({
                             {bindings.filter((b) => b.profile === profile).map((b) => (
                               <tr key={`${b.profile}-${b.button}`}>
                                 <td className="mono">{b.button}</td>
-                                <td className={suspiciousNames.has(b.action) || macroNames.includes(b.action) ? 'mouse-hot' : ''}>{b.action}</td>
+                                <td className={isMacroAction(b.action) ? 'mouse-hot' : ''}>
+                                  {b.action}
+                                  {isMacroAction(b.action) && <span className="binding-macro-tag">makró</span>}
+                                </td>
                               </tr>
                             ))}
                           </tbody>
                         </table>
                       </div>
                     ))}
+                  </>
+                )}
+
+                {knownDevices.length > 0 && (
+                  <>
+                    <h4>Eszközök a programban</h4>
+                    <div className="mouse-chips">
+                      {knownDevices.map((d) => <span key={d} className="mouse-chip">{d}</span>)}
+                    </div>
                   </>
                 )}
 
@@ -347,13 +412,18 @@ export function MouseSoftwareSection({
       {orphanMacros.length > 0 && (
         <div className="mouse-loose">
           <h4>Különálló makró-fájlok</h4>
-          {orphanMacros.map((m) => (
-            <div className="mouse-macro" key={m.label}>
-              <strong>{detail(m, 'Makró neve')}</strong>
-              <span className="type-pill">{detail(m, 'Makró típusa')}</span>
-              <small className="mono">{detail(m, 'Fájl')}</small>
-            </div>
-          ))}
+          {orphanMacros.map((m) => {
+            const parsed = parseMacroDetails(detail(m, 'Makrók részletesen'));
+            return parsed.length > 0
+              ? <MacroCard key={m.label} macro={parsed[0]} />
+              : (
+                <div className="mouse-macro" key={m.label}>
+                  <strong>{detail(m, 'Makró neve')}</strong>
+                  <span className="type-pill">{detail(m, 'Makró típusa')}</span>
+                  <small className="mono">{detail(m, 'Fájl')}</small>
+                </div>
+              );
+          })}
         </div>
       )}
     </section>

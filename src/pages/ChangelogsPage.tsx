@@ -8,6 +8,17 @@ interface ChangelogEntry {
 
 const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '2.6.0',
+    date: '2026-11-07',
+    items: [
+      'Makrók pontosan: minden makró lépésenként (melyik gomb le/fel, várakozás ms-ban, billentyű, egérmozgatás), a számolt kattintás/másodperccel, a két kattintás közti legrövidebb idővel és az ismétlési móddal (egyszer, amíg nyomva, toggle, N-szer).',
+      'Minden makrónál látszik, melyik gombra és melyik profilban van kiosztva; a gombkiosztásban a makróra állított gombok külön jelölést kapnak.',
+      'Az egér beállításai pontos értékkel: DPI-fokozatok, polling, debounce, LOD, szögkorrekció, motion sync, gyors-tüzelés. A 0-2 ms-os debounce (dupla kattintásra alkalmas) kiemelve.',
+      'Új: az ATK Hub, VXE és a többi Electron-alapú egérprogram adatai (eszközök, makrók neve, típusa, ismétlése) is kiolvashatók.',
+      'AutoHotkey-szkriptek gyorsbillentyűnként: melyik gombra mi fut le, Sleep-értékek, ciklusok és a kattintási ütem; az autoclicker-programok saját beállításai (kattintási időköz, CPS).'
+    ]
+  },
+  {
     version: '2.5.0',
     date: '2026-11-07',
     items: [
