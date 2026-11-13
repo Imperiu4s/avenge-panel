@@ -16,9 +16,6 @@ export function LoginPage() {
 
   const redirectTo = (location.state as { from?: string } | null)?.from ?? '/panel';
 
-  // Hibás belépésnél a kártya "megrázza magát" - a class eltávolítása és a
-  // reflow kikényszerítése után az animáció minden sikertelen próbálkozásnál
-  // újraindul, nem csak az elsőnél.
   useEffect(() => {
     const card = cardRef.current;
     if (!error || !card) return;

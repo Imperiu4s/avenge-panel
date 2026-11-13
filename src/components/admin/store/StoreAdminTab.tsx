@@ -15,7 +15,9 @@ import { Icon, type IconName } from '../../Icon';
 import { useCopyFeedback } from '../../motion';
 import { StoreCustomersAdmin } from './StoreCustomersAdmin';
 import { StoreDiscountsAdmin } from './StoreDiscountsAdmin';
+import { StoreInvoicesAdmin } from './StoreInvoicesAdmin';
 import { StoreProductsAdmin } from './StoreProductsAdmin';
+import { StoreRefundsAdmin } from './StoreRefundsAdmin';
 
 const SECTIONS: { key: string; label: string; icon: IconName }[] = [
   { key: 'overview', label: 'Áttekintés', icon: 'activity' },
@@ -24,6 +26,8 @@ const SECTIONS: { key: string; label: string; icon: IconName }[] = [
   { key: 'customers', label: 'Vásárlók', icon: 'users' },
   { key: 'orders', label: 'Rendelések', icon: 'card' },
   { key: 'subscriptions', label: 'Előfizetések', icon: 'radar' },
+  { key: 'invoices', label: 'Bizonylatok', icon: 'file' },
+  { key: 'refunds', label: 'Visszatérítés', icon: 'refresh' },
   { key: 'settings', label: 'Beállítások', icon: 'settings' }
 ];
 
@@ -178,7 +182,9 @@ function Settings({ onSaved }: { onSaved: (s: AdminStoreSettings) => void }) {
     setDraft({
       brandName: s.brandName, tagline: s.tagline, about: s.about, currency: s.currency, storeEnabled: s.storeEnabled,
       subscriptionEnabled: s.subscriptionEnabled, subscriptionName: s.subscriptionName, subscriptionPrice: s.subscriptionPrice,
-      tebexProjectId: s.tebexProjectId, tebexPrivateKey: null, tebexWebhookSecret: null
+      tebexProjectId: s.tebexProjectId, tebexPrivateKey: null, tebexWebhookSecret: null,
+      sellerName: s.sellerName, sellerAddress: s.sellerAddress, sellerTaxNumber: s.sellerTaxNumber, sellerEmail: s.sellerEmail,
+      receiptNote: s.receiptNote
     });
   }, []);
 
@@ -253,6 +259,31 @@ function Settings({ onSaved }: { onSaved: (s: AdminStoreSettings) => void }) {
           </label>
         </div>
 
+        <h2 className="card-title section-gap"><Icon name="file" size={18} /> Bizonylatok</h2>
+        <p className="muted small">Ezek az adatok kerülnek az újonnan kiállított bizonylatokra. A már kiállítottak nem változnak.</p>
+        <div className="seller-grid">
+          <label>
+            <span className="field-label">Eladó neve</span>
+            <input maxLength={120} value={draft.sellerName} onChange={(e) => set('sellerName', e.target.value)} placeholder="Pl. Avenge vagy a vállalkozásod neve" />
+          </label>
+          <label>
+            <span className="field-label">Ügyfélszolgálati e-mail</span>
+            <input type="email" maxLength={120} value={draft.sellerEmail} onChange={(e) => set('sellerEmail', e.target.value)} />
+          </label>
+          <label>
+            <span className="field-label">Cím</span>
+            <input maxLength={300} value={draft.sellerAddress} onChange={(e) => set('sellerAddress', e.target.value)} />
+          </label>
+          <label>
+            <span className="field-label">Adószám</span>
+            <input maxLength={40} value={draft.sellerTaxNumber} onChange={(e) => set('sellerTaxNumber', e.target.value)} placeholder="Ha van" />
+          </label>
+        </div>
+        <label>
+          <span className="field-label">Megjegyzés a bizonylat alján</span>
+          <textarea rows={3} maxLength={1500} value={draft.receiptNote} onChange={(e) => set('receiptNote', e.target.value)} />
+        </label>
+
         <h2 className="card-title section-gap"><Icon name="lock" size={18} /> Tebex</h2>
         <ol className="setup-steps small muted">
           <li>Hozz létre fiókot és webáruházat a <a className="text-link" href="https://creator.tebex.io" target="_blank" rel="noopener noreferrer">creator.tebex.io</a> oldalon, és kérd a <b>Checkout API</b> hozzáférést (a Tebex jóváhagyja).</li>
@@ -316,7 +347,6 @@ function Settings({ onSaved }: { onSaved: (s: AdminStoreSettings) => void }) {
   );
 }
 
-/** Az Admin Panel "Áruház" füle - csak a platform adminjának. */
 export function StoreAdminTab() {
   const [searchParams, setSearchParams] = useSearchParams();
   const section = SECTIONS.some((s) => s.key === searchParams.get('store')) ? searchParams.get('store')! : 'overview';
@@ -344,6 +374,8 @@ export function StoreAdminTab() {
       {section === 'customers' && <StoreCustomersAdmin currency={currency} />}
       {section === 'orders' && <Orders />}
       {section === 'subscriptions' && <Subscriptions />}
+      {section === 'invoices' && <StoreInvoicesAdmin />}
+      {section === 'refunds' && <StoreRefundsAdmin />}
       {section === 'settings' && <Settings onSaved={(s) => setCurrency(s.currency)} />}
     </>
   );

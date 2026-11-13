@@ -30,16 +30,13 @@ export default function App() {
         <Route element={<Layout />}>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/home" element={<HomePage />} />
-          {/* A vizsgált játékos oldala: nincs fiókja, a staff által generált kóddal tölt le. */}
           <Route path="/d/:code" element={<PlayerDownloadPage />} />
-          {/* Megosztó link: bárki megnyithatja bejelentkezés nélkül, 3 napig. */}
           <Route path="/s/:token" element={<SharedResultPage />} />
           <Route path="/account" element={<ProtectedRoute><AccountPage /></ProtectedRoute>} />
           <Route path="/changelogs" element={<ProtectedRoute><ChangelogsPage /></ProtectedRoute>} />
           <Route path="/panel" element={<ProtectedRoute><SessionsPage /></ProtectedRoute>} />
           <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
           <Route path="/results/:resultId" element={<ProtectedRoute><ResultPage /></ProtectedRoute>} />
-          {/* Avenge Foundry: plugin-áruház és az SS tool előfizetése (vásárlói fiókkal). */}
           <Route element={<StoreShell />}>
             <Route path="/store" element={<StorePage />} />
             <Route path="/store/fiok" element={<StoreAccountPage />} />

@@ -14,11 +14,6 @@ import {
   type TimedChange
 } from './timeline';
 
-// A detektor (client: MouseSoftwareDetector) és a szerver (MouseSoftwareComparison) közös
-// megállapodása: a találat fajtáját a Details kulcsai jelölik. A "Változások" a fájlszintű
-// idővonal, a "Tartalmi változások" a gombonkénti/makrónkénti különbség, a "Gombkiosztás" a
-// jelenlegi kiosztás (profil, gomb, művelet) - mind tabulátorral tagolt sorok.
-
 const SEVERITY_LABELS: Record<string, string> = {
   Critical: 'Kritikus',
   High: 'Magas',
@@ -56,7 +51,6 @@ function parseBindings(value: string | null): Binding[] {
   });
 }
 
-/** A 2.1.0 előtti kliensek még nem nézték az egérprogramokat: náluk a hiány nem jelent semmit. */
 function checksMouseSoftware(clientVersion: string): boolean {
   const [major, minor] = clientVersion.split('.').map(Number);
   return major > 2 || (major === 2 && minor >= 1);

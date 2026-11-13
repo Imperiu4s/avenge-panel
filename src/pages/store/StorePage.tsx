@@ -19,7 +19,6 @@ const SORTS: { key: Sort; label: string }[] = [
   { key: 'price-desc', label: 'Ár szerint csökkenő' }
 ];
 
-/** Az Avenge Foundry "alkotói oldala": márkafejléc, statisztika, szűrhető pluginlista, rólunk. */
 export function StorePage() {
   const { info, error: infoError } = useStoreInfo();
   const [products, setProducts] = useState<StoreProductCard[] | null>(null);
@@ -46,7 +45,6 @@ export function StorePage() {
   }, [all]);
   const allPlatforms = useMemo(() => [...new Set(all.flatMap((p) => p.platforms))].sort(), [all]);
 
-  // A legnagyobb éppen futó akció a sávhoz (pl. Black Friday az összes termékre).
   const sale = useMemo(() => {
     const discounted = all.filter((p) => p.discountPercent > 0);
     if (discounted.length === 0) return null;

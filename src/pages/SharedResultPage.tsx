@@ -7,7 +7,6 @@ import { Skeleton } from '../components/motion';
 import { ResultReport } from '../components/ResultReport';
 import { formatSecond } from '../components/timeline';
 
-/// Bejelentkezés nélkül megnyitható eredmény (megosztó link, 3 napig érvényes).
 export function SharedResultPage() {
   const { token } = useParams<{ token: string }>();
   const [shared, setShared] = useState<SharedResultView | null>(null);

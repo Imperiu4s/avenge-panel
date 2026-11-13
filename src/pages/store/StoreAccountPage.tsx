@@ -1,12 +1,13 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { ApiError } from '../../api/client';
-import { storeApi, type CustomerOwned, type StoreRelease } from '../../api/store';
+import { storeApi, type CustomerOwned, type StoreInvoice, type StoreRelease } from '../../api/store';
 import { useAuth } from '../../auth/AuthContext';
 import { ratePassword } from '../../auth/password';
 import { Icon } from '../../components/Icon';
 import { Skeleton } from '../../components/motion';
 import { useCustomer } from '../../store/CustomerAuth';
+import { InvoiceTable } from '../../store/InvoiceTable';
 import { ProductIcon } from '../../store/ProductCard';
 import { formatBytes, formatDate, formatDateTime, formatPrice, ORDER_STATUS_LABELS, SUBSCRIPTION_STATUS_LABELS } from '../../store/format';
 import { downloadRelease } from './StoreProductPage';
@@ -140,6 +141,32 @@ function OwnedPlugin({ item, onError }: { item: CustomerOwned; onError: (message
   );
 }
 
+function MyInvoices({ refreshKey }: { refreshKey: string }) {
+  const [invoices, setInvoices] = useState<StoreInvoice[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    storeApi.invoices()
+      .then((list) => { if (alive) setInvoices(list); })
+      .catch((err) => { if (alive) setError(err instanceof ApiError ? err.message : 'Nem sikerült betölteni a számláidat.'); });
+    return () => { alive = false; };
+  }, [refreshKey]);
+
+  return (
+    <section id="szamlak" className="card section-gap stagger-in" style={{ animationDelay: '90ms' }}>
+      <h2 className="card-title"><Icon name="file" size={18} /> Számlák és bizonylatok</h2>
+      {invoices === null && !error && <><Skeleton width="60%" /><Skeleton width="85%" style={{ marginTop: 10 }} /></>}
+      {invoices && <InvoiceTable invoices={invoices} download={storeApi.downloadInvoice} empty="Még nincs bizonylatod. Minden fizetés után itt jelenik meg." />}
+      {error && <p className="error-text error-in">{error}</p>}
+      <p className="invoice-note small muted">
+        <Icon name="shield" size={15} />
+        <span>Minden fizetésről és visszatérítésről automatikusan bizonylat készül, ami innen bármikor újra letölthető, és soha nem törlődik. A fizetést a Tebex dolgozza fel, ezért a hivatalos nyugtát vagy számlát ő küldi e-mailben.</span>
+      </p>
+    </section>
+  );
+}
+
 function Dashboard() {
   const { me, refresh, logout, replaceToken } = useCustomer();
   const staff = useAuth();
@@ -238,8 +265,10 @@ function Dashboard() {
               </tbody>
             </table>
           </div>
-          <p className="muted small">A számlát a Tebex küldi e-mailben a fizetés után.</p>
+          <p className="muted small">A bizonylataidat lent, a Számlák résznél töltheted le.</p>
         </section>
+
+        <MyInvoices refreshKey={`${me.orders.length}-${me.orders.map((o) => o.status).join('')}-${sub?.status ?? ''}`} />
       </div>
 
       <aside className="side-stack">
@@ -289,7 +318,7 @@ function Dashboard() {
           <details className="danger-zone">
             <summary>Fiók törlése</summary>
             <form className="account-form" onSubmit={deleteAccount}>
-              <p className="muted small">A fiókod és a letöltési jogaid törlődnek; a rendeléseid név nélkül maradnak meg a könyveléshez. Élő előfizetést előbb mondj le.</p>
+              <p className="muted small">A fiókod és a letöltési jogaid törlődnek. A kiállított bizonylatok a könyvelési kötelezettség miatt megmaradnak. Élő előfizetést előbb mondj le.</p>
               <input type="password" placeholder="Jelszó a megerősítéshez" autoComplete="current-password" required value={deletePassword} onChange={(e) => setDeletePassword(e.target.value)} />
               <button type="submit" className="btn-ghost btn-tiny btn-danger" disabled={busy !== null}>Végleges törlés</button>
             </form>

@@ -16,14 +16,11 @@ interface AuthContextValue {
   isAdmin: boolean;
   isLoading: boolean;
   error: string | null;
-  /// Igaz, ha a munkamenet magától szűnt meg (nem a felhasználó lépett ki).
   sessionExpired: boolean;
   user: CurrentUserView | null;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
-  /// Jelszóváltás után a szerver új tokent ad - a munkamenet ezzel folytatódik.
   replaceToken: (token: string) => void;
-  /// Újratölti a fiók adatait (pl. az Admin beállításai után a jogosultságokat).
   refreshUser: () => void;
 }
 
@@ -45,9 +42,6 @@ function hasExpiredStoredToken(): boolean {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  // Egyetlen igazságforrás: a token. A korábbi külön "isAuthenticated" állapot
-  // bent ragadt igazon, miután a 401 törölte a tokent - ezért kapott az Admin
-  // oldal minden gombja "Hiba (401)"-et a 8 órás munkamenet lejárta után.
   const [token, setToken] = useState<string | null>(readValidToken);
   const [sessionExpired, setSessionExpired] = useState(hasExpiredStoredToken);
   const [user, setUser] = useState<CurrentUserView | null>(null);
@@ -71,7 +65,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener(SESSION_EXPIRED_EVENT, expireSession);
   }, [expireSession]);
 
-  // A lejáratkor magától is kilépünk, ne csak a következő kéréskor derüljön ki.
   useEffect(() => {
     if (!token) return;
     const { expiresAt } = decodeStaffToken(token);
@@ -85,7 +78,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
     api.me()
       .then((me) => { if (!cancelled) setUser(me); })
-      .catch(() => { /* a 401-et az esemény kezeli, a többi nem blokkoló */ });
+      .catch(() => { });
     return () => { cancelled = true; };
   }, [token]);
 
@@ -99,8 +92,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSessionExpired(false);
       return true;
     } catch (e) {
-      // A backend szándékosan nem árulja el, hogy az email vagy a jelszó volt
-      // hibás (user enumeration elleni védelem) - ezt itt is így hagyjuk.
       let message = 'Nem sikerült bejelentkezni. Próbáld újra.';
       if (e instanceof ApiError && e.status === 401) message = 'Hibás email vagy jelszó.';
       if (e instanceof ApiError && e.status === 429) message = e.message;
@@ -125,7 +116,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const refreshUser = useCallback(() => {
-    api.me().then(setUser).catch(() => { /* nem blokkoló */ });
+    api.me().then(setUser).catch(() => { });
   }, []);
 
   return (

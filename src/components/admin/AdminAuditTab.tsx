@@ -57,7 +57,6 @@ function actor(entry: AuditEntryView): string {
   return 'rendszer';
 }
 
-/// A napló részleteiből a lényeg, olvasható formában (pl. hány vizsgálat törlődött).
 function summary(entry: AuditEntryView): string | null {
   if (!entry.details) return null;
   try {

@@ -8,6 +8,16 @@ interface ChangelogEntry {
 
 const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '2.8.0',
+    date: '2026-11-13',
+    items: [
+      'Számlák a vásárlói fiókban: minden plugin-vásárlásról, előfizetési díjról és visszatérítésről automatikusan PDF bizonylat készül, ami bármikor újra letölthető és soha nem törlődik.',
+      'Visszatérítés az Admin Panel Áruház fülén: a fizetéstől számított 14 napon belül egy kattintással visszaküldhető a teljes összeg; a plugin joga vagy az előfizetés azonnal megszűnik, és visszatérítési bizonylat készül.',
+      'Az adminok minden bizonylatot látnak és letölthetnek (keresés bizonylatszámra, e-mail címre, tranzakcióra), a vásárló adatlapján is.',
+      'Az oldal kódja kommentek nélkül, tömörítve kerül ki; a fejlesztői eszközök és a forrásnézet megnyitása le van tiltva.'
+    ]
+  },
+  {
     version: '2.7.0',
     date: '2026-11-13',
     items: [

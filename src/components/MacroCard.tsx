@@ -11,7 +11,6 @@ function stepTone(step: string): string {
   return 'macro-step-other';
 }
 
-/// Egy makró pontosan: típus, melyik gombon van, ismétlés, a számolt értékek és minden lépése.
 export function MacroCard({ macro }: { macro: MacroDetailView }) {
   const [showAll, setShowAll] = useState(false);
   const hot = isHotKind(macro.kind);

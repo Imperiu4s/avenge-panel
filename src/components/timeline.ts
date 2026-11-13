@@ -1,6 +1,3 @@
-// A kliens két, tabulátorral tagolt formátuma (lásd client: ForensicEvents, ConfigHistory.Encode).
-
-/** Egy esemény az idővonalon: "Változások" (egérprogram) vagy "Események" (minden más találat). */
 export interface TimelineEvent {
   time: string;
   action: string;
@@ -10,7 +7,6 @@ export interface TimelineEvent {
   notBefore: string | null;
 }
 
-/** Egy tartalmi változás (gomb, makró, profil, beállítás) és amit az idejéről tudunk. */
 export interface TimedChange {
   kind: string;
   text: string;
@@ -46,7 +42,6 @@ export function parseChanges(value: string | null | undefined): TimedChange[] {
   });
 }
 
-/** Mindig másodpercre: "2026. 11. 06. 14:32:07". */
 export function formatSecond(iso: string): string {
   return new Date(iso).toLocaleString('hu-HU', {
     year: 'numeric',
@@ -58,7 +53,6 @@ export function formatSecond(iso: string): string {
   });
 }
 
-/** Az esemény a vizsgálathoz képest: ez a lényeg, nem csak a naptári időpont. */
 export function beforeScan(eventIso: string, scanIso: string): string {
   const seconds = Math.round((new Date(scanIso).getTime() - new Date(eventIso).getTime()) / 1000);
   if (seconds < 0) return 'a vizsgálat közben';
@@ -71,7 +65,6 @@ export function beforeScan(eventIso: string, scanIso: string): string {
 }
 
 export interface TimingLabel {
-  /** Rövid jelző: pontos / időablak / legkésőbb / ismeretlen. */
   badge: string;
   tone: 'exact' | 'window' | 'unknown';
   text: string;

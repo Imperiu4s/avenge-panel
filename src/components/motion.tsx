@@ -1,15 +1,9 @@
 import { useEffect, useRef, useState, type CSSProperties, type ElementType, type ReactNode } from 'react';
 
-// Közös animációs építőkövek - külső animációs könyvtár nélkül. Minden
-// animáció csak transform/opacity-t mozgat (GPU-n komponálódik, nem okoz
-// layout-újraszámolást), így akadásmentes marad gyengébb gépen is. A
-// prefers-reduced-motion beállítást mindegyik tiszteletben tartja.
-
 export function prefersReducedMotion(): boolean {
   return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
-/** Igaz lesz, amint az elem először a képernyőre ér (utána már nem vált vissza). */
 export function useInView<T extends Element>(rootMargin = '0px 0px -8% 0px') {
   const ref = useRef<T | null>(null);
   const [inView, setInView] = useState(false);
@@ -47,12 +41,6 @@ interface RevealProps {
   id?: string;
 }
 
-/**
- * Görgetéskor (első megjelenéskor) beúszó tartalom. Keyframe-animációval,
- * "backwards" kitöltéssel (lásd index.css .reveal) - így a beúszás után az
- * elem visszakapja a saját stílusait, és pl. a hover-emelés nem akad össze a
- * beúszás késleltetésével.
- */
 export function Reveal({ children, as: Tag = 'div', className = '', delay = 0, variant = 'up', style, id }: RevealProps) {
   const { ref, inView } = useInView<HTMLElement>();
   return (
@@ -67,7 +55,6 @@ export function Reveal({ children, as: Tag = 'div', className = '', delay = 0, v
   );
 }
 
-/** Számláló, ami 0-ról felfut a célértékig, amikor láthatóvá válik. */
 export function CountUp({ value, suffix = '', duration = 1600 }: { value: number; suffix?: string; duration?: number }) {
   const { ref, inView } = useInView<HTMLSpanElement>();
   const [display, setDisplay] = useState(0);
@@ -82,7 +69,7 @@ export function CountUp({ value, suffix = '', duration = 1600 }: { value: number
     const start = performance.now();
     const tick = (now: number) => {
       const t = Math.min(1, (now - start) / duration);
-      const eased = 1 - Math.pow(1 - t, 4); // easeOutQuart
+      const eased = 1 - Math.pow(1 - t, 4);
       setDisplay(Math.round(value * eased));
       if (t < 1) frame = requestAnimationFrame(tick);
     };
@@ -100,11 +87,6 @@ export function CountUp({ value, suffix = '', duration = 1600 }: { value: number
 
 const SCRAMBLE_CHARS = '0123456789';
 
-/**
- * "Nyerőgép"-szerű betűpörgetés: amikor a szöveg megváltozik (pl. új session
- * kód generálásakor), a karakterek balról jobbra, egymás után állnak be a
- * végleges értékre.
- */
 export function ScrambleText({
   text,
   className = '',
@@ -153,10 +135,6 @@ export function ScrambleText({
   return <span className={className}>{display}</span>;
 }
 
-/**
- * A ".spot" osztályú elemeken a kurzor alatt felizzik egy fényfolt (lásd
- * index.css). Egyetlen, dokumentum-szintű figyelő - nem kártyánként külön.
- */
 export function usePointerSpotlight() {
   useEffect(() => {
     if (prefersReducedMotion()) return;
@@ -172,7 +150,6 @@ export function usePointerSpotlight() {
   }, []);
 }
 
-/** Vágólapra másolás rövid "Másolva" visszajelzéssel. */
 export function useCopyFeedback(resetMs = 1800) {
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const timer = useRef(0);
@@ -186,15 +163,12 @@ export function useCopyFeedback(resetMs = 1800) {
       window.clearTimeout(timer.current);
       timer.current = window.setTimeout(() => setCopiedKey(null), resetMs);
     } catch {
-      // A vágólap-hozzáférés böngésző-engedélytől függ - nem blokkoló hiba,
-      // a szöveg a képernyőn marad, kézzel is kimásolható.
     }
   };
 
   return { copiedKey, copy };
 }
 
-/** Másodpercenként frissülő jelenlegi idő - visszaszámlálókhoz. */
 export function useNow(intervalMs = 1000): number {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
@@ -204,7 +178,6 @@ export function useNow(intervalMs = 1000): number {
   return now;
 }
 
-/** Betöltés közbeni, csillogó helykitöltő blokk. */
 export function Skeleton({ width = '100%', height = 16, radius = 8, style }: { width?: number | string; height?: number | string; radius?: number; style?: CSSProperties }) {
   return <span className="skeleton" style={{ width, height, borderRadius: radius, ...style }} aria-hidden="true" />;
 }

@@ -40,7 +40,6 @@ function readToken(): string | null {
   return token;
 }
 
-/** A vásárlói (áruházi) fiók állapota - független a staff bejelentkezéstől. */
 export function CustomerAuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(readToken);
   const [me, setMe] = useState<CustomerMe | null>(null);

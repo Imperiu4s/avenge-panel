@@ -10,7 +10,6 @@ export function useStoreInfo() {
   return useContext(StoreInfoContext);
 }
 
-/** Az áruház oldalainak közös kerete: márkasáv (Foundry), menü és vásárlói fiók gomb. */
 export function StoreShell() {
   const [info, setInfo] = useState<StoreInfo | null>(null);
   const [error, setError] = useState<string | null>(null);

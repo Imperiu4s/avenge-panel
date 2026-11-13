@@ -15,8 +15,6 @@ interface IssuedLink {
   expiresAt: string;
 }
 
-/// Bejelentkezés nélkül megnyitható, 3 napig érvényes link az eredményhez. A link
-/// címét csak most látjuk (a szerver csak a lenyomatát tárolja), utána új kérhető.
 export function ShareLinkPanel({ resultId }: Props) {
   const [links, setLinks] = useState<ShareLinkView[]>([]);
   const [issued, setIssued] = useState<IssuedLink | null>(null);

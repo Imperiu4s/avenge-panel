@@ -35,7 +35,6 @@ const AGE_OPTIONS = [
 
 interface Props {
   users: AdminUserView[];
-  /// Más fülről (pl. Felhasználók) érkező előszűrés.
   initialUserId?: string;
   onChanged?: () => void;
 }

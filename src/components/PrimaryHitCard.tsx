@@ -18,8 +18,6 @@ interface Props {
   onReveal: (finding: FindingDto) => void;
 }
 
-/// "Mire jelzett": a vizsgálat legerősebb találata egy külön blokkban, a verdikt
-/// alatt - csalás vagy autoclicker, a nevével, a helyével, az okával és az idejével.
 export function PrimaryHitCard({ result, onReveal }: Props) {
   const ranked = rankHits(result.findings, result.createdAt);
   const signals = ranked.filter(isSignal);

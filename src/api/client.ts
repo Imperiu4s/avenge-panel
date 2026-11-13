@@ -32,9 +32,6 @@ import { API_BASE } from './config';
 
 const TOKEN_STORAGE_KEY = 'avenge_staff_token';
 
-/// A szerver 401-et adott egy tokennel küldött kérésre (lejárt a 8 órás
-/// munkamenet, vagy közben jelszót váltottak) - az AuthContext erre kilépteti
-/// a felhasználót, különben az oldal bent ragadna, és minden gomb 401-et kapna.
 export const SESSION_EXPIRED_EVENT = 'avenge:session-expired';
 
 export class ApiError extends Error {
@@ -86,7 +83,6 @@ async function request<T>(
       const errorBody = await response.json();
       message = errorBody?.message ?? errorBody?.title ?? message;
     } catch {
-      // a válasz nem JSON - a generikus üzenetnél maradunk
     }
     throw new ApiError(response.status, message);
   }
@@ -129,7 +125,6 @@ export const api = {
   revokeShareLink: (resultId: string, id: string) =>
     request<void>(`/api/scan-results/${encodeURIComponent(resultId)}/shares/${encodeURIComponent(id)}`, { method: 'DELETE' }),
 
-  /// Bejelentkezés nélkül: a megosztó link tokenjével.
   getSharedResult: (token: string) =>
     request<SharedResultView>(`/api/shared/${encodeURIComponent(token)}`, { auth: false }),
 
@@ -218,13 +213,10 @@ export const api = {
     request<void>(`/api/admin/users/${encodeURIComponent(id)}/sign-out`, { method: 'POST', body: {} })
 };
 
-/// A megosztó link teljes címe (a Panel saját címével, hogy bárki megnyithassa).
 export function shareLinkUrl(token: string): string {
   return `${window.location.origin}/s/${token}`;
 }
 
-/// A böngésző natív letöltőjének szánt URL - a Panel letöltési jegyével, vagy a
-/// játékos esetén a staff által generált session kóddal.
 export function clientDownloadUrl(access: { ticket: string } | { code: string }): string {
   const query = 'ticket' in access
     ? `ticket=${encodeURIComponent(access.ticket)}`

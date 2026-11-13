@@ -1,5 +1,3 @@
-// A kliens (MacroDetail.Encode, DeviceSetting.Encode, ToolSettings) tabulátorral tagolt sorai.
-
 export interface MacroDetailView {
   name: string;
   kind: string;
@@ -70,7 +68,6 @@ export function parseProgramSettings(value: string | null | undefined): ProgramS
   });
 }
 
-/** Ezredmásodperc olvashatóan: 120000 → "2 perc", 1500 → "1,5 mp", 15 → "15 ms". */
 export function formatMs(ms: number): string {
   if (ms >= 60_000) {
     const minutes = Math.floor(ms / 60_000);
@@ -85,7 +82,6 @@ export function formatCps(cps: number): string {
   return cps.toLocaleString('hu-HU', { maximumFractionDigits: cps < 1 ? 3 : 1 });
 }
 
-/** Autoclicker / recoil jellegű makró: piros kiemelés. */
 export function isHotKind(kind: string): boolean {
   return /gyorskattint|visszarúgás/i.test(kind);
 }

@@ -12,8 +12,6 @@ const STEPS = [
   'Írd be a kódot, a vizsgálat magától elindul.'
 ];
 
-/// A vizsgált játékos ide kapja a linket a stafftól. Fiók nem kell, de a letöltés
-/// csak addig él, amíg a kód érvényes és még nem használták fel.
 export function PlayerDownloadPage() {
   const { code = '' } = useParams<{ code: string }>();
   const [status, setStatus] = useState<DownloadStatusView | null>(null);

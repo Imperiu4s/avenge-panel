@@ -1,10 +1,3 @@
-/* ─────────────────────────────────────────────────────────────────────────
-   Avenge Foundry - áruház, vásárlói fiók, előfizetés, jogi oldalak és az
-   áruház admin felülete. Ugyanaz a tőr-nyelv: levágott sarkok, acél, vörös jel.
-   ───────────────────────────────────────────────────────────────────────── */
-
-/* ── Közös apróságok ───────────────────────────────────────────────────── */
-
 textarea {
   width: 100%;
   min-height: 90px;
@@ -121,8 +114,6 @@ textarea::placeholder { color: var(--text-3); }
 .error-inline { color: #ff8d86; }
 .notice-inline { color: var(--warn); }
 
-/* ── Márkasáv (Foundry) ────────────────────────────────────────────────── */
-
 .foundry-shell { display: contents; }
 
 .foundry-bar {
@@ -180,8 +171,6 @@ textarea::placeholder { color: var(--text-3); }
 .foundry-bar-account.is-active { border-color: var(--signal); color: #fff; }
 
 .store-page { padding-top: 112px; }
-
-/* ── Alkotói oldal ─────────────────────────────────────────────────────── */
 
 .foundry-banner {
   --cut: 22px;
@@ -451,8 +440,6 @@ a.product-card:hover h3 { color: #fff; }
 
 .foundry-about { max-width: 860px; }
 
-/* ── Plugin oldal ──────────────────────────────────────────────────────── */
-
 .breadcrumbs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; color: var(--text-2); }
 .breadcrumbs a { color: var(--signal-hot); font-weight: 700; }
 .breadcrumbs a:hover { color: #fff; }
@@ -516,8 +503,6 @@ a.product-card:hover h3 { color: #fff; }
 .lightbox img { max-width: 100%; max-height: 100%; object-fit: contain; border: 1px solid var(--line-strong); }
 .lightbox-close { position: absolute; top: 18px; right: 18px; padding: 8px; border: 0; background: none; color: #fff; cursor: pointer; }
 
-/* ── Markdown ──────────────────────────────────────────────────────────── */
-
 .markdown { display: grid; gap: 12px; color: var(--text-2); font-size: 15px; }
 .markdown h2 { margin-top: 14px; font-size: 22px; color: var(--text); }
 .markdown h3 { margin-top: 10px; font-size: 18px; color: var(--text); }
@@ -541,8 +526,6 @@ a.product-card:hover h3 { color: #fff; }
 .md-table th { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-3); }
 .md-table th:empty { display: none; }
 .markdown-preview { padding: 16px; border: 1px dashed var(--line-strong); background: rgba(0, 0, 0, 0.25); max-height: 440px; overflow: auto; }
-
-/* ── Vásárlói fiók ─────────────────────────────────────────────────────── */
 
 .store-auth { display: grid; grid-template-columns: minmax(0, 440px) minmax(0, 1fr); gap: 34px; align-items: start; }
 .store-auth-card form .btn-primary { margin-top: 18px; }
@@ -580,8 +563,6 @@ a.product-card:hover h3 { color: #fff; }
 .danger-zone { margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--line); }
 .danger-zone summary { cursor: pointer; font-size: 13px; font-weight: 700; color: #ff8d86; }
 
-/* ── Köszönjük ─────────────────────────────────────────────────────────── */
-
 .thanks-card { display: grid; justify-items: center; gap: 12px; padding: 50px 30px; text-align: center; }
 .thanks-card h1 { font-size: clamp(28px, 4vw, 40px); }
 
@@ -600,8 +581,6 @@ a.product-card:hover h3 { color: #fff; }
 .thanks-spin svg { animation: spin 1.4s linear infinite; }
 .thanks-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
 
-
-/* ── SS előfizetés ─────────────────────────────────────────────────────── */
 
 .sub-hero { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 40px; align-items: center; margin-bottom: 40px; }
 .sub-hero h1 { font-size: clamp(34px, 5vw, 56px); margin: 8px 0 16px; }
@@ -622,8 +601,6 @@ a.product-card:hover h3 { color: #fff; }
 .faq details:last-child { border-bottom: 0; }
 .faq summary { cursor: pointer; font-weight: 700; color: var(--text); }
 .faq details p { margin-top: 8px; }
-
-/* ── Jogi oldalak ──────────────────────────────────────────────────────── */
 
 .legal-layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 22px; align-items: start; }
 .legal-nav { position: sticky; top: 96px; display: grid; gap: 2px; padding: 14px; }
@@ -647,8 +624,6 @@ a.product-card:hover h3 { color: #fff; }
 .site-footer-links { display: flex; flex-wrap: wrap; gap: 6px 14px; justify-content: center; }
 .site-footer-links a { color: var(--text-3); transition: color 0.2s; }
 .site-footer-links a:hover { color: var(--signal-hot); }
-
-/* ── Áruház admin ──────────────────────────────────────────────────────── */
 
 .sub-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 18px; }
 
@@ -772,8 +747,6 @@ a.product-card:hover h3 { color: #fff; }
 .copy-field { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: rgba(0, 0, 0, 0.35); border: 1px solid var(--line); }
 .copy-field code { flex: 1; min-width: 0; overflow-wrap: anywhere; font-size: 13px; }
 
-/* ── Reszponzív ────────────────────────────────────────────────────────── */
-
 @media (max-width: 1080px) {
   .product-layout, .account-grid { grid-template-columns: minmax(0, 1fr); }
   .product-side { position: static; }
@@ -814,3 +787,36 @@ a.product-card:hover h3 { color: #fff; }
 
 .closing-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
 .hero-note .text-link { margin: 0 2px; }
+
+.block { display: block; }
+.data-table th.num, .data-table td.num { text-align: right; }
+.invoice-table td { vertical-align: top; }
+.invoice-number { display: block; font-weight: 700; color: var(--text); letter-spacing: 0.02em; }
+.invoice-kind { margin-top: 4px; font-size: 11px; padding: 1px 7px; }
+.invoice-kind-purchase { color: var(--info); border-color: rgba(124, 184, 255, 0.4); background: rgba(124, 184, 255, 0.08); }
+.invoice-kind-subscription { color: var(--legit); border-color: rgba(53, 224, 161, 0.4); background: rgba(53, 224, 161, 0.08); }
+.invoice-kind-refund { color: #ff8d86; border-color: rgba(255, 45, 55, 0.45); background: rgba(255, 45, 55, 0.1); }
+.invoice-row-refund td { background: rgba(255, 45, 55, 0.035); }
+.amount-negative { color: #ff8d86; }
+.invoice-note { display: flex; gap: 10px; align-items: flex-start; margin-top: 14px; padding: 10px 12px; border: 1px solid var(--line); background: rgba(255, 232, 226, 0.03); }
+.invoice-note svg { flex: none; margin-top: 2px; color: var(--signal-hot); }
+
+.refund-toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.refund-window { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--warn); }
+.refund-deadline { display: block; font-size: 12px; color: var(--text-3); }
+.refund-deadline.is-close { color: var(--warn); }
+.refund-dialog { display: grid; gap: 12px; margin-top: 12px; padding: 16px; border: 1px solid rgba(255, 45, 55, 0.45); background: rgba(255, 45, 55, 0.06); }
+.refund-dialog textarea { min-height: 70px; }
+.refund-dialog-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.refund-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.refund-summary div { padding: 10px 12px; border: 1px solid var(--line); background: rgba(0, 0, 0, 0.25); }
+.refund-summary dt { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-3); }
+.refund-summary dd { margin: 4px 0 0; font-weight: 700; }
+.warning-list { display: grid; gap: 6px; margin: 10px 0 0; padding: 0; list-style: none; }
+.warning-list li { display: flex; gap: 8px; color: var(--warn); font-size: 13px; }
+.seller-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 720px) { .seller-grid { grid-template-columns: minmax(0, 1fr); } }
+
+.chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip-row .chip { cursor: pointer; }
+.chip-row .chip:hover { border-color: var(--line-strong); color: var(--text); }

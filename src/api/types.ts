@@ -1,6 +1,3 @@
-// Ugyanaz a szerkezet, mint a backend Contracts/SessionContracts.cs DTO-i
-// (System.Text.Json alapból camelCase-re szerializál minimal API Results.Ok()-nál).
-
 export interface LoginResponse {
   accessToken: string;
   expiresAt: string;
@@ -13,13 +10,10 @@ export interface CurrentUserView {
   organizationName: string;
   createdAt: string;
   lastLoginAt: string | null;
-  /// Az Admin beállításaiból: törölheti-e a saját vizsgálatait, készíthet-e megosztó linket.
   canDeleteOwnScans?: boolean;
   canShareResults?: boolean;
   seesOnlyOwnScans?: boolean;
-  /// Az Avenge saját csapata (áruház, globális csalásjelek kezelése).
   isPlatformAdmin?: boolean;
-  /// Előfizetéssel kapott szervezet - csak élő előfizetéssel generálhat kódot.
   isSubscriptionOrg?: boolean;
   hasAccess?: boolean;
   subscriptionEnd?: string | null;
@@ -115,11 +109,9 @@ export interface ScanResultView {
   createdAt: string;
   findings: FindingDto[];
   minecraftUsername: string | null;
-  /// A megosztott nézetben nincs (null).
   sessionCode?: string | null;
 }
 
-// ── Admin (tulajdonos) ──
 export type UserRole = 'Admin' | 'Staff';
 
 export interface AdminUserView {
@@ -142,7 +134,6 @@ export interface UpdateUserRequest {
   isActive?: boolean;
 }
 
-// ── Ismert csaló-jel katalógus (szerver-vezérelt) ──
 export interface SignatureDto {
   id: string;
   game: string;
@@ -165,7 +156,6 @@ export interface UpdateSignatureRequest {
   isActive?: boolean;
 }
 
-// ── HWID-feketelista ──
 export interface BannedHwidView {
   id: string;
   hwid: string;
@@ -178,7 +168,6 @@ export interface CreateBannedHwidRequest {
   reason?: string;
 }
 
-// ── Megosztó link (bejelentkezés nélkül, 3 napig érvényes) ──
 export interface CreateShareLinkResponse {
   id: string;
   token: string;
@@ -200,7 +189,6 @@ export interface SharedResultView {
   organizationName: string;
 }
 
-// ── Admin: áttekintés, vizsgálatok, beállítások, napló ──
 export interface DailyCount {
   date: string;
   scans: number;

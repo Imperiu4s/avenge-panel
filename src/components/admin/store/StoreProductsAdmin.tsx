@@ -34,12 +34,12 @@ function ProductEditor({ product, currency, onSaved, onClose }: {
   const [releaseVersion, setReleaseVersion] = useState('');
   const [releaseChangelog, setReleaseChangelog] = useState('');
 
-  // Csak másik plugin kiválasztásakor töltjük újra: egy kép feltöltése ne dobja el a mentetlen szerkesztést.
   const productId = product?.id;
-  useEffect(() => {
+  const [draftFor, setDraftFor] = useState(productId);
+  if (draftFor !== productId) {
+    setDraftFor(productId);
     setDraft(product ? toDraft(product) : EMPTY);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [productId]);
+  }
 
   const platforms = draft.platforms.split(',').map((p) => p.trim()).filter(Boolean);
   const set = <K extends keyof ProductUpsert>(key: K, value: ProductUpsert[K]) => { setDraft((d) => ({ ...d, [key]: value })); setNotice(null); };

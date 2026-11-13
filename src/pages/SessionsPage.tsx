@@ -70,25 +70,14 @@ export function SessionsPage() {
     loadSessions(page);
   }, [loadSessions, page]);
 
-  // A jelenleg ismert kódok gyors halmaza - a SignalR handlerben (ami nem
-  // kap friss "sessions" closure-t, mert csak mount-kor iratkozik fel) ebből
-  // döntjük el, hogy egy esemény egy MÁR LÁTOTT session-re vonatkozik-e
-  // (helyi state-frissítés elég), vagy egy ÚJ, még le nem kérdezett session-re
-  // (ilyenkor egy teljes listát kell újra lekérni, különben némán eltűnne az
-  // esemény - ezt egy éles teszttel buktam meg, lásd a beszélgetést).
   const knownCodesRef = useRef<Set<string>>(new Set());
   useEffect(() => {
     knownCodesRef.current = new Set(sessions.map((s) => s.code));
   }, [sessions]);
 
-  // Élő frissítés: a SignalR hub-on érkező eseményekből közvetlenül
-  // frissítjük a helyi state-et (nem kérünk le újra mindent a szervertől
-  // minden eseménynél) - lásd server/Hubs/ScanEventBroadcaster.cs.
   useEffect(() => {
     const offStatus = onSessionStatusChanged((event) => {
       if (!knownCodesRef.current.has(event.code)) {
-        // Egy MÁS staff (vagy egy még le nem kérdezett) session-je - csak az
-        // első oldalon van értelme újratölteni, különben elcsúszna a lapozás.
         if (page === 1) {
           loadSessions(1);
         }

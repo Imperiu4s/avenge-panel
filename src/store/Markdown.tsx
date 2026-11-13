@@ -1,11 +1,5 @@
 import { Fragment, type ReactNode } from 'react';
 
-// Szándékosan kicsi, biztonságos Markdown-megjelenítő a plugin-leírásokhoz és a jogi
-// szövegekhez: React elemeket épít (nincs dangerouslySetInnerHTML), a linkek csak
-// http(s)/mailto/belső útvonalak lehetnek, a képek csak https-ről töltődnek.
-// Támogatott: # címek, bekezdések, - és 1. listák, > idézet, ``` kódblokk, ---,
-// **félkövér**, *dőlt*, `kód`, [link](url), ![kép](url), | táblázat |.
-
 function safeHref(url: string): string | null {
   const trimmed = url.trim();
   if (/^https?:\/\//i.test(trimmed) || /^mailto:/i.test(trimmed)) return trimmed;
@@ -135,7 +129,6 @@ export function Markdown({ source, className = '' }: { source: string; className
       continue;
     }
 
-    // Az első sort mindig felvesszük, így egy egyik blokkhoz sem illő sor sem akaszthatja meg.
     const paragraph: string[] = [trimmed];
     i++;
     while (i < lines.length) {

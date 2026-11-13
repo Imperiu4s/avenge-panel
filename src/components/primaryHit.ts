@@ -1,11 +1,6 @@
 import type { FindingDto } from '../api/types';
 import { parseEvents } from './timeline';
 
-// Az eredményoldal "Mire jelzett" blokkja: a vizsgálat legerősebb találata, két
-// fajtába sorolva - csalás (kliens, injektor, csalóprogram, X-ray) vagy
-// autoclicker (autoclicker, gyorskattintó makró, kattintó szkript). Ami egyik
-// sem (pl. csak nyomeltüntetés), azt "egyéb"-ként, őszintén jelezzük.
-
 export type HitKind = 'cheat' | 'autoclicker' | 'other';
 
 export interface PrimaryHit {
@@ -15,7 +10,6 @@ export interface PrimaryHit {
   reason: string | null;
   when: string | null;
   whenLabel: string;
-  /// Honnan töltötték le (a fájl Zone.Identifier jelöléséből), ha ismert.
   downloadedFrom: string | null;
   runningNow: boolean;
   score: number;
@@ -35,8 +29,6 @@ const SEVERITY_RANK: Record<FindingDto['severity'], number> = {
   Info: 1
 };
 
-// Csak ezek a kategóriák lehetnek "a" találat: a másodfiók, a VPN, a felvevő
-// program és a VM önmagában nem csalás, és nem is autoclicker.
 const CANDIDATE_CATEGORIES = new Set<FindingDto['category']>([
   'CheatSignature',
   'Injector',
@@ -78,8 +70,6 @@ export function hitKind(f: FindingDto): HitKind {
   if (f.category === 'MouseSoftware') {
     const kind = f.details?.['Makró típusa'] ?? '';
     if (/visszarúgás/i.test(kind)) return 'cheat';
-    // Egy egérprogram önmagában (gyártó szerinti bejegyzés) csak akkor számít, ha
-    // makró- vagy gombváltozás miatt kapott közepes súlyt.
     return 'autoclicker';
   }
   return AUTOCLICKER.test(searchableText(f)) ? 'autoclicker' : 'cheat';
@@ -98,7 +88,6 @@ function fileName(path: string | null): string | null {
 
 function displayName(f: FindingDto): string {
   const details = f.details ?? {};
-  // Név szerint felismert csalás (pl. DoomsDay): a csalás neve, mellette a fájl.
   if (details['Csalás']) {
     const file = fileName(f.filePath);
     return file ? `${details['Csalás']} (${file})` : details['Csalás'];
@@ -177,8 +166,6 @@ function toHit(f: FindingDto, scanTime: string): PrimaryHit {
   };
 }
 
-/// A legerősebb találatok erősorrendben. Csalás és autoclicker előre kerül; az
-/// "egyéb" (nyomeltüntetés) csak akkor lehet az első, ha nincs más.
 export function rankHits(findings: FindingDto[], scanTime: string): PrimaryHit[] {
   return findings
     .filter((f) => CANDIDATE_CATEGORIES.has(f.category))
@@ -192,7 +179,6 @@ export function rankHits(findings: FindingDto[], scanTime: string): PrimaryHit[]
     });
 }
 
-/// Közepes vagy erősebb találat számít jelzésnek; az alatti csak "gyenge nyom".
 export function isSignal(hit: PrimaryHit): boolean {
   return SEVERITY_RANK[hit.finding.severity] >= SEVERITY_RANK.Medium;
 }

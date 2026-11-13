@@ -1,7 +1,3 @@
-// Az avenge.hu jogi dokumentumai (Markdown, a store/Markdown.tsx jeleníti meg).
-// A [KITÖLTENDŐ: ...] részeket az üzemeltető valós adataival kell kitölteni,
-// élesítés előtt pedig érdemes jogásszal átnézetni a szövegeket.
-
 export interface LegalDocument {
   slug: string;
   title: string;
@@ -96,6 +92,7 @@ ${OPERATOR}
 | E-mail cím, jelszó (csak hash-elve), megjelenő név | fiók, belépés, kapcsolattartás | szerződés teljesítése (GDPR 6. cikk (1) b)) | a fiók törléséig |
 | ÁSZF-elfogadás ideje és verziója | a hozzájárulás igazolása | jogi kötelezettség / jogos érdek | a fiók törléséig |
 | Rendelések (tételek, összeg, időpont, Tebex-azonosító) | teljesítés, könyvelés, visszaélés-megelőzés | jogi kötelezettség (számviteli törvény) | 8 év; a fiók törlése után név nélkül |
+| Vásárlási és visszatérítési bizonylatok (név, e-mail cím, tételek, összeg, időpont, Tebex-azonosító) | a fizetések és visszatérítések igazolása, elszámolás, könyvelés | jogi kötelezettség (számviteli törvény), jogos érdek (jogviták rendezése) | 8 év; a fiók törlése után is változatlanul |
 | Megvásárolt pluginok, letöltések száma | letöltési jog biztosítása | szerződés teljesítése | a fiók törléséig |
 | Előfizetés állapota, Tebex-hivatkozás | a havi előfizetés kezelése | szerződés teljesítése | a fiók törléséig |
 | Kitiltás oka (ha van) | visszaélések megelőzése | jogos érdek | a fiók törléséig |
@@ -149,10 +146,10 @@ Nem adunk visszatérítést, ha a plugin a szervered beállítása, egy nem tám
 ## 2. SS tool előfizetés
 - Az előfizetést bármikor lemondhatod; a következő hónapra már nem terhelünk.
 - A megkezdett hónap díját nem térítjük vissza, de a hónap végéig használhatod a szolgáltatást.
-- Ha az első fizetést követő 7 napon belül a szolgáltatás a mi hibánkból nem volt használható, kérésre a teljes havi díjat visszatérítjük.
+- Ha a fizetést követő 14 napon belül a szolgáltatás a mi hibánkból nem volt használható, kérésre a havi díjat visszatérítjük; ilyenkor az előfizetés azonnal megszűnik.
 
 ## 3. Hogyan kérj visszatérítést?
-Írj a [KITÖLTENDŐ: ügyfélszolgálati e-mail] címre a vásárlói fiókod e-mail címéről, add meg a rendelés idejét és a probléma leírását. A jogos visszatérítést a Tebexen keresztül, az eredeti fizetési módra indítjuk, általában 5-10 munkanapon belül.
+Visszatérítést a fizetéstől számított **14 napon belül** kérhetsz. Írj a [KITÖLTENDŐ: ügyfélszolgálati e-mail] címre a vásárlói fiókod e-mail címéről, add meg a bizonylat számát (a fiókod Számlák részén találod) és a probléma leírását. A jogos visszatérítést a Tebexen keresztül, a teljes összegről, az eredeti fizetési módra indítjuk; a pénz általában 5-10 munkanapon belül érkezik meg. A visszatérítésről visszatérítési bizonylatot kapsz, ami a fiókodban letölthető.
 
 ## 4. Visszaterhelés (chargeback)
 Kérjük, mielőtt a bankodnál visszaterhelést kezdeményezel, keress minket. Visszatérítés vagy visszaterhelés esetén a plugin letöltési joga megszűnik, a licenc érvényét veszti; visszaélésszerű visszaterhelésnél a fiókot felfüggeszthetjük.

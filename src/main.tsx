@@ -9,6 +9,9 @@ import '@fontsource-variable/jetbrains-mono/index.css'
 import './index.css'
 import './store.css'
 import App from './App.tsx'
+import { installProtection, shouldProtect } from './protect'
+
+if (shouldProtect()) installProtection()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

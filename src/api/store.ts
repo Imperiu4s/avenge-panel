@@ -1,10 +1,5 @@
-// Az áruház (Avenge Foundry) API-ja: nyilvános katalógus, vásárlói fiók (külön token),
-// és a platform admin áruház-kezelése (a staff tokennel). A DTO-k a backend
-// Endpoints/StoreEndpoints.cs és StoreAdminEndpoints.cs rekordjait követik.
 import { API_BASE } from './config';
 import { ApiError, clearStoredToken, getStoredToken, SESSION_EXPIRED_EVENT } from './client';
-
-// ── Típusok ─────────────────────────────────────────────────────────────────
 
 export interface StoreInfo {
   brandName: string;
@@ -112,8 +107,6 @@ export interface CheckoutResult {
   orderId: string;
   checkoutUrl: string;
 }
-
-// Admin
 
 export interface AdminAsset {
   id: string;
@@ -237,6 +230,46 @@ export interface AdminSubscription {
   note: string | null;
 }
 
+export type InvoiceKind = 'purchase' | 'subscription' | 'refund';
+
+export interface StoreInvoice {
+  id: string;
+  number: string;
+  kind: InvoiceKind;
+  title: string;
+  total: number;
+  currency: string;
+  issuedAt: string;
+  paidAt: string;
+  buyerEmail: string;
+  buyerName: string | null;
+  customerId: string | null;
+  orderId: string | null;
+  subscriptionId: string | null;
+  tebexTransactionId: string | null;
+  refundOfInvoiceId: string | null;
+  refundOfNumber: string | null;
+  refundedByInvoiceId: string | null;
+  refundedByNumber: string | null;
+  reason: string | null;
+  refundable: boolean;
+  refundableUntil: string | null;
+  periodStart: string | null;
+  periodEnd: string | null;
+}
+
+export interface RefundsOverview {
+  recent: StoreInvoice[];
+  history: StoreInvoice[];
+  paymentsConfigured: boolean;
+  windowDays: number;
+}
+
+export interface RefundResult {
+  refund: StoreInvoice;
+  warnings: string[];
+}
+
 export interface AdminCustomerDetail {
   customer: AdminCustomer;
   owned: { productId: string; productName: string; source: string; grantedAt: string; revokedAt: string | null }[];
@@ -244,6 +277,7 @@ export interface AdminCustomerDetail {
   subscriptions: AdminSubscription[];
   acceptedTermsVersion: string | null;
   acceptedTermsAt: string | null;
+  invoices: StoreInvoice[];
 }
 
 export interface AdminStoreSettings {
@@ -260,6 +294,11 @@ export interface AdminStoreSettings {
   hasWebhookSecret: boolean;
   webhookUrl: string;
   updatedAt: string;
+  sellerName: string;
+  sellerAddress: string;
+  sellerTaxNumber: string;
+  sellerEmail: string;
+  receiptNote: string;
 }
 
 export interface StoreSettingsUpdate {
@@ -272,9 +311,13 @@ export interface StoreSettingsUpdate {
   subscriptionName: string;
   subscriptionPrice: number;
   tebexProjectId: string | null;
-  /// null = marad, "" = törlés, más = csere
   tebexPrivateKey: string | null;
   tebexWebhookSecret: string | null;
+  sellerName: string;
+  sellerAddress: string;
+  sellerTaxNumber: string;
+  sellerEmail: string;
+  receiptNote: string;
 }
 
 export interface StoreOverview {
@@ -297,8 +340,6 @@ export interface WebhookLog {
   result: string;
 }
 
-// ── Vásárlói token ──────────────────────────────────────────────────────────
-
 const CUSTOMER_TOKEN_KEY = 'avenge_customer_token';
 export const CUSTOMER_EXPIRED_EVENT = 'avenge:customer-expired';
 
@@ -314,7 +355,6 @@ export function storeCustomerToken(token: string) {
   try {
     localStorage.setItem(CUSTOMER_TOKEN_KEY, token);
   } catch {
-    /* privát mód: csak a munkamenet idejére marad bent */
   }
 }
 
@@ -322,7 +362,6 @@ export function clearCustomerToken() {
   try {
     localStorage.removeItem(CUSTOMER_TOKEN_KEY);
   } catch {
-    /* nincs teendő */
   }
 }
 
@@ -354,7 +393,6 @@ async function send<T>(path: string, options: { method?: string; body?: unknown;
       throw new ApiError(401, 'A munkameneted lejárt, jelentkezz be újra.');
     }
     if (response.status === 401 && token && mode === 'customer-optional') {
-      // Lejárt vásárlói token egy nyilvános oldalon: kiléptetjük, és név nélkül próbáljuk újra.
       clearCustomerToken();
       window.dispatchEvent(new Event(CUSTOMER_EXPIRED_EVENT));
       return send<T>(path, { ...options, auth: 'none' });
@@ -364,7 +402,6 @@ async function send<T>(path: string, options: { method?: string; body?: unknown;
       const errorBody = await response.json();
       message = errorBody?.message ?? errorBody?.title ?? message;
     } catch {
-      // nem JSON
     }
     throw new ApiError(response.status, message);
   }
@@ -373,7 +410,26 @@ async function send<T>(path: string, options: { method?: string; body?: unknown;
   return (await response.json()) as T;
 }
 
-// ── Nyilvános + vásárló ─────────────────────────────────────────────────────
+async function downloadFile(path: string, auth: AuthMode, fileName: string): Promise<void> {
+  const token = auth === 'staff' ? getStoredToken() : getCustomerToken();
+  const response = await fetch(`${API_BASE}${path}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+  if (!response.ok) {
+    if (response.status === 401) throw new ApiError(401, 'A bejelentkezésed lejárt, lépj be újra.');
+    throw new ApiError(response.status, response.status === 404 ? 'A bizonylat nem található.' : `Hiba (${response.status})`);
+  }
+  const url = URL.createObjectURL(await response.blob());
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+}
+
+export function invoiceFileName(invoice: Pick<StoreInvoice, 'number'>): string {
+  return `Avenge-${invoice.number}.pdf`;
+}
 
 export const storeApi = {
   info: () => send<StoreInfo>('/api/store/info'),
@@ -400,7 +456,11 @@ export const storeApi = {
   panelToken: () => send<CustomerToken>('/api/store/subscription/panel-token', { method: 'POST', auth: 'customer' }),
 
   downloadTicket: (releaseId: string) =>
-    send<{ ticket: string }>(`/api/store/downloads/${encodeURIComponent(releaseId)}/ticket`, { method: 'POST', auth: 'customer' })
+    send<{ ticket: string }>(`/api/store/downloads/${encodeURIComponent(releaseId)}/ticket`, { method: 'POST', auth: 'customer' }),
+
+  invoices: () => send<StoreInvoice[]>('/api/store/me/invoices', { auth: 'customer' }),
+  downloadInvoice: (invoice: StoreInvoice) =>
+    downloadFile(`/api/store/me/invoices/${encodeURIComponent(invoice.id)}/pdf`, 'customer', invoiceFileName(invoice))
 };
 
 export function storeAssetUrl(id: string): string {
@@ -410,8 +470,6 @@ export function storeAssetUrl(id: string): string {
 export function storeDownloadUrl(releaseId: string, ticket: string): string {
   return `${API_BASE}/api/store/downloads/${encodeURIComponent(releaseId)}?ticket=${encodeURIComponent(ticket)}`;
 }
-
-// ── Platform admin ──────────────────────────────────────────────────────────
 
 const A = '/api/admin/store';
 
@@ -458,6 +516,17 @@ export const storeAdminApi = {
   subscriptions: () => send<AdminSubscription[]>(`${A}/subscriptions`, { auth: 'staff' }),
   cancelSubscription: (id: string, immediate: boolean) =>
     send<void>(`${A}/subscriptions/${id}/cancel`, { method: 'POST', body: { immediate }, auth: 'staff' }),
+
+  invoices: (q = '', kind = '') => {
+    const params = new URLSearchParams();
+    if (q) params.set('q', q);
+    if (kind) params.set('kind', kind);
+    const query = params.toString();
+    return send<StoreInvoice[]>(`${A}/invoices${query ? `?${query}` : ''}`, { auth: 'staff' });
+  },
+  downloadInvoice: (invoice: StoreInvoice) => downloadFile(`${A}/invoices/${invoice.id}/pdf`, 'staff', invoiceFileName(invoice)),
+  refunds: () => send<RefundsOverview>(`${A}/refunds`, { auth: 'staff' }),
+  refund: (invoiceId: string, reason: string) => send<RefundResult>(`${A}/refunds`, { method: 'POST', body: { invoiceId, reason }, auth: 'staff' }),
 
   settings: () => send<AdminStoreSettings>(`${A}/settings`, { auth: 'staff' }),
   updateSettings: (body: StoreSettingsUpdate) => send<AdminStoreSettings>(`${A}/settings`, { method: 'PUT', body, auth: 'staff' }),

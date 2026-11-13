@@ -28,7 +28,6 @@ export function formatBytes(bytes: number): string {
   return `${(bytes / 1048576).toFixed(1)} MB`;
 }
 
-/** "3 nap 4 óra" jellegű hátralévő idő az akció végéig. */
 export function timeLeft(until: string | null, now = Date.now()): string | null {
   if (!until) return null;
   const ms = new Date(until).getTime() - now;
@@ -48,6 +47,12 @@ export const ORDER_STATUS_LABELS: Record<string, string> = {
   Chargeback: 'Visszaterhelés',
   Cancelled: 'Megszakítva',
   Declined: 'Elutasítva'
+};
+
+export const INVOICE_KIND_LABELS: Record<string, string> = {
+  purchase: 'Plugin vásárlás',
+  subscription: 'Előfizetés',
+  refund: 'Visszatérítés'
 };
 
 export const SUBSCRIPTION_STATUS_LABELS: Record<string, string> = {

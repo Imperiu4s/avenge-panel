@@ -6,10 +6,6 @@ import { useCustomer } from '../../store/CustomerAuth';
 
 type State = 'waiting' | 'done' | 'failed' | 'slow' | 'login';
 
-/**
- * A Tebex fizetés után ide tér vissza a vásárló. A jóváírást a Tebex webhookja végzi
- * (pár másodperc), ezért itt megvárjuk, amíg a rendelés / előfizetés aktív lesz.
- */
 export function StoreThanksPage() {
   const [params] = useSearchParams();
   const orderId = params.get('order');
@@ -37,7 +33,6 @@ export function StoreThanksPage() {
           return 'done';
         }
       } catch {
-        // átmeneti hiba: próbáljuk tovább
       }
       return attempts >= 40 ? 'slow' : null;
     };

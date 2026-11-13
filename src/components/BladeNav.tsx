@@ -6,11 +6,6 @@ import { Icon, type IconName } from './Icon';
 import { prefersReducedMotion } from './motion';
 import avengeLogo from '../assets/avenge-logo-crop.png';
 
-// A navbar maga az Avenge tőr: balra hegyesedő penge (rajta a menü), keresztvas,
-// és piros bőrrel bevont markolat (rajta a műveletek). A penge alsó éle egy
-// "fogazott" skála: a fogak a kurzor közelében felébrednek, a célkereszt rugóval
-// ugrik a kiválasztott menüpontra, a skála vörös sávja pedig a görgetést mutatja.
-
 interface NavItem {
   to: string;
   label: string;
@@ -103,7 +98,6 @@ function useBladeMotion(activeIndex: number, itemCount: number) {
       ctx.fillRect(x, height - toothHeight, 1.25, toothHeight);
     }
 
-    // A célkereszt tűje a skálán.
     ctx.fillStyle = '#ff5a4d';
     ctx.beginPath();
     ctx.moveTo(needle - 4, height);
@@ -131,7 +125,6 @@ function useBladeMotion(activeIndex: number, itemCount: number) {
     }
     draw();
 
-    // Minden nyugalomban - a következő mozdulat (wake) indítja újra a ciklust.
     if (settledX && settledWidth && heatSettled) {
       s.frame = 0;
       return;
@@ -187,7 +180,6 @@ function useBladeMotion(activeIndex: number, itemCount: number) {
     };
   }, [aimAt, wake, activeIndex]);
 
-  // A betűtípus késői betöltése elmozgatja a menüpontokat.
   useEffect(() => {
     document.fonts?.ready.then(() => {
       const s = state.current;
@@ -227,7 +219,6 @@ function useBladeMotion(activeIndex: number, itemCount: number) {
   return { linksRef, reticleRef, canvasRef, bladeRef, onBladePointerMove, onBladePointerLeave, onItemEnter };
 }
 
-/** Valódi, mért válaszidő a szerver felől - nem díszlet. */
 function useApiPing() {
   const [latency, setLatency] = useState<number | null>(null);
   const [isOnline, setIsOnline] = useState(true);

@@ -27,7 +27,6 @@ const ALL_TABS: { key: string; label: string; icon: IconName; platformOnly?: boo
   { key: 'scans', label: 'Vizsgálatok', icon: 'history' },
   { key: 'settings', label: 'Beállítások', icon: 'settings' },
   { key: 'audit', label: 'Napló', icon: 'clock' },
-  // A csalásjel-katalógus és az áruház közös, az egész platformra érvényes: csak az Avenge csapatáé.
   { key: 'signatures', label: 'Csalásjelek', icon: 'bug', platformOnly: true },
   { key: 'bans', label: 'Kitiltott gépek', icon: 'ban' },
   { key: 'store', label: 'Áruház', icon: 'cart', platformOnly: true }
@@ -101,7 +100,6 @@ export function AdminPage() {
     setIsCreating(true);
     try {
       const created = await api.createAdminUser({ email, password, role });
-      // A jelszó csak most látszik utoljára: a szerver már csak a hash-t tárolja.
       setIssued({ title: 'Fiók létrehozva', email: created.email, password });
       setEmail('');
       setPassword('');

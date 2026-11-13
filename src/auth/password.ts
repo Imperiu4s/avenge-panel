@@ -4,7 +4,6 @@ const DIGITS = '23456789';
 const SYMBOLS = '!@#$%*-_+?';
 const ALL = LOWER + UPPER + DIGITS + SYMBOLS;
 
-/// Egyenletes eloszlású véletlen index (a sima "% n" kissé torzítana).
 function randomIndex(max: number): number {
   const limit = Math.floor(0x100000000 / max) * max;
   const buffer = new Uint32Array(1);
@@ -14,9 +13,6 @@ function randomIndex(max: number): number {
   return buffer[0] % max;
 }
 
-/// Erős, véletlen jelszó a böngészőben generálva - a szerverre csak a fiók
-/// létrehozásakor kerül, ott is csak hash-elve tárolódik. A könnyen összetéveszthető
-/// karakterek (0/O, 1/l/I) kimaradnak, mert sokszor kézzel adják tovább.
 export function generatePassword(length = 16): string {
   const chars = [LOWER, UPPER, DIGITS, SYMBOLS].map((set) => set[randomIndex(set.length)]);
   while (chars.length < length) {

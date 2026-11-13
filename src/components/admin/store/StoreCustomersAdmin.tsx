@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { ApiError } from '../../../api/client';
 import { storeAdminApi, type AdminCustomer, type AdminCustomerDetail, type AdminProduct } from '../../../api/store';
 import { formatDate, formatDateTime, formatPrice, ORDER_STATUS_LABELS, SUBSCRIPTION_STATUS_LABELS } from '../../../store/format';
+import { InvoiceTable } from '../../../store/InvoiceTable';
 import { Icon } from '../../Icon';
 
 function CustomerDetail({ id, currency, products, onChanged, onClose }: {
@@ -44,7 +45,7 @@ function CustomerDetail({ id, currency, products, onChanged, onClose }: {
   };
 
   const remove = () => {
-    if (!window.confirm(`Véglegesen törlöd ${c.email} fiókját? A letöltési jogai megszűnnek, az előfizetése leáll, a rendelései név nélkül megmaradnak. Ez nem vonható vissza.`)) return;
+    if (!window.confirm(`Véglegesen törlöd ${c.email} fiókját? A letöltési jogai megszűnnek, az előfizetése leáll, a rendelései név nélkül, a bizonylatai változatlanul megmaradnak. Ez nem vonható vissza.`)) return;
     run(async () => { await storeAdminApi.deleteCustomer(c.id); onClose(); }, false);
   };
 
@@ -131,6 +132,9 @@ function CustomerDetail({ id, currency, products, onChanged, onClose }: {
           </tbody>
         </table>
       </div>
+
+      <span className="field-label section-gap">Bizonylatok</span>
+      <InvoiceTable invoices={detail.invoices} download={storeAdminApi.downloadInvoice} empty="Nincs bizonylat." />
       {error && <p className="error-text error-in">{error}</p>}
     </section>
   );

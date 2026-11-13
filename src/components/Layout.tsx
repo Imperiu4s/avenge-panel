@@ -3,7 +3,6 @@ import { Link, Outlet, useLocation } from 'react-router-dom';
 import { BladeNav } from './BladeNav';
 import { usePointerSpotlight } from './motion';
 
-/** A teljes oldal kerete - route-ok között NEM épül újra, így a navbar mozgása folytonos. */
 export function Layout() {
   const location = useLocation();
   usePointerSpotlight();
@@ -23,8 +22,6 @@ export function Layout() {
 
       <BladeNav />
 
-      {/* Oldalváltáskor végigsöprő vörös vizsgálati csík - a key miatt minden
-          navigációnál újraindul. */}
       <div className="route-sweep" key={`sweep-${location.pathname}`} aria-hidden="true" />
 
       <div className="page-transition" key={location.pathname}>
@@ -41,6 +38,7 @@ export function Layout() {
           <Link to="/jogi/licenc">Licenc</Link>
           <Link to="/jogi/cookie">Sütik</Link>
           <Link to="/jogi/impresszum">Impresszum</Link>
+          <a href="/third-party-licenses.txt" target="_blank" rel="noopener">Nyílt forráskód</a>
         </nav>
       </footer>
     </div>

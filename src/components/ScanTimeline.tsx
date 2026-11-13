@@ -3,9 +3,6 @@ import type { FindingDto } from '../api/types';
 import { Icon } from './Icon';
 import { actionTone, beforeScan, eventTiming, parseEvents, type TimelineEvent } from './timeline';
 
-// A teljes vizsgálat egyetlen, másodpercre pontos idővonalon: minden találat eseményei
-// ("Események") és az egérprogramok változásai ("Változások") időrendben, a találat nevével.
-
 interface Entry extends TimelineEvent {
   finding: string;
   severity: string;

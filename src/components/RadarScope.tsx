@@ -1,10 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { prefersReducedMotion } from './motion';
 
-// A főoldal radarja: a sugár körbejár, és amelyik nyomforráson áthalad, az
-// felizzik - ezek azok a helyek, amiket a kliens valóban átnéz. Vászonra rajzol,
-// és csak akkor fut, amikor látszik a képernyőn.
-
 interface Blip {
   angle: number;
   radius: number;
@@ -44,8 +40,6 @@ export function RadarScope({ className = '' }: { className?: string }) {
 
     const render = (time: number) => {
       const size = canvas.clientWidth;
-      // Háttérben megnyitott lapon a méret eleinte 0 - ilyenkor a körök sugara negatív
-      // lenne, a kivétel pedig végleg megállítaná a rajzolási ciklust.
       if (size < MIN_DRAW_SIZE) return;
 
       const ratio = Math.min(window.devicePixelRatio || 1, 2);
@@ -59,7 +53,6 @@ export function RadarScope({ className = '' }: { className?: string }) {
       const center = size / 2;
       const outer = size / 2 - 22;
 
-      // Rácsgyűrűk és kereszt
       ctx.lineWidth = 1;
       for (const f of [0.25, 0.5, 0.75, 1]) {
         ctx.strokeStyle = `rgba(255, 228, 220, ${f === 1 ? 0.24 : 0.09})`;
@@ -75,7 +68,6 @@ export function RadarScope({ className = '' }: { className?: string }) {
       ctx.lineTo(center, center + outer);
       ctx.stroke();
 
-      // Fokbeosztás
       for (let i = 0; i < 72; i++) {
         const a = (i / 72) * TWO_PI;
         const major = i % 6 === 0;
@@ -90,7 +82,6 @@ export function RadarScope({ className = '' }: { className?: string }) {
 
       const angle = reduced ? 0.9 : ((time / SWEEP_PERIOD_MS) * TWO_PI) % TWO_PI;
 
-      // A sugár csóvája: kúpos gradiens, ami a vezető él mögött halványul el.
       const tail = 1.5;
       if (typeof ctx.createConicGradient === 'function') {
         const gradient = ctx.createConicGradient(angle - tail, center, center);
@@ -112,7 +103,6 @@ export function RadarScope({ className = '' }: { className?: string }) {
       ctx.lineTo(center + Math.cos(angle) * outer, center + Math.sin(angle) * outer);
       ctx.stroke();
 
-      // Nyomforrások
       ctx.font = `600 ${Math.max(9, size * 0.021)}px "JetBrains Mono Variable", Consolas, monospace`;
       for (const blip of blips) {
         const passed = previousAngle <= angle
@@ -142,7 +132,6 @@ export function RadarScope({ className = '' }: { className?: string }) {
         ctx.arc(x, y, 3.2, 0, TWO_PI);
         ctx.fill();
 
-        // Célkereszt-keret és felirat a felizzó pont köré
         const b = 10;
         const c = 4;
         ctx.strokeStyle = `rgba(255, 236, 230, ${glow * 0.85})`;

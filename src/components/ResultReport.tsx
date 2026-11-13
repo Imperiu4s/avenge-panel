@@ -19,8 +19,6 @@ const VERDICT_TEXT: Record<string, string> = {
   Inconclusive: 'Közepes súlyú találat. Nézd át a részleteket, és döntsd el.'
 };
 
-// Identitás/média jellegű kategóriák: külön, lenyitható szekciókban. Minden más
-// (csalásnyom, gyanús fájl stb.) a fő találati listába kerül.
 const ACCORDION_CATEGORIES: { category: FindingDto['category']; label: string; icon: IconName }[] = [
   { category: 'AltAccount', label: 'Másodfiókok', icon: 'users' },
   { category: 'RecordingSoftware', label: 'Felvevő szoftverek', icon: 'video' },
@@ -74,12 +72,9 @@ function formatDuration(ms: number): string {
 
 interface Props {
   result: ScanResultView;
-  /// A verdikt-kártya alá kerülő extra tartalom (pl. a megosztó link a staffnak).
   aside?: ReactNode;
 }
 
-/// Egy vizsgálat teljes eredménye. A staff eredményoldala és a bejelentkezés
-/// nélküli megosztott nézet ugyanezt jeleníti meg.
 export function ResultReport({ result, aside }: Props) {
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
   const [expandedFinding, setExpandedFinding] = useState<number | null>(null);
@@ -96,8 +91,6 @@ export function ResultReport({ result, aside }: Props) {
   const cheatCount = (grouped.CheatSignature ?? []).length + (grouped.Injector ?? []).length;
   const verdictKey = result.verdict.toLowerCase();
 
-  // A "Mire jelzett" blokkból a megfelelő helyre ugrik: a találati sorhoz (és lenyitja),
-  // az egérprogramokhoz, vagy a lenyitható kategóriához.
   function reveal(finding: FindingDto) {
     const index = mainFindings.indexOf(finding);
     if (index >= 0) {
