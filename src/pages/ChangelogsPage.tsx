@@ -8,6 +8,14 @@ interface ChangelogEntry {
 
 const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '2.8.1',
+    date: '2026-11-13',
+    items: [
+      'Admin Panel / Discord: az Avenge Discord-botja a szerverről működik, a tokenje csak ott tárolódik.',
+      'Egy gombnyomással berendezi a Discord szervert (rangok, csatornák, fórumok, jogosultságok, üdvözlő képernyő), és kirakja az info-üzeneteket.'
+    ]
+  },
+  {
     version: '2.8.0',
     date: '2026-11-13',
     items: [

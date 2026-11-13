@@ -48,7 +48,9 @@ export type IconName =
   | 'card'
   | 'star'
   | 'scale'
-  | 'refresh';
+  | 'refresh'
+  | 'message'
+  | 'external';
 
 const PATHS: Record<IconName, ReactElement> = {
   settings: (
@@ -292,7 +294,9 @@ const PATHS: Record<IconName, ReactElement> = {
       <path d="M4.5 7 2 13a2.6 2.6 0 0 0 5 0ZM19.5 7 17 13a2.6 2.6 0 0 0 5 0Z" />
     </>
   ),
-  refresh: <path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3M19.5 4v4.2h-4.2" />
+  refresh: <path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3M19.5 4v4.2h-4.2" />,
+  message: <path d="M4 5.5h16v10.5H9.5L5 19.5V16H4zM8.5 10.5h.01M12 10.5h.01M15.5 10.5h.01" />,
+  external: <path d="M14 4h6v6M20 4l-9 9M18 13.5V20H4V6h6.5" />
 };
 
 export function Icon({ name, size = 22, className }: { name: IconName; size?: number; className?: string }) {

@@ -2491,3 +2491,10 @@ input[type='checkbox'].switch:focus-visible { outline: 2px solid var(--signal-ho
   html { scroll-behavior: auto; }
   .backdrop-scan, .steps-beam, .timeline-beam, .blade-glint { display: none; }
 }
+
+.discord-token-form input { flex: 1; min-width: 240px; }
+.discord-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 10px; }
+.discord-log-wrap { margin-top: 16px; display: grid; gap: 8px; }
+.discord-log-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.discord-log { margin: 0; max-height: 340px; overflow: auto; padding: 14px 16px; background: rgba(0, 0, 0, 0.45); border: 1px solid var(--line); color: var(--text-2); white-space: pre-wrap; line-height: 1.6; }
+.discord-guilds select { min-width: 260px; }

@@ -332,6 +332,30 @@ export interface StoreOverview {
   paymentsConfigured: boolean;
 }
 
+export interface DiscordJob {
+  running: boolean;
+  kind: string | null;
+  startedAt: string | null;
+  finishedAt: string | null;
+  error: string | null;
+  log: string[];
+}
+
+export interface DiscordSettings {
+  hasToken: boolean;
+  guildId: string | null;
+  botId: string | null;
+  botName: string | null;
+  botError: string | null;
+  guilds: { id: string; name: string }[];
+  inviteUrl: string | null;
+  postedMessages: number;
+  lastRunAt: string | null;
+  lastRunKind: string;
+  lastRunLog: string;
+  job: DiscordJob;
+}
+
 export interface WebhookLog {
   id: string;
   webhookId: string;
@@ -531,4 +555,15 @@ export const storeAdminApi = {
   settings: () => send<AdminStoreSettings>(`${A}/settings`, { auth: 'staff' }),
   updateSettings: (body: StoreSettingsUpdate) => send<AdminStoreSettings>(`${A}/settings`, { method: 'PUT', body, auth: 'staff' }),
   webhooks: () => send<WebhookLog[]>(`${A}/webhooks`, { auth: 'staff' })
+};
+
+const D = '/api/admin/discord';
+
+export const discordAdminApi = {
+  get: () => send<DiscordSettings>(D, { auth: 'staff' }),
+  update: (body: { botToken?: string | null; guildId?: string | null }) => send<void>(D, { method: 'PUT', body, auth: 'staff' }),
+  job: () => send<DiscordJob>(`${D}/job`, { auth: 'staff' }),
+  structure: () => send<{ lines: string[] }>(`${D}/structure`, { auth: 'staff' }),
+  apply: () => send<DiscordJob>(`${D}/apply`, { method: 'POST', auth: 'staff' }),
+  post: () => send<DiscordJob>(`${D}/post`, { method: 'POST', auth: 'staff' })
 };

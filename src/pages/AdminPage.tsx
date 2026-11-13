@@ -7,6 +7,7 @@ import { AdminOverviewTab } from '../components/admin/AdminOverviewTab';
 import { AdminScansTab } from '../components/admin/AdminScansTab';
 import { AdminSettingsTab } from '../components/admin/AdminSettingsTab';
 import { StoreAdminTab } from '../components/admin/store/StoreAdminTab';
+import { DiscordAdminTab } from '../components/admin/DiscordAdminTab';
 import { useAuth } from '../auth/AuthContext';
 import { Icon, type IconName } from '../components/Icon';
 import { useCopyFeedback } from '../components/motion';
@@ -29,7 +30,8 @@ const ALL_TABS: { key: string; label: string; icon: IconName; platformOnly?: boo
   { key: 'audit', label: 'Napló', icon: 'clock' },
   { key: 'signatures', label: 'Csalásjelek', icon: 'bug', platformOnly: true },
   { key: 'bans', label: 'Kitiltott gépek', icon: 'ban' },
-  { key: 'store', label: 'Áruház', icon: 'cart', platformOnly: true }
+  { key: 'store', label: 'Áruház', icon: 'cart', platformOnly: true },
+  { key: 'discord', label: 'Discord', icon: 'message', platformOnly: true }
 ];
 
 function formatSize(bytes: number): string {
@@ -224,6 +226,7 @@ export function AdminPage() {
       {tab === 'bans' && <BannedHwidsSection />}
 
       {tab === 'store' && <StoreAdminTab />}
+      {tab === 'discord' && <DiscordAdminTab />}
 
       {tab === 'users' && (
         <div className="panel-grid">
