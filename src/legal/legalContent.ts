@@ -59,8 +59,7 @@ export const DEFAULT_FIELDS: Record<string, string> = {
 };
 
 export const DEFAULT_HOSTING: LegalHostingEntry[] = [
-  { role: 'Szerver (API, adatbázis, letöltések)', name: 'HexaVerse', address: '', contact: '' },
-  { role: 'Weboldal (avenge.hu)', name: 'GitHub, Inc. (GitHub Pages)', address: '88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA', contact: 'https://support.github.com' }
+  { role: 'Szerver (API, adatbázis, letöltések)', name: 'HexaVerse', address: '', contact: '' }
 ];
 
 export const PLACEHOLDER_HELP: { token: string; text: string }[] = [

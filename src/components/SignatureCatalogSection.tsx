@@ -7,7 +7,7 @@ const SEVERITIES: FindingSeverity[] = ['Info', 'Low', 'Medium', 'High', 'Critica
 
 const emptyForm: CreateSignatureRequest = { game: 'generic', name: '', severity: 'Medium' };
 
-export function SignatureCatalogSection() {
+export function SignatureCatalogSection({ canEdit = true }: { canEdit?: boolean }) {
   const [signatures, setSignatures] = useState<SignatureDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [listError, setListError] = useState<string | null>(null);
@@ -106,12 +106,16 @@ export function SignatureCatalogSection() {
                     </span>
                   </td>
                   <td className="admin-actions">
-                    <button className="btn-ghost btn-tiny" onClick={() => handleToggleActive(s)}>
-                      {s.isActive ? 'Deaktiválás' : 'Aktiválás'}
-                    </button>
-                    <button className="btn-ghost btn-tiny btn-danger" onClick={() => handleDelete(s)}>
-                      Törlés
-                    </button>
+                    {canEdit ? (
+                      <>
+                        <button className="btn-ghost btn-tiny" onClick={() => handleToggleActive(s)}>
+                          {s.isActive ? 'Deaktiválás' : 'Aktiválás'}
+                        </button>
+                        <button className="btn-ghost btn-tiny btn-danger" onClick={() => handleDelete(s)}>
+                          Törlés
+                        </button>
+                      </>
+                    ) : <span className="muted small">csak olvasható</span>}
                   </td>
                 </tr>
               ))}
@@ -126,46 +130,48 @@ export function SignatureCatalogSection() {
         {listError && <p className="error-text">{listError}</p>}
       </div>
 
-      <div className="card generate-card">
-        <h2 className="card-title"><Icon name="plus" size={18} /> Új csalásjel</h2>
-        <form onSubmit={handleCreate}>
-          <label className="field-label">Játék (pl. "generic" vagy "minecraft")</label>
-          <input type="text" value={form.game} onChange={(e) => setForm((f) => ({ ...f, game: e.target.value }))} required />
+      {canEdit && (
+        <div className="card generate-card">
+          <h2 className="card-title"><Icon name="plus" size={18} /> Új csalásjel</h2>
+          <form onSubmit={handleCreate}>
+            <label className="field-label">Játék (pl. "generic" vagy "minecraft")</label>
+            <input type="text" value={form.game} onChange={(e) => setForm((f) => ({ ...f, game: e.target.value }))} required />
 
-          <label className="field-label">Név (ez alapján illeszkedik fájl-/mappanévre)</label>
-          <input type="text" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} required />
+            <label className="field-label">Név (ez alapján illeszkedik fájl-/mappanévre)</label>
+            <input type="text" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} required />
 
-          <label className="field-label">Folyamatnév-minta (opcionális, regex)</label>
-          <input
-            type="text"
-            value={form.processName ?? ''}
-            onChange={(e) => setForm((f) => ({ ...f, processName: e.target.value }))}
-          />
+            <label className="field-label">Folyamatnév-minta (opcionális, regex)</label>
+            <input
+              type="text"
+              value={form.processName ?? ''}
+              onChange={(e) => setForm((f) => ({ ...f, processName: e.target.value }))}
+            />
 
-          <label className="field-label">SHA-256 (opcionális)</label>
-          <input
-            type="text"
-            value={form.sha256 ?? ''}
-            onChange={(e) => setForm((f) => ({ ...f, sha256: e.target.value }))}
-          />
+            <label className="field-label">SHA-256 (opcionális)</label>
+            <input
+              type="text"
+              value={form.sha256 ?? ''}
+              onChange={(e) => setForm((f) => ({ ...f, sha256: e.target.value }))}
+            />
 
-          <label className="field-label">Súlyosság</label>
-          <select
-            value={form.severity}
-            onChange={(e) => setForm((f) => ({ ...f, severity: e.target.value as FindingSeverity }))}
-            className="role-select role-select-full"
-          >
-            {SEVERITIES.map((sev) => (
-              <option key={sev} value={sev}>{sev}</option>
-            ))}
-          </select>
+            <label className="field-label">Súlyosság</label>
+            <select
+              value={form.severity}
+              onChange={(e) => setForm((f) => ({ ...f, severity: e.target.value as FindingSeverity }))}
+              className="role-select role-select-full"
+            >
+              {SEVERITIES.map((sev) => (
+                <option key={sev} value={sev}>{sev}</option>
+              ))}
+            </select>
 
-          <button className="btn-primary btn-block" type="submit" disabled={isCreating}>
-            {isCreating ? 'Létrehozás...' : 'Létrehozás'}
-          </button>
-          {createError && <p className="error-text">{createError}</p>}
-        </form>
-      </div>
+            <button className="btn-primary btn-block" type="submit" disabled={isCreating}>
+              {isCreating ? 'Létrehozás...' : 'Létrehozás'}
+            </button>
+            {createError && <p className="error-text">{createError}</p>}
+          </form>
+        </div>
+      )}
     </div>
   );
 }

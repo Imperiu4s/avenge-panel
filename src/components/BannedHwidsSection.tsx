@@ -3,7 +3,7 @@ import { api, ApiError } from '../api/client';
 import { Icon } from './Icon';
 import type { BannedHwidView } from '../api/types';
 
-export function BannedHwidsSection() {
+export function BannedHwidsSection({ canEdit = true }: { canEdit?: boolean }) {
   const [banned, setBanned] = useState<BannedHwidView[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [listError, setListError] = useState<string | null>(null);
@@ -90,9 +90,11 @@ export function BannedHwidsSection() {
                   <td>{b.reason ?? <span className="muted">-</span>}</td>
                   <td>{new Date(b.createdAt).toLocaleString('hu-HU')}</td>
                   <td className="admin-actions">
-                    <button className="btn-ghost btn-tiny btn-danger" onClick={() => handleDelete(b)}>
-                      Törlés
-                    </button>
+                    {canEdit ? (
+                      <button className="btn-ghost btn-tiny btn-danger" onClick={() => handleDelete(b)}>
+                        Törlés
+                      </button>
+                    ) : <span className="muted small">csak olvasható</span>}
                   </td>
                 </tr>
               ))}
@@ -107,21 +109,23 @@ export function BannedHwidsSection() {
         {listError && <p className="error-text">{listError}</p>}
       </div>
 
-      <div className="card generate-card">
-        <h2 className="card-title"><Icon name="plus" size={18} /> HWID kitiltása</h2>
-        <form onSubmit={handleCreate}>
-          <label className="field-label">HWID</label>
-          <input type="text" value={hwid} onChange={(e) => setHwid(e.target.value)} required />
+      {canEdit && (
+        <div className="card generate-card">
+          <h2 className="card-title"><Icon name="plus" size={18} /> HWID kitiltása</h2>
+          <form onSubmit={handleCreate}>
+            <label className="field-label">HWID</label>
+            <input type="text" value={hwid} onChange={(e) => setHwid(e.target.value)} required />
 
-          <label className="field-label">Indoklás (opcionális)</label>
-          <input type="text" value={reason} onChange={(e) => setReason(e.target.value)} />
+            <label className="field-label">Indoklás (opcionális)</label>
+            <input type="text" value={reason} onChange={(e) => setReason(e.target.value)} />
 
-          <button className="btn-primary btn-block" type="submit" disabled={isCreating}>
-            {isCreating ? 'Hozzáadás...' : 'Kitiltás'}
-          </button>
-          {createError && <p className="error-text">{createError}</p>}
-        </form>
-      </div>
+            <button className="btn-primary btn-block" type="submit" disabled={isCreating}>
+              {isCreating ? 'Hozzáadás...' : 'Kitiltás'}
+            </button>
+            {createError && <p className="error-text">{createError}</p>}
+          </form>
+        </div>
+      )}
     </div>
   );
 }

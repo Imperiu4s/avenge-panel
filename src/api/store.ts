@@ -14,6 +14,7 @@ export interface StoreInfo {
   plugins: number;
   sales: number;
   downloads: number;
+  models?: number;
 }
 
 export interface StoreProductCard {
@@ -35,7 +36,10 @@ export interface StoreProductCard {
   downloadCount: number;
   latestVersion: string | null;
   updatedAt: string;
+  kind?: ProductKind;
 }
+
+export type ProductKind = 'plugin' | 'model';
 
 export interface StoreRelease {
   id: string;
@@ -102,6 +106,8 @@ export interface CustomerMe {
   orders: CustomerOrder[];
   subscription: CustomerSubscription | null;
   minecraftUsername: string | null;
+  avatarUrl?: string | null;
+  theme?: string | null;
 }
 
 export interface CheckoutResult {
@@ -141,6 +147,7 @@ export interface AdminProduct {
   releases: StoreRelease[];
   gallery: AdminAsset[];
   tebexPackageId: string | null;
+  kind?: ProductKind;
 }
 
 export interface ProductUpsert {
@@ -156,6 +163,7 @@ export interface ProductUpsert {
   isFeatured: boolean;
   sortOrder: number;
   tebexPackageId: string;
+  kind: ProductKind;
 }
 
 export interface AdminDiscount {
@@ -414,9 +422,9 @@ export function clearCustomerToken() {
   }
 }
 
-type AuthMode = 'none' | 'customer' | 'customer-optional' | 'staff';
+export type AuthMode = 'none' | 'customer' | 'customer-optional' | 'staff';
 
-async function send<T>(path: string, options: { method?: string; body?: unknown; form?: FormData; auth?: AuthMode } = {}): Promise<T> {
+export async function send<T>(path: string, options: { method?: string; body?: unknown; form?: FormData; auth?: AuthMode } = {}): Promise<T> {
   const headers: Record<string, string> = {};
   if (options.body !== undefined) headers['Content-Type'] = 'application/json';
 
@@ -487,8 +495,8 @@ export const storeApi = {
   products: () => send<StoreProductCard[]>('/api/store/products'),
   product: (slug: string) => send<StoreProductDetail>(`/api/store/products/${encodeURIComponent(slug)}`, { auth: 'customer-optional' }),
 
-  register: (email: string, password: string, displayName: string, acceptTerms: boolean) =>
-    send<CustomerToken>('/api/store/auth/register', { method: 'POST', body: { email, password, displayName, acceptTerms } }),
+  register: (email: string, password: string, minecraftUsername: string, acceptTerms: boolean) =>
+    send<CustomerToken>('/api/store/auth/register', { method: 'POST', body: { email, password, displayName: minecraftUsername, minecraftUsername, acceptTerms } }),
   login: (email: string, password: string) =>
     send<CustomerToken>('/api/store/auth/login', { method: 'POST', body: { email, password } }),
 

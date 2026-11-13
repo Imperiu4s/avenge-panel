@@ -17,6 +17,10 @@ export interface CurrentUserView {
   isSubscriptionOrg?: boolean;
   hasAccess?: boolean;
   subscriptionEnd?: string | null;
+  permissions?: string[];
+  isPlatformOrg?: boolean;
+  avatarUrl?: string | null;
+  theme?: string | null;
 }
 
 export interface ClientReleaseView {
@@ -112,7 +116,7 @@ export interface ScanResultView {
   sessionCode?: string | null;
 }
 
-export type UserRole = 'Admin' | 'Staff';
+export type UserRole = 'Owner' | 'Admin' | 'Staff';
 
 export interface AdminUserView {
   id: string;

@@ -8,6 +8,18 @@ interface ChangelogEntry {
 
 const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '3.0.0',
+    date: '2026-11-13',
+    items: [
+      'Új rangrendszer: Tulajdonos, Admin és Staff. A Tulajdonos az Admin Panel Rangok fülén jogonként állítja be, mit tehet az Admin és a Staff (vizsgálatok, törlés, megosztás, felhasználók, beállítások, napló, kitiltások, áruház, Discord, jogi oldalak).',
+      'Minden szervezet legrégebbi adminja automatikusan Tulajdonos lett; Tulajdonos rangot csak Tulajdonos adhat, és Tulajdonos fiókját csak Tulajdonos módosíthatja.',
+      'Modellek az áruházban: a pluginok mellett Minecraft modellek (ModelEngine, ItemsAdder, Oraxen, Nexo, Blockbench) is vásárolhatók, külön fülön és szűrővel.',
+      'Profilkép és színtéma: a vásárlói és a staff fiókban is feltölthető profilkép, és hét színtéma közül választható.',
+      'A regisztrációnál megadott név a Minecraft-neved: fizetéskor már nem kell újra beírni, és a Fiókom oldalon bármikor módosítható.',
+      'Az Admin Panel fülei kiférnek: több sorba tördelődnek.'
+    ]
+  },
+  {
     version: '2.9.3',
     date: '2026-11-13',
     items: [

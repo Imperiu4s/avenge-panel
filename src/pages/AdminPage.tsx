@@ -9,7 +9,9 @@ import { AdminSettingsTab } from '../components/admin/AdminSettingsTab';
 import { StoreAdminTab } from '../components/admin/store/StoreAdminTab';
 import { DiscordAdminTab } from '../components/admin/DiscordAdminTab';
 import { LegalAdminTab } from '../components/admin/LegalAdminTab';
+import { RolesAdminTab } from '../components/admin/RolesAdminTab';
 import { useAuth } from '../auth/AuthContext';
+import { canAny, ROLE_LABELS } from '../auth/permissions';
 import { Icon, type IconName } from '../components/Icon';
 import { useCopyFeedback } from '../components/motion';
 import { formatSecond } from '../components/timeline';
@@ -23,32 +25,38 @@ interface IssuedCredentials {
   password: string;
 }
 
-const ALL_TABS: { key: string; label: string; icon: IconName; platformOnly?: boolean }[] = [
-  { key: 'overview', label: 'Áttekintés', icon: 'activity' },
-  { key: 'users', label: 'Felhasználók', icon: 'users' },
-  { key: 'scans', label: 'Vizsgálatok', icon: 'history' },
-  { key: 'settings', label: 'Beállítások', icon: 'settings' },
-  { key: 'audit', label: 'Napló', icon: 'clock' },
-  { key: 'signatures', label: 'Csalásjelek', icon: 'bug', platformOnly: true },
-  { key: 'bans', label: 'Kitiltott gépek', icon: 'ban' },
-  { key: 'store', label: 'Áruház', icon: 'cart', platformOnly: true },
-  { key: 'discord', label: 'Discord', icon: 'message', platformOnly: true },
-  { key: 'legal', label: 'Jogi', icon: 'scale', platformOnly: true }
+const ALL_TABS: { key: string; label: string; icon: IconName; perms: string[] }[] = [
+  { key: 'overview', label: 'Áttekintés', icon: 'activity', perms: ['admin.overview'] },
+  { key: 'users', label: 'Felhasználók', icon: 'users', perms: ['users.view', 'users.create'] },
+  { key: 'roles', label: 'Rangok', icon: 'crown', perms: ['roles.manage'] },
+  { key: 'scans', label: 'Vizsgálatok', icon: 'history', perms: ['admin.scans'] },
+  { key: 'settings', label: 'Beállítások', icon: 'settings', perms: ['settings.view', 'settings.edit', 'sharelinks.manage'] },
+  { key: 'audit', label: 'Napló', icon: 'clock', perms: ['audit.view'] },
+  { key: 'signatures', label: 'Csalásjelek', icon: 'bug', perms: ['signatures.view', 'platform.signatures'] },
+  { key: 'bans', label: 'Kitiltott gépek', icon: 'ban', perms: ['bans.view', 'bans.manage'] },
+  { key: 'store', label: 'Áruház', icon: 'cart', perms: ['platform.store'] },
+  { key: 'discord', label: 'Discord', icon: 'message', perms: ['platform.discord'] },
+  { key: 'legal', label: 'Jogi', icon: 'scale', perms: ['platform.legal'] }
 ];
+
+const ROLE_OPTIONS: UserRole[] = ['Staff', 'Admin', 'Owner'];
 
 function formatSize(bytes: number): string {
   return `${(bytes / 1048576).toFixed(0)} MB`;
 }
 
 export function AdminPage() {
-  const { user } = useAuth();
-  const TABS = ALL_TABS.filter((t) => !t.platformOnly || user?.isPlatformAdmin);
+  const { user, can } = useAuth();
+  const TABS = ALL_TABS.filter((t) => canAny(user, t.perms));
   const [searchParams, setSearchParams] = useSearchParams();
-  const tab = TABS.some((t) => t.key === searchParams.get('tab')) ? searchParams.get('tab')! : 'overview';
+  const tab = TABS.some((t) => t.key === searchParams.get('tab')) ? searchParams.get('tab')! : TABS[0]?.key ?? '';
+  const isOwner = user?.role === 'Owner';
+  const canListUsers = canAny(user, ['users.view', 'admin.scans', 'scans.purge']);
+  const assignable = ROLE_OPTIONS.filter((r) => r === 'Staff' || (r === 'Admin' && can('users.role')) || (r === 'Owner' && isOwner));
   const scansUser = searchParams.get('user') ?? '';
 
   const [users, setUsers] = useState<AdminUserView[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(canListUsers);
   const [listError, setListError] = useState<string | null>(null);
   const [listNotice, setListNotice] = useState<string | null>(null);
 
@@ -71,6 +79,7 @@ export function AdminPage() {
   }
 
   const loadUsers = useCallback(async () => {
+    if (!canListUsers) return;
     setIsLoading(true);
     setListError(null);
     try {
@@ -82,7 +91,7 @@ export function AdminPage() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [canListUsers]);
 
   useEffect(() => {
     loadUsers();
@@ -195,9 +204,7 @@ export function AdminPage() {
         <span className="eyebrow">Adminisztráció</span>
         <h1>Admin Panel</h1>
         <p className="muted">
-          {user?.isPlatformAdmin
-            ? 'Felhasználók, vizsgálatok, beállítások, napló, csalásjelek, kitiltott gépek és az áruház.'
-            : 'Felhasználók, vizsgálatok, beállítások, napló és kitiltott gépek.'}
+          {user ? `${ROLE_LABELS[user.role] ?? user.role} rangod szerint ${TABS.length} terület érhető el.` : 'Betöltés...'}
         </p>
       </header>
 
@@ -219,13 +226,15 @@ export function AdminPage() {
 
       {tab === 'scans' && <AdminScansTab users={users} initialUserId={scansUser} />}
 
-      {tab === 'settings' && <AdminSettingsTab />}
+      {tab === 'roles' && <RolesAdminTab />}
+
+      {tab === 'settings' && <AdminSettingsTab onOpenRoles={can('roles.manage') ? () => openTab('roles') : undefined} />}
 
       {tab === 'audit' && <AdminAuditTab />}
 
-      {tab === 'signatures' && <SignatureCatalogSection />}
+      {tab === 'signatures' && <SignatureCatalogSection canEdit={can('platform.signatures')} />}
 
-      {tab === 'bans' && <BannedHwidsSection />}
+      {tab === 'bans' && <BannedHwidsSection canEdit={can('bans.manage')} />}
 
       {tab === 'store' && <StoreAdminTab />}
       {tab === 'discord' && <DiscordAdminTab />}
@@ -247,38 +256,50 @@ export function AdminPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {users.map((u, i) => (
-                    <tr key={u.id} className="row-in" style={{ animationDelay: `${i * 40}ms` }}>
-                      <td className="mono small">{u.email}</td>
-                      <td>
-                        <select
-                          value={u.role}
-                          onChange={(e) => handleRoleChange(u, e.target.value as UserRole)}
-                          className="role-select"
-                          aria-label={`${u.email} rangja`}
-                        >
-                          <option value="Staff">Staff</option>
-                          <option value="Admin">Admin</option>
-                        </select>
-                      </td>
-                      <td>
-                        <span className={`status-badge ${u.isActive ? 'status-completed' : 'status-interrupted'}`}>
-                          {u.isActive ? 'Aktív' : 'Inaktív'}
-                        </span>
-                      </td>
-                      <td className="muted small">{u.lastLoginAt ? formatSecond(u.lastLoginAt) : '-'}</td>
-                      <td className="admin-actions">
-                        <button className="btn-ghost btn-tiny" onClick={() => openTab('scans', { user: u.id })}>Vizsgálatai</button>
-                        <button className="btn-ghost btn-tiny btn-danger" onClick={() => handlePurgeUser(u)}>Előzmények törlése</button>
-                        <button className="btn-ghost btn-tiny" onClick={() => handleResetPassword(u)}>Új jelszó</button>
-                        <button className="btn-ghost btn-tiny" onClick={() => handleSignOut(u)}>Kijelentkeztetés</button>
-                        <button className="btn-ghost btn-tiny" onClick={() => handleToggleActive(u)}>
-                          {u.isActive ? 'Deaktiválás' : 'Aktiválás'}
-                        </button>
-                        <button className="btn-ghost btn-tiny btn-danger" onClick={() => handleDelete(u)}>Fiók törlése</button>
-                      </td>
-                    </tr>
-                  ))}
+                  {users.map((u, i) => {
+                    const isSelf = u.id === user?.id;
+                    const locked = u.role === 'Owner' && !isOwner;
+                    const canChangeRole = can('users.role') && !isSelf && !locked;
+                    return (
+                      <tr key={u.id} className="row-in" style={{ animationDelay: `${i * 40}ms` }}>
+                        <td className="mono small">{u.email}{isSelf && <span className="muted"> (te)</span>}</td>
+                        <td>
+                          {canChangeRole ? (
+                            <select
+                              value={u.role}
+                              onChange={(e) => handleRoleChange(u, e.target.value as UserRole)}
+                              className="role-select"
+                              aria-label={`${u.email} rangja`}
+                            >
+                              {[...new Set([...assignable, u.role])].map((r) => <option key={r} value={r}>{ROLE_LABELS[r] ?? r}</option>)}
+                            </select>
+                          ) : (
+                            <span className={`role-chip ${u.role === 'Owner' ? 'role-chip-owner' : ''}`}>
+                              {u.role === 'Owner' && <Icon name="crown" size={12} />} {ROLE_LABELS[u.role] ?? u.role}
+                            </span>
+                          )}
+                        </td>
+                        <td>
+                          <span className={`status-badge ${u.isActive ? 'status-completed' : 'status-interrupted'}`}>
+                            {u.isActive ? 'Aktív' : 'Inaktív'}
+                          </span>
+                        </td>
+                        <td className="muted small">{u.lastLoginAt ? formatSecond(u.lastLoginAt) : '-'}</td>
+                        <td className="admin-actions">
+                          {can('admin.scans') && <button className="btn-ghost btn-tiny" onClick={() => openTab('scans', { user: u.id })}>Vizsgálatai</button>}
+                          {can('scans.purge') && <button className="btn-ghost btn-tiny btn-danger" onClick={() => handlePurgeUser(u)}>Előzmények törlése</button>}
+                          {!isSelf && !locked && can('users.password') && <button className="btn-ghost btn-tiny" onClick={() => handleResetPassword(u)}>Új jelszó</button>}
+                          {!isSelf && !locked && can('users.signout') && <button className="btn-ghost btn-tiny" onClick={() => handleSignOut(u)}>Kijelentkeztetés</button>}
+                          {!isSelf && !locked && can('users.deactivate') && (
+                            <button className="btn-ghost btn-tiny" onClick={() => handleToggleActive(u)}>
+                              {u.isActive ? 'Deaktiválás' : 'Aktiválás'}
+                            </button>
+                          )}
+                          {!isSelf && !locked && can('users.delete') && <button className="btn-ghost btn-tiny btn-danger" onClick={() => handleDelete(u)}>Fiók törlése</button>}
+                        </td>
+                      </tr>
+                    );
+                  })}
                   {!isLoading && users.length === 0 && (
                     <tr>
                       <td colSpan={5} className="muted empty-row">Nincs felhasználó.</td>
@@ -292,67 +313,68 @@ export function AdminPage() {
           </section>
 
           <div className="side-stack">
-            <section className="card generate-card stagger-in" style={{ animationDelay: '120ms' }}>
-              <h2 className="card-title"><Icon name="plus" size={18} /> Új felhasználó</h2>
-              <form onSubmit={handleCreate}>
-                <label className="field-label" htmlFor="new-user-email">Email</label>
-                <input
-                  id="new-user-email"
-                  type="email"
-                  autoComplete="off"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-
-                <div className="field-label-row">
-                  <label className="field-label" htmlFor="new-user-password">Jelszó</label>
-                  <button type="button" className="text-action" onClick={handleGeneratePassword}>
-                    <Icon name="dice" size={15} /> Véletlen jelszó
-                  </button>
-                </div>
-                <div className="input-with-action">
+            {can('users.create') && (
+              <section className="card generate-card stagger-in" style={{ animationDelay: '120ms' }}>
+                <h2 className="card-title"><Icon name="plus" size={18} /> Új felhasználó</h2>
+                <form onSubmit={handleCreate}>
+                  <label className="field-label" htmlFor="new-user-email">Email</label>
                   <input
-                    id="new-user-password"
-                    type={showPassword ? 'text' : 'password'}
-                    autoComplete="new-password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    minLength={8}
+                    id="new-user-email"
+                    type="email"
+                    autoComplete="off"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     required
                   />
-                  <button
-                    type="button"
-                    className="input-action"
-                    onClick={() => setShowPassword((v) => !v)}
-                    aria-label={showPassword ? 'Jelszó elrejtése' : 'Jelszó megjelenítése'}
+
+                  <div className="field-label-row">
+                    <label className="field-label" htmlFor="new-user-password">Jelszó</label>
+                    <button type="button" className="text-action" onClick={handleGeneratePassword}>
+                      <Icon name="dice" size={15} /> Véletlen jelszó
+                    </button>
+                  </div>
+                  <div className="input-with-action">
+                    <input
+                      id="new-user-password"
+                      type={showPassword ? 'text' : 'password'}
+                      autoComplete="new-password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      minLength={8}
+                      required
+                    />
+                    <button
+                      type="button"
+                      className="input-action"
+                      onClick={() => setShowPassword((v) => !v)}
+                      aria-label={showPassword ? 'Jelszó elrejtése' : 'Jelszó megjelenítése'}
+                    >
+                      <Icon name={showPassword ? 'eye-off' : 'eye'} size={18} />
+                    </button>
+                  </div>
+                  <div className={`strength strength-${strength.score}`} aria-live="polite">
+                    <span className="strength-bars" aria-hidden="true"><i /><i /><i /><i /></span>
+                    <span className="small">{strength.label}</span>
+                  </div>
+
+                  <label className="field-label" htmlFor="new-user-role">Rang</label>
+                  <select
+                    id="new-user-role"
+                    value={role}
+                    onChange={(e) => setRole(e.target.value as UserRole)}
+                    className="role-select role-select-full"
                   >
-                    <Icon name={showPassword ? 'eye-off' : 'eye'} size={18} />
+                    {assignable.map((r) => <option key={r} value={r}>{ROLE_LABELS[r] ?? r}</option>)}
+                  </select>
+
+                  <button className={`btn-primary btn-block ${isCreating ? 'is-loading' : ''}`} type="submit" disabled={isCreating}>
+                    {isCreating && <span className="btn-spinner" aria-hidden="true" />}
+                    {isCreating ? 'Létrehozás...' : 'Fiók létrehozása'}
                   </button>
-                </div>
-                <div className={`strength strength-${strength.score}`} aria-live="polite">
-                  <span className="strength-bars" aria-hidden="true"><i /><i /><i /><i /></span>
-                  <span className="small">{strength.label}</span>
-                </div>
-
-                <label className="field-label" htmlFor="new-user-role">Rang</label>
-                <select
-                  id="new-user-role"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value as UserRole)}
-                  className="role-select role-select-full"
-                >
-                  <option value="Staff">Staff</option>
-                  <option value="Admin">Admin</option>
-                </select>
-
-                <button className={`btn-primary btn-block ${isCreating ? 'is-loading' : ''}`} type="submit" disabled={isCreating}>
-                  {isCreating && <span className="btn-spinner" aria-hidden="true" />}
-                  {isCreating ? 'Létrehozás...' : 'Fiók létrehozása'}
-                </button>
-                {createError && <p className="error-text error-in">{createError}</p>}
-              </form>
-            </section>
+                  {createError && <p className="error-text error-in">{createError}</p>}
+                </form>
+              </section>
+            )}
 
             {issued && (
               <section className="card credentials-card" key={`${issued.email}-${issued.password}`}>

@@ -35,7 +35,7 @@ export function StoreProductPage() {
   const load = useCallback(() => {
     storeApi.product(slug)
       .then((d) => { setDetail(d); setNotFound(false); })
-      .catch((err) => { if (err instanceof ApiError && err.status === 404) setNotFound(true); else setError('Nem sikerült betölteni a plugint.'); });
+      .catch((err) => { if (err instanceof ApiError && err.status === 404) setNotFound(true); else setError('Nem sikerült betölteni a terméket.'); });
   }, [slug]);
 
   useEffect(() => { load(); }, [load, isLoggedIn]);
@@ -52,7 +52,7 @@ export function StoreProductPage() {
       <main className="page store-page">
         <div className="card store-empty">
           <Icon name="package" size={30} />
-          <h3>Ez a plugin nem található</h3>
+          <h3>Ez a termék nem található</h3>
           <p className="muted">Lehet, hogy átnevezték vagy már nem érhető el.</p>
           <Link to="/store" className="btn-secondary">Vissza az áruházba</Link>
         </div>
@@ -71,6 +71,7 @@ export function StoreProductPage() {
   }
 
   const { card } = detail;
+  const isModel = card.kind === 'model';
   const currency = info?.currency ?? 'EUR';
   const latest = detail.releases[0];
   const left = card.discountPercent > 0 ? timeLeft(card.discountEndsAt, now) : null;
@@ -126,6 +127,7 @@ export function StoreProductPage() {
           <h1>{card.name}</h1>
           <p className="muted">{card.tagline}</p>
           <div className="product-chips">
+            <span className={`kind-pill ${isModel ? 'kind-pill-model' : ''}`}><Icon name={isModel ? 'cube' : 'package'} size={11} /> {isModel ? 'Modell' : 'Plugin'}</span>
             {card.supportedVersions && <span className="chip"><Icon name="layers" size={12} /> {card.supportedVersions}</span>}
             {card.platforms.map((p) => <span className="chip chip-dim" key={p}>{p}</span>)}
             {card.isFeatured && <span className="chip chip-hot"><Icon name="star" size={12} /> Kiemelt</span>}
@@ -135,7 +137,7 @@ export function StoreProductPage() {
 
       <div className="product-layout">
         <div className="product-main">
-          <nav className="foundry-tabs" aria-label="Plugin fülek">
+          <nav className="foundry-tabs" aria-label="Termék fülek">
             <button type="button" className={tab === 'overview' ? 'is-active' : ''} onClick={() => setTab('overview')}>Leírás</button>
             <button type="button" className={tab === 'versions' ? 'is-active' : ''} onClick={() => setTab('versions')}>
               Verziók <span className="foundry-tab-count">{detail.releases.length}</span>
@@ -156,7 +158,7 @@ export function StoreProductPage() {
               )}
               {detail.description.trim()
                 ? <Markdown source={detail.description} />
-                : <p className="muted">Ehhez a pluginhoz még nincs részletes leírás.</p>}
+                : <p className="muted">{isModel ? 'Ehhez a modellhez' : 'Ehhez a pluginhoz'} még nincs részletes leírás.</p>}
             </section>
           )}
 
@@ -213,7 +215,7 @@ export function StoreProductPage() {
                     <Icon name="download" size={17} /> Letöltés (v{latest.version})
                   </button>
                 )}
-                <Link to="/store/fiok" className="btn-ghost btn-block">Pluginjaim</Link>
+                <Link to="/store/fiok" className="btn-ghost btn-block">Termékeim</Link>
               </>
             ) : (
               <>
@@ -245,7 +247,7 @@ export function StoreProductPage() {
               <div><dt>Legújabb verzió</dt><dd className="mono">{latest ? `v${latest.version}` : '-'}</dd></div>
               <div><dt>Frissítve</dt><dd>{formatDate(card.updatedAt)}</dd></div>
               <div><dt>Minecraft</dt><dd>{card.supportedVersions || '-'}</dd></div>
-              <div><dt>Szerverszoftver</dt><dd>{card.platforms.join(', ') || '-'}</dd></div>
+              <div><dt>{isModel ? 'Kompatibilis' : 'Szerverszoftver'}</dt><dd>{card.platforms.join(', ') || '-'}</dd></div>
               {card.category && <div><dt>Kategória</dt><dd>{card.category}</dd></div>}
               <div><dt>Vásárlás / letöltés</dt><dd>{card.salesCount} / {card.downloadCount}</dd></div>
             </dl>

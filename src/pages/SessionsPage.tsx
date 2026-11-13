@@ -47,10 +47,11 @@ export function SessionsPage() {
 
   const { copiedKey, copy } = useCopyFeedback();
   const now = useNow();
-  const { user, isAdmin } = useAuth();
+  const { user, can } = useAuth();
+  const createBlocked = user !== null && !can('scans.create');
 
   const canDeleteRow = (s: SessionListItem) =>
-    isAdmin || (user?.canDeleteOwnScans === true && s.createdByMe === true);
+    can('scans.delete.all') || (can('scans.delete.own') && s.createdByMe === true);
 
   const loadSessions = useCallback(async (targetPage: number) => {
     setIsLoadingList(true);
@@ -136,7 +137,7 @@ export function SessionsPage() {
       await loadSessions(1);
       await copy('code', result.code);
     } catch (err) {
-      if (err instanceof ApiError && err.status === 402) {
+      if (err instanceof ApiError && (err.status === 402 || err.status === 403)) {
         setGenerateError(err.message);
       } else if (!(err instanceof ApiError && err.status === 401)) {
         setGenerateError('Nem sikerült kódot generálni.');
@@ -221,7 +222,7 @@ export function SessionsPage() {
             </div>
           )}
 
-          <button className={`btn-primary btn-block btn-large ${isGenerating ? 'is-loading' : ''}`} onClick={handleGenerate} disabled={isGenerating}>
+          <button className={`btn-primary btn-block btn-large ${isGenerating ? 'is-loading' : ''}`} onClick={handleGenerate} disabled={isGenerating || createBlocked} title={createBlocked ? 'A rangod nem indíthat vizsgálatot.' : undefined}>
             {isGenerating && <span className="btn-spinner" aria-hidden="true" />}
             {isGenerating ? 'Generálás...' : newSession ? 'Új kód generálása' : 'Kód generálása'}
           </button>

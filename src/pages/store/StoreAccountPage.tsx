@@ -1,11 +1,14 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { ApiError } from '../../api/client';
-import { storeApi, type CustomerOwned, type StoreInvoice, type StoreRelease } from '../../api/store';
+import { customerProfileApi } from '../../api/profile';
+import { storeApi, type CustomerMe, type CustomerOwned, type StoreInvoice, type StoreRelease } from '../../api/store';
 import { useAuth } from '../../auth/AuthContext';
 import { ratePassword } from '../../auth/password';
 import { Icon } from '../../components/Icon';
 import { Skeleton } from '../../components/motion';
+import { ProfileCustomizer } from '../../components/ProfileCustomizer';
+import { MINECRAFT_NAME_PATTERN } from '../../store/MinecraftNamePrompt';
 import { useCustomer } from '../../store/CustomerAuth';
 import { InvoiceTable } from '../../store/InvoiceTable';
 import { ProductIcon } from '../../store/ProductCard';
@@ -23,7 +26,7 @@ function AuthForms() {
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [displayName, setDisplayName] = useState('');
+  const [minecraftName, setMinecraftName] = useState('');
   const [accept, setAccept] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -36,7 +39,7 @@ function AuthForms() {
     setError(null);
     try {
       if (mode === 'login') await login(email, password);
-      else await register(email, password, displayName, accept);
+      else await register(email, password, minecraftName.trim(), accept);
       if (back) navigate(back);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Nem sikerült. Próbáld újra.');
@@ -59,8 +62,17 @@ function AuthForms() {
           </label>
           {mode === 'register' && (
             <label>
-              <span className="field-label">Megjelenő név (nem kötelező)</span>
-              <input maxLength={40} autoComplete="nickname" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
+              <span className="field-label">Minecraft-név</span>
+              <input
+                maxLength={32}
+                autoComplete="nickname"
+                required
+                pattern={MINECRAFT_NAME_PATTERN}
+                title="3-32 karakter: betűk, számok, alulvonás (Bedrock-névnél . vagy * előtag)"
+                value={minecraftName}
+                onChange={(e) => setMinecraftName(e.target.value)}
+              />
+              <small className="muted">Ezen a néven köszönünk, és ehhez köti a Tebex a vásárlásaidat, így fizetéskor már nem kell megadnod.</small>
             </label>
           )}
           <label>
@@ -89,7 +101,7 @@ function AuthForms() {
       <section className="store-auth-aside stagger-in" style={{ animationDelay: '80ms' }}>
         <h2>Miért kell fiók?</h2>
         <ul className="check-list">
-          <li><Icon name="download" size={16} /> A megvásárolt pluginjaid és minden frissítésük itt lesz letölthető.</li>
+          <li><Icon name="download" size={16} /> A megvásárolt pluginjaid, modelljeid és minden frissítésük itt lesz letölthető.</li>
           <li><Icon name="radar" size={16} /> Az SS tool előfizetésed is ehhez a fiókhoz kötődik.</li>
           <li><Icon name="lock" size={16} /> Kártyaadatot nem tárolunk: a fizetést a Tebex intézi.</li>
         </ul>
@@ -167,6 +179,66 @@ function MyInvoices({ refreshKey }: { refreshKey: string }) {
   );
 }
 
+function ProfileSection({ me, refresh }: { me: CustomerMe; refresh: () => Promise<void> }) {
+  const [name, setName] = useState(me.minecraftUsername ?? '');
+  const [savedName, setSavedName] = useState(me.minecraftUsername ?? '');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+
+  if ((me.minecraftUsername ?? '') !== savedName) {
+    setSavedName(me.minecraftUsername ?? '');
+    setName(me.minecraftUsername ?? '');
+  }
+
+  async function saveName(e: FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setError(null);
+    setNotice(null);
+    try {
+      await customerProfileApi.update({ minecraftUsername: name.trim() });
+      await refresh();
+      setNotice('Minecraft-név mentve. A következő fizetésnél már ezt használjuk.');
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Nem sikerült menteni.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <section className="card stagger-in" style={{ animationDelay: '20ms' }}>
+      <h2 className="card-title"><Icon name="user" size={18} /> Profil</h2>
+      <ProfileCustomizer
+        avatarUrl={me.avatarUrl}
+        name={me.minecraftUsername ?? me.displayName ?? me.email}
+        theme={me.theme}
+        onUpload={async (image) => { await customerProfileApi.uploadAvatar(image); await refresh(); }}
+        onRemove={async () => { await customerProfileApi.removeAvatar(); await refresh(); }}
+        onTheme={async (key) => { await customerProfileApi.update({ theme: key }); }}
+      />
+      <form className="account-form mc-name-form" onSubmit={saveName}>
+        <span className="field-label">Minecraft-név</span>
+        <div className="mc-name-row">
+          <input
+            value={name}
+            maxLength={32}
+            pattern={MINECRAFT_NAME_PATTERN}
+            title="3-32 karakter: betűk, számok, alulvonás (Bedrock-névnél . vagy * előtag)"
+            placeholder="pl. Steve"
+            onChange={(e) => { setName(e.target.value); setNotice(null); }}
+          />
+          <button type="submit" className={`btn-secondary btn-tiny ${busy ? 'is-loading' : ''}`} disabled={busy || name.trim() === savedName}>Mentés</button>
+        </div>
+        <small className="muted">A Tebex ehhez a névhez köti a vásárlást; előfizetésnél és vásárlásnál már nem kérjük újra.</small>
+        {notice && <p className="success-text"><Icon name="check" size={15} /> {notice}</p>}
+        {error && <p className="error-text error-in">{error}</p>}
+      </form>
+    </section>
+  );
+}
+
 function Dashboard() {
   const { me, refresh, logout, replaceToken } = useCustomer();
   const staff = useAuth();
@@ -226,7 +298,7 @@ function Dashboard() {
 
   const deleteAccount = (e: FormEvent) => {
     e.preventDefault();
-    if (!window.confirm('Biztosan törlöd a fiókodat? A megvásárolt pluginokhoz többé nem férsz hozzá, és ez nem vonható vissza.')) return;
+    if (!window.confirm('Biztosan törlöd a fiókodat? A megvásárolt pluginokhoz és modellekhez többé nem férsz hozzá, és ez nem vonható vissza.')) return;
     run('delete', async () => {
       await storeApi.deleteAccount(deletePassword);
       logout();
@@ -239,11 +311,11 @@ function Dashboard() {
       <div className="account-main">
         <section className="card stagger-in">
           <div className="scans-head">
-            <h2 className="card-title"><Icon name="package" size={18} /> Pluginjaim</h2>
+            <h2 className="card-title"><Icon name="package" size={18} /> Termékeim</h2>
             <Link to="/store" className="btn-ghost btn-tiny">Áruház</Link>
           </div>
           {me.owned.length === 0
-            ? <p className="muted">Még nincs pluginod. <Link to="/store" className="text-link">Nézz körül az áruházban.</Link></p>
+            ? <p className="muted">Még nincs pluginod vagy modelled. <Link to="/store" className="text-link">Nézz körül az áruházban.</Link></p>
             : <div className="owned-list">{me.owned.map((item) => <OwnedPlugin key={item.productId} item={item} onError={setError} />)}</div>}
         </section>
 
@@ -272,6 +344,7 @@ function Dashboard() {
       </div>
 
       <aside className="side-stack">
+        <ProfileSection me={me} refresh={refresh} />
         <section className={`card sub-card stagger-in ${subLive ? 'sub-card-live' : ''}`} style={{ animationDelay: '40ms' }}>
           <h2 className="card-title"><Icon name="radar" size={18} /> SS tool előfizetés</h2>
           {sub ? (
@@ -318,7 +391,7 @@ function Dashboard() {
           <details className="danger-zone">
             <summary>Fiók törlése</summary>
             <form className="account-form" onSubmit={deleteAccount}>
-              <p className="muted small">A fiókod és a letöltési jogaid törlődnek. A kiállított bizonylatok a könyvelési kötelezettség miatt megmaradnak. Élő előfizetést előbb mondj le.</p>
+              <p className="muted small">A fiókod, a profilképed és a letöltési jogaid törlődnek. A kiállított bizonylatok a könyvelési kötelezettség miatt megmaradnak. Élő előfizetést előbb mondj le.</p>
               <input type="password" placeholder="Jelszó a megerősítéshez" autoComplete="current-password" required value={deletePassword} onChange={(e) => setDeletePassword(e.target.value)} />
               <button type="submit" className="btn-ghost btn-tiny btn-danger" disabled={busy !== null}>Végleges törlés</button>
             </form>
@@ -338,8 +411,8 @@ export function StoreAccountPage() {
     <main className="page store-page">
       <header className="page-head stagger-in">
         <span className="eyebrow">Vásárlói fiók</span>
-        <h1>{isLoggedIn ? `Szia${me?.displayName ? `, ${me.displayName}` : ''}!` : 'Belépés az áruházba'}</h1>
-        <p className="muted">{isLoggedIn ? 'Itt éred el a pluginjaidat, a rendeléseidet és az SS tool előfizetésedet.' : 'Vásárláshoz és letöltéshez fiók szükséges.'}</p>
+        <h1>{isLoggedIn ? `Szia${me?.minecraftUsername || me?.displayName ? `, ${me?.minecraftUsername || me?.displayName}` : ''}!` : 'Belépés az áruházba'}</h1>
+        <p className="muted">{isLoggedIn ? 'Itt éred el a pluginjaidat, a modelljeidet, a rendeléseidet és az SS tool előfizetésedet.' : 'Vásárláshoz és letöltéshez fiók szükséges.'}</p>
       </header>
       {isLoggedIn ? <Dashboard /> : <AuthForms />}
     </main>

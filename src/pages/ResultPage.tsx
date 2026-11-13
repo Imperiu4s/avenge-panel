@@ -10,7 +10,7 @@ import { ShareLinkPanel } from '../components/ShareLinkPanel';
 
 export function ResultPage() {
   const { resultId } = useParams<{ resultId: string }>();
-  const { user, isAdmin } = useAuth();
+  const { user, can } = useAuth();
   const navigate = useNavigate();
   const [result, setResult] = useState<ScanResultView | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -59,8 +59,8 @@ export function ResultPage() {
     );
   }
 
-  const canShare = isAdmin || user?.canShareResults === true;
-  const canDelete = Boolean(result.sessionCode) && (isAdmin || user?.canDeleteOwnScans === true);
+  const canShare = user?.canShareResults === true;
+  const canDelete = Boolean(result.sessionCode) && (can('scans.delete.all') || user?.canDeleteOwnScans === true);
 
   async function handleDelete() {
     if (!result?.sessionCode) return;

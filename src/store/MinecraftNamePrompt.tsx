@@ -2,6 +2,8 @@ import { useState, type FormEvent } from 'react';
 import { ApiError } from '../api/client';
 import { Icon } from '../components/Icon';
 
+export const MINECRAFT_NAME_PATTERN = '[A-Za-z0-9_.*\\-]{3,32}';
+
 export function needsMinecraftName(err: unknown): boolean {
   return err instanceof ApiError && (err.code === 'minecraft_username_required' || err.code === 'minecraft_username_invalid');
 }

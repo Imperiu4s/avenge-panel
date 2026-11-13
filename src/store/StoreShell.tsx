@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { Link, NavLink, Outlet } from 'react-router-dom';
 import { storeApi, type StoreInfo } from '../api/store';
 import { Icon } from '../components/Icon';
+import { Avatar } from '../components/ProfileCustomizer';
 import { useCustomer } from './CustomerAuth';
 
 const StoreInfoContext = createContext<{ info: StoreInfo | null; error: string | null }>({ info: null, error: null });
@@ -31,15 +32,17 @@ export function StoreShell() {
             <span>{first} <em>{rest.join(' ')}</em></span>
           </Link>
           <nav className="foundry-bar-links" aria-label="Áruház menü">
-            <NavLink to="/store" end className={({ isActive }) => `foundry-bar-link ${isActive ? 'is-active' : ''}`}>Pluginok</NavLink>
+            <NavLink to="/store" end className={({ isActive }) => `foundry-bar-link ${isActive ? 'is-active' : ''}`}>Termékek</NavLink>
             {(info?.subscriptionEnabled ?? true) && (
               <NavLink to="/elofizetes" className={({ isActive }) => `foundry-bar-link ${isActive ? 'is-active' : ''}`}>SS tool előfizetés</NavLink>
             )}
             <NavLink to="/jogi/aszf" className={({ isActive }) => `foundry-bar-link ${isActive ? 'is-active' : ''}`}>Feltételek</NavLink>
           </nav>
           <NavLink to="/store/fiok" className={({ isActive }) => `foundry-bar-account ${isActive ? 'is-active' : ''}`}>
-            <Icon name="user" size={15} />
-            <span>{isLoggedIn ? (me?.displayName || me?.email || 'Fiókom') : 'Belépés / Regisztráció'}</span>
+            {isLoggedIn && me?.avatarUrl
+              ? <Avatar url={me.avatarUrl} name={me.minecraftUsername || me.email} className="foundry-bar-avatar" />
+              : <Icon name="user" size={15} />}
+            <span>{isLoggedIn ? (me?.minecraftUsername || me?.displayName || me?.email || 'Fiókom') : 'Belépés / Regisztráció'}</span>
           </NavLink>
         </div>
         <Outlet />

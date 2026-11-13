@@ -8,13 +8,14 @@ import {
   storeCustomerToken,
   type CustomerMe
 } from '../api/store';
+import { applyTheme } from '../theme';
 
 interface CustomerAuthValue {
   isLoggedIn: boolean;
   me: CustomerMe | null;
   isLoadingMe: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, displayName: string, acceptTerms: boolean) => Promise<void>;
+  register: (email: string, password: string, minecraftUsername: string, acceptTerms: boolean) => Promise<void>;
   logout: () => void;
   replaceToken: (token: string) => void;
   refresh: () => Promise<void>;
@@ -60,7 +61,9 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
     if (!getCustomerToken()) return;
     setIsLoadingMe(true);
     try {
-      setMe(await storeApi.me());
+      const next = await storeApi.me();
+      setMe(next);
+      if (next.theme) applyTheme(next.theme);
     } catch (err) {
       if (!(err instanceof ApiError && err.status === 401)) throw err;
     } finally {
@@ -82,8 +85,8 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
     replaceToken(result.token);
   }, [replaceToken]);
 
-  const register = useCallback(async (email: string, password: string, displayName: string, acceptTerms: boolean) => {
-    const result = await storeApi.register(email, password, displayName, acceptTerms);
+  const register = useCallback(async (email: string, password: string, minecraftUsername: string, acceptTerms: boolean) => {
+    const result = await storeApi.register(email, password, minecraftUsername, acceptTerms);
     replaceToken(result.token);
   }, [replaceToken]);
 

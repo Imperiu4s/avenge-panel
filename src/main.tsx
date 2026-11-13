@@ -10,8 +10,10 @@ import './index.css'
 import './store.css'
 import App from './App.tsx'
 import { installProtection, shouldProtect } from './protect'
+import { initTheme } from './theme'
 
 if (shouldProtect()) installProtection()
+initTheme()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

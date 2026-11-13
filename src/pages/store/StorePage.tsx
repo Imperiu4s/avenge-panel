@@ -10,6 +10,19 @@ import { formatPrice, timeLeft } from '../../store/format';
 import avengeLogo from '../../assets/avenge-logo-crop.png';
 
 type Sort = 'featured' | 'newest' | 'price-asc' | 'price-desc' | 'popular';
+type Tab = 'all' | 'plugin' | 'model' | 'about';
+
+const KIND_TABS: { key: Exclude<Tab, 'about'>; label: string; icon: 'layers' | 'package' | 'cube' }[] = [
+  { key: 'all', label: 'Összes', icon: 'layers' },
+  { key: 'plugin', label: 'Pluginok', icon: 'package' },
+  { key: 'model', label: 'Modellek', icon: 'cube' }
+];
+
+const NOUN: Record<Exclude<Tab, 'about'>, string> = { all: 'termék', plugin: 'plugin', model: 'modell' };
+
+function kindOf(p: StoreProductCard): 'plugin' | 'model' {
+  return p.kind === 'model' ? 'model' : 'plugin';
+}
 
 const SORTS: { key: Sort; label: string }[] = [
   { key: 'featured', label: 'Kiemelt' },
@@ -23,7 +36,7 @@ export function StorePage() {
   const { info, error: infoError } = useStoreInfo();
   const [products, setProducts] = useState<StoreProductCard[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [tab, setTab] = useState<'plugins' | 'about'>('plugins');
+  const [tab, setTab] = useState<Tab>('all');
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('');
   const [platforms, setPlatforms] = useState<string[]>([]);
@@ -33,11 +46,19 @@ export function StorePage() {
   const now = useNow(30000);
 
   useEffect(() => {
-    storeApi.products().then(setProducts).catch(() => setError('Nem sikerült betölteni a pluginokat.'));
+    storeApi.products().then(setProducts).catch(() => setError('Nem sikerült betölteni a termékeket.'));
   }, []);
 
   const currency = info?.currency ?? 'EUR';
-  const all = useMemo(() => products ?? [], [products]);
+  const everything = useMemo(() => products ?? [], [products]);
+  const kindTab: Exclude<Tab, 'about'> = tab === 'about' ? 'all' : tab;
+  const all = useMemo(() => (kindTab === 'all' ? everything : everything.filter((p) => kindOf(p) === kindTab)), [everything, kindTab]);
+  const counts = useMemo(() => ({
+    all: everything.length,
+    plugin: everything.filter((p) => kindOf(p) === 'plugin').length,
+    model: everything.filter((p) => kindOf(p) === 'model').length
+  }), [everything]);
+  const noun = NOUN[kindTab];
   const categories = useMemo(() => {
     const counts = new Map<string, number>();
     all.forEach((p) => p.category && counts.set(p.category, (counts.get(p.category) ?? 0) + 1));
@@ -46,11 +67,11 @@ export function StorePage() {
   const allPlatforms = useMemo(() => [...new Set(all.flatMap((p) => p.platforms))].sort(), [all]);
 
   const sale = useMemo(() => {
-    const discounted = all.filter((p) => p.discountPercent > 0);
+    const discounted = everything.filter((p) => p.discountPercent > 0);
     if (discounted.length === 0) return null;
     const best = discounted.reduce((a, b) => (b.discountPercent > a.discountPercent ? b : a));
-    return { name: best.discountName ?? 'Akció', percent: best.discountPercent, endsAt: best.discountEndsAt, count: discounted.length, all: discounted.length === all.length };
-  }, [all]);
+    return { name: best.discountName ?? 'Akció', percent: best.discountPercent, endsAt: best.discountEndsAt, count: discounted.length, all: discounted.length === everything.length };
+  }, [everything]);
 
   const visible = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -81,13 +102,14 @@ export function StorePage() {
         <div className="foundry-identity">
           <div className="foundry-avatar"><img src={avengeLogo} alt="" /></div>
           <div className="foundry-identity-text">
-            <span className="eyebrow">Minecraft plugin fejlesztő</span>
+            <span className="eyebrow">Minecraft pluginok és modellek</span>
             <h1>{info?.brandName ?? 'Avenge Foundry'} <span className="verified-chip" title="Az Avenge hivatalos plugin-műhelye"><Icon name="check" size={12} /> Hivatalos</span></h1>
-            <p className="muted">{info?.tagline || 'Minecraft pluginok az Avenge csapatától.'}</p>
+            <p className="muted">{info?.tagline || 'Minecraft pluginok és modellek az Avenge csapatától.'}</p>
           </div>
         </div>
         <dl className="foundry-stats">
           <div><dt>Plugin</dt><dd>{info ? <CountUp value={info.plugins} /> : '–'}</dd></div>
+          {(info?.models ?? 0) > 0 && <div><dt>Modell</dt><dd><CountUp value={info?.models ?? 0} /></dd></div>}
           <div><dt>Vásárlás</dt><dd>{info ? <CountUp value={info.sales} /> : '–'}</dd></div>
           <div><dt>Letöltés</dt><dd>{info ? <CountUp value={info.downloads} /> : '–'}</dd></div>
         </dl>
@@ -102,23 +124,25 @@ export function StorePage() {
 
       {infoError && <p className="error-text">{infoError}</p>}
       {info && !info.storeEnabled && (
-        <p className="store-notice"><Icon name="info" size={16} /> Az áruház karbantartás miatt átmenetileg nem fogad rendelést. A már megvásárolt pluginjaidat a fiókodban továbbra is letöltheted.</p>
+        <p className="store-notice"><Icon name="info" size={16} /> Az áruház karbantartás miatt átmenetileg nem fogad rendelést. A már megvásárolt termékeidet a fiókodban továbbra is letöltheted.</p>
       )}
 
       {sale && (
         <div className="sale-strip stagger-in" style={{ animationDelay: '60ms' }}>
           <Icon name="tag" size={18} />
           <strong>{sale.name}</strong>
-          <span>{sale.all ? `Minden plugin` : `${sale.count} plugin`} akár <b>−{sale.percent}%</b></span>
+          <span>{sale.all ? `Minden termék` : `${sale.count} termék`} akár <b>−{sale.percent}%</b></span>
           {left && <span className="sale-strip-left mono"><Icon name="clock" size={13} /> még {left}</span>}
-          <button type="button" className="btn-ghost btn-tiny" onClick={() => { setTab('plugins'); setOnlySale(true); }}>Akciósak</button>
+          <button type="button" className="btn-ghost btn-tiny" onClick={() => { setTab('all'); setOnlySale(true); }}>Akciósak</button>
         </div>
       )}
 
       <nav className="foundry-tabs" aria-label="Alkotói oldal">
-        <button type="button" className={tab === 'plugins' ? 'is-active' : ''} onClick={() => setTab('plugins')}>
-          Pluginok <span className="foundry-tab-count">{all.length}</span>
-        </button>
+        {KIND_TABS.map((k) => (
+          <button key={k.key} type="button" className={tab === k.key ? 'is-active' : ''} onClick={() => { setTab(k.key); setCategory(''); setPlatforms([]); }}>
+            <Icon name={k.icon} size={14} /> {k.label} <span className="foundry-tab-count">{counts[k.key]}</span>
+          </button>
+        ))}
         <button type="button" className={tab === 'about' ? 'is-active' : ''} onClick={() => setTab('about')}>Rólunk</button>
       </nav>
 
@@ -128,10 +152,10 @@ export function StorePage() {
             ? <Markdown source={info.about} />
             : (
               <div className="markdown">
-                <h2>Az Avenge csapat plugin-műhelye</h2>
-                <p>Az Avenge elsősorban screenshare (SS) eszköz Minecraft szervereknek. A Foundry ennek a kiegészítése: itt adjuk ki a saját fejlesztésű pluginjainkat, ugyanazzal a gondossággal, amivel a csalásokat keressük.</p>
+                <h2>Az Avenge csapat műhelye</h2>
+                <p>Az Avenge elsősorban screenshare (SS) eszköz Minecraft szervereknek. A Foundry ennek a kiegészítése: itt adjuk ki a saját fejlesztésű pluginjainkat és modelljeinket, ugyanazzal a gondossággal, amivel a csalásokat keressük.</p>
                 <ul>
-                  <li>Minden pluginhoz azonnali letöltés és frissítések a fiókodban</li>
+                  <li>Minden pluginhoz és modellhez azonnali letöltés és frissítések a fiókodban</li>
                   <li>Biztonságos fizetés a Tebexen keresztül</li>
                   <li>Átlátható licencfeltételek és visszatérítési szabályzat</li>
                 </ul>
@@ -143,7 +167,7 @@ export function StorePage() {
           <aside className="foundry-filters card">
             <label className="filter-search">
               <Icon name="search" size={16} />
-              <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Keresés a pluginok között" aria-label="Keresés" />
+              <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={kindTab === 'model' ? 'Keresés a modellek között' : kindTab === 'plugin' ? 'Keresés a pluginok között' : 'Keresés a termékek között'} aria-label="Keresés" />
             </label>
 
             {categories.length > 0 && (
@@ -162,7 +186,7 @@ export function StorePage() {
 
             {allPlatforms.length > 0 && (
               <div className="filter-group">
-                <span className="field-label">Szerverszoftver</span>
+                <span className="field-label">{kindTab === 'model' ? 'Kompatibilitás' : kindTab === 'plugin' ? 'Szerverszoftver' : 'Platform'}</span>
                 {allPlatforms.map((pl) => (
                   <label className="filter-check" key={pl}>
                     <input
@@ -200,7 +224,7 @@ export function StorePage() {
 
           <section className="foundry-results">
             <div className="foundry-toolbar">
-              <span className="muted small">{products ? `${visible.length} plugin` : 'Betöltés...'}</span>
+              <span className="muted small">{products ? `${visible.length} ${noun}` : 'Betöltés...'}</span>
               <label className="sort-select">
                 <span className="small muted">Rendezés</span>
                 <select value={sort} onChange={(e) => setSort(e.target.value as Sort)}>
@@ -219,8 +243,8 @@ export function StorePage() {
             )}
             {products && visible.length === 0 && (
               <div className="card store-empty">
-                <Icon name="package" size={30} />
-                <h3>{all.length === 0 ? 'Hamarosan érkeznek az első pluginok' : 'Nincs a szűrésnek megfelelő plugin'}</h3>
+                <Icon name={kindTab === 'model' ? 'cube' : 'package'} size={30} />
+                <h3>{all.length === 0 ? (kindTab === 'model' ? 'Hamarosan érkeznek az első modellek' : kindTab === 'plugin' ? 'Hamarosan érkeznek az első pluginok' : 'Hamarosan érkeznek az első termékek') : `Nincs a szűrésnek megfelelő ${noun}`}</h3>
                 <p className="muted">{all.length === 0 ? 'Nézz vissza később, vagy addig próbáld ki az Avenge SS toolt.' : 'Próbálj kevesebb szűrőt.'}</p>
               </div>
             )}

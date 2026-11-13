@@ -135,7 +135,7 @@ export function HomePage() {
             <Icon name="lock" size={14} />
             <span>
               Saját szervered van? <Link to="/elofizetes" className="text-link">Havi előfizetéssel</Link> te is használhatod.
-              Pluginokat a <Link to="/store" className="text-link">Foundry</Link> áruházban találsz.
+              Pluginokat és modelleket a <Link to="/store" className="text-link">Foundry</Link> áruházban találsz.
             </span>
           </p>
         </div>

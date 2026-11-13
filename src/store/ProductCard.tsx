@@ -33,12 +33,15 @@ export function ProductCard({ product, currency, index = 0 }: { product: StorePr
         <div className="product-card-title">
           <h3>{product.name}</h3>
           <span className="product-card-meta">
+            <span className={`kind-pill ${product.kind === 'model' ? 'kind-pill-model' : ''}`}>
+              <Icon name={product.kind === 'model' ? 'cube' : 'package'} size={11} /> {product.kind === 'model' ? 'Modell' : 'Plugin'}
+            </span>
             {product.category && <span>{product.category}</span>}
             {product.latestVersion && <span className="mono">v{product.latestVersion}</span>}
           </span>
         </div>
       </div>
-      <p className="product-card-tagline">{product.tagline || 'Minecraft plugin az Avenge csapatától.'}</p>
+      <p className="product-card-tagline">{product.tagline || (product.kind === 'model' ? 'Minecraft modell az Avenge csapatától.' : 'Minecraft plugin az Avenge csapatától.')}</p>
       <div className="product-chips">
         {product.supportedVersions && <span className="chip"><Icon name="layers" size={12} /> {product.supportedVersions}</span>}
         {product.platforms.slice(0, 3).map((p) => <span className="chip chip-dim" key={p}>{p}</span>)}

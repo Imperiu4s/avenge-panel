@@ -10,10 +10,13 @@ import {
 import type { CurrentUserView } from '../api/types';
 import { disconnectScanHub } from '../realtime/scanHub';
 import { decodeStaffToken } from './jwt';
+import { applyTheme } from '../theme';
+import { can as userCan, canOpenAdmin } from './permissions';
 
 interface AuthContextValue {
   isAuthenticated: boolean;
   isAdmin: boolean;
+  can: (permission: string) => boolean;
   isLoading: boolean;
   error: string | null;
   sessionExpired: boolean;
@@ -77,7 +80,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!token) return;
     let cancelled = false;
     api.me()
-      .then((me) => { if (!cancelled) setUser(me); })
+      .then((me) => {
+        if (cancelled) return;
+        setUser(me);
+        if (me.theme) applyTheme(me.theme);
+      })
       .catch(() => { });
     return () => { cancelled = true; };
   }, [token]);
@@ -123,7 +130,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider
       value={{
         isAuthenticated: token !== null,
-        isAdmin: token !== null && decodeStaffToken(token).role === 'Admin',
+        isAdmin: token !== null && canOpenAdmin(user),
+        can: (permission: string) => token !== null && userCan(user, permission),
         isLoading,
         error,
         sessionExpired,

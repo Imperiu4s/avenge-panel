@@ -2,8 +2,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { API_BASE } from '../api/config';
+import { Avatar } from './ProfileCustomizer';
 import { Icon, type IconName } from './Icon';
 import { prefersReducedMotion } from './motion';
+import { accentChannels } from '../theme';
 import avengeLogo from '../assets/avenge-logo-crop.png';
 
 interface NavItem {
@@ -85,6 +87,7 @@ function useBladeMotion(activeIndex: number, itemCount: number) {
     const offset = links ? links.getBoundingClientRect().left - canvas.getBoundingClientRect().left : 0;
     const needle = offset + s.x.value + s.width.value / 2;
     const progressEnd = width * s.scroll;
+    const accent = accentChannels();
 
     for (let x = 4; x < width; x += TOOTH_SPACING) {
       const nearPointer = s.heat * Math.exp(-Math.pow((x - s.pointerX) / 46, 2));
@@ -94,11 +97,12 @@ function useBladeMotion(activeIndex: number, itemCount: number) {
       const glow = Math.max(nearPointer, nearNeedle * 0.9);
       const alpha = (lit ? 0.5 : 0.17) + glow * 0.75;
       const red = lit || glow > 0.12;
-      ctx.fillStyle = red ? `rgba(255, ${Math.round(70 + glow * 90)}, ${Math.round(70 + glow * 50)}, ${Math.min(1, alpha)})` : `rgba(255, 236, 230, ${alpha})`;
+      const [r, g, b] = accent.signal.map((c, i) => Math.round(c + (accent.hot[i] - c) * Math.min(1, 0.3 + glow)));
+      ctx.fillStyle = red ? `rgba(${r}, ${g}, ${b}, ${Math.min(1, alpha)})` : `rgba(255, 236, 230, ${alpha})`;
       ctx.fillRect(x, height - toothHeight, 1.25, toothHeight);
     }
 
-    ctx.fillStyle = '#ff5a4d';
+    ctx.fillStyle = `rgb(${accent.hot.join(', ')})`;
     ctx.beginPath();
     ctx.moveTo(needle - 4, height);
     ctx.lineTo(needle + 4, height);
@@ -267,8 +271,6 @@ export function BladeNav() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const initial = user?.email?.[0]?.toUpperCase() ?? '•';
-
   return (
     <header className={`blade-nav ${isCompact ? 'blade-nav-compact' : ''}`}>
       <div
@@ -333,7 +335,9 @@ export function BladeNav() {
 
         {isAuthenticated ? (
           <div className="grip-account">
-            <Link to="/account" className="grip-avatar" title={user?.email ?? 'Fiók'} aria-label="Fiók">{initial}</Link>
+            <Link to="/account" className="grip-avatar" title={user?.email ?? 'Fiók'} aria-label="Fiók">
+              <Avatar url={user?.avatarUrl} name={user?.email ?? '•'} className="avatar-fill" />
+            </Link>
             <button className="grip-logout" onClick={logout} title="Kijelentkezés" aria-label="Kijelentkezés">
               <Icon name="logout" size={17} />
             </button>

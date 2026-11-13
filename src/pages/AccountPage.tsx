@@ -2,17 +2,18 @@ import { useState, type FormEvent } from 'react';
 import { api, ApiError } from '../api/client';
 import { useAuth } from '../auth/AuthContext';
 import { generatePassword, ratePassword } from '../auth/password';
+import { staffProfileApi } from '../api/profile';
+import { ROLE_LABELS } from '../auth/permissions';
 import { Icon } from '../components/Icon';
 import { Skeleton } from '../components/motion';
-
-const ROLE_LABELS: Record<string, string> = { Admin: 'Adminisztrátor', Staff: 'Staff' };
+import { Avatar, ProfileCustomizer } from '../components/ProfileCustomizer';
 
 function formatDate(iso: string | null | undefined): string {
   return iso ? new Date(iso).toLocaleString('hu-HU') : '-';
 }
 
 export function AccountPage() {
-  const { user, replaceToken } = useAuth();
+  const { user, replaceToken, refreshUser } = useAuth();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -64,20 +65,34 @@ export function AccountPage() {
       <header className="page-head stagger-in">
         <span className="eyebrow">Beállítások</span>
         <h1>Fiók</h1>
-        <p className="muted">A fiókod adatai és a jelszavad.</p>
+        <p className="muted">A fiókod adatai, a profilképed, a témád és a jelszavad.</p>
       </header>
 
       <section className="card profile-card stagger-in" style={{ animationDelay: '80ms' }}>
-        <span className="profile-avatar" aria-hidden="true">{user?.email?.[0]?.toUpperCase() ?? ''}</span>
+        <Avatar url={user?.avatarUrl} name={user?.email ?? ''} className="profile-avatar" />
         <div className="profile-main">
           {user ? <strong className="profile-email">{user.email}</strong> : <Skeleton width={220} height={20} />}
-          <span className="role-chip">{user ? ROLE_LABELS[user.role] ?? user.role : '...'}</span>
+          <span className={`role-chip ${user?.role === 'Owner' ? 'role-chip-owner' : ''}`}>
+            {user?.role === 'Owner' && <Icon name="crown" size={12} />} {user ? ROLE_LABELS[user.role] ?? user.role : '...'}
+          </span>
         </div>
         <dl className="profile-facts">
           <div><dt>Szervezet</dt><dd>{user?.organizationName || '-'}</dd></div>
           <div><dt>Fiók létrehozva</dt><dd>{formatDate(user?.createdAt)}</dd></div>
           <div><dt>Utolsó belépés</dt><dd>{formatDate(user?.lastLoginAt)}</dd></div>
         </dl>
+      </section>
+
+      <section className="card stagger-in section-gap-bottom" style={{ animationDelay: '120ms' }}>
+        <h2 className="card-title"><Icon name="user" size={18} /> Megjelenés</h2>
+        <ProfileCustomizer
+          avatarUrl={user?.avatarUrl}
+          name={user?.email ?? ''}
+          theme={user?.theme}
+          onUpload={async (image) => { await staffProfileApi.uploadAvatar(image); refreshUser(); }}
+          onRemove={async () => { await staffProfileApi.removeAvatar(); refreshUser(); }}
+          onTheme={async (key) => { await staffProfileApi.setTheme(key); }}
+        />
       </section>
 
       <section className="card stagger-in" style={{ animationDelay: '150ms' }}>

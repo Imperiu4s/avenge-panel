@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { api, ApiError } from '../../api/client';
 import type { AdminSessionPage, AdminUserView, ScanVerdict } from '../../api/types';
+import { useAuth } from '../../auth/AuthContext';
 import { Icon } from '../Icon';
 import { Skeleton } from '../motion';
 import { formatSecond } from '../timeline';
@@ -40,6 +41,9 @@ interface Props {
 }
 
 export function AdminScansTab({ users, initialUserId = '', onChanged }: Props) {
+  const { can } = useAuth();
+  const canDelete = can('scans.delete.all');
+  const canPurge = can('scans.purge');
   const [query, setQuery] = useState('');
   const [userId, setUserId] = useState(initialUserId);
   const [verdict, setVerdict] = useState<ScanVerdict | ''>('');
@@ -192,17 +196,19 @@ export function AdminScansTab({ users, initialUserId = '', onChanged }: Props) {
           </select>
         </div>
 
-        <div className="bulk-bar">
-          <span className="muted small">{selected.size > 0 ? `${selected.size} kijelölve` : 'Jelöld ki, amit törölni szeretnél.'}</span>
-          <button
-            type="button"
-            className="btn-ghost btn-tiny btn-danger"
-            disabled={selected.size === 0}
-            onClick={() => deleteCodes([...selected])}
-          >
-            <Icon name="trash" size={14} /> Kijelöltek törlése
-          </button>
-        </div>
+        {canDelete && (
+          <div className="bulk-bar">
+            <span className="muted small">{selected.size > 0 ? `${selected.size} kijelölve` : 'Jelöld ki, amit törölni szeretnél.'}</span>
+            <button
+              type="button"
+              className="btn-ghost btn-tiny btn-danger"
+              disabled={selected.size === 0}
+              onClick={() => deleteCodes([...selected])}
+            >
+              <Icon name="trash" size={14} /> Kijelöltek törlése
+            </button>
+          </div>
+        )}
 
         {notice && <p className="notice-text">{notice}</p>}
         {error && <p className="error-text">{error}</p>}
@@ -212,7 +218,7 @@ export function AdminScansTab({ users, initialUserId = '', onChanged }: Props) {
             <thead>
               <tr>
                 <th className="check-col">
-                  <input type="checkbox" checked={allSelected} onChange={toggleAll} aria-label="Összes kijelölése ezen az oldalon" />
+                  {canDelete && <input type="checkbox" checked={allSelected} onChange={toggleAll} aria-label="Összes kijelölése ezen az oldalon" />}
                 </th>
                 <th>Kód</th>
                 <th>Időpont</th>
@@ -231,7 +237,7 @@ export function AdminScansTab({ users, initialUserId = '', onChanged }: Props) {
               {items.map((s, i) => (
                 <tr key={s.code} className={`row-in ${selected.has(s.code) ? 'row-selected' : ''}`} style={{ animationDelay: `${Math.min(i, 15) * 25}ms` }}>
                   <td className="check-col">
-                    <input type="checkbox" checked={selected.has(s.code)} onChange={() => toggle(s.code)} aria-label={`#${s.code} kijelölése`} />
+                    {canDelete && <input type="checkbox" checked={selected.has(s.code)} onChange={() => toggle(s.code)} aria-label={`#${s.code} kijelölése`} />}
                   </td>
                   <td className="mono">
                     {s.resultIdHash ? <Link to={`/results/${s.resultIdHash}`}>#{s.code}</Link> : <>#{s.code}</>}
@@ -251,9 +257,11 @@ export function AdminScansTab({ users, initialUserId = '', onChanged }: Props) {
                     )}
                   </td>
                   <td>
-                    <button type="button" className="icon-button row-delete" onClick={() => deleteCodes([s.code])} aria-label={`#${s.code} törlése`} title="Törlés">
-                      <Icon name="trash" size={14} />
-                    </button>
+                    {canDelete && (
+                      <button type="button" className="icon-button row-delete" onClick={() => deleteCodes([s.code])} aria-label={`#${s.code} törlése`} title="Törlés">
+                        <Icon name="trash" size={14} />
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -271,46 +279,48 @@ export function AdminScansTab({ users, initialUserId = '', onChanged }: Props) {
         </div>
       </section>
 
-      <section className="card section-gap stagger-in" style={{ animationDelay: '80ms' }}>
-        <h2 className="card-title"><Icon name="trash" size={18} /> Előzmények tömeges törlése</h2>
-        <p className="muted small">A feltételek együtt érvényesek. A törölt vizsgálatok az eredményükkel és a megosztó linkjeikkel együtt tűnnek el; a tevékenységnaplóban megmarad, ki és mikor törölte.</p>
-        <form className="purge-form" onSubmit={handlePurge}>
-          <label>
-            <span className="field-label">Kié</span>
-            <select value={purgeUser} onChange={(e) => setPurgeUser(e.target.value)}>
-              <option value="">Mindenkié</option>
-              {users.map((u) => <option key={u.id} value={u.id}>{u.email}</option>)}
-            </select>
-          </label>
-          <label>
-            <span className="field-label">Mikori</span>
-            <select value={purgeAge} onChange={(e) => setPurgeAge(Number(e.target.value))}>
-              {AGE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-            </select>
-          </label>
-          <label>
-            <span className="field-label">Eredmény</span>
-            <select value={purgeVerdict} onChange={(e) => setPurgeVerdict(e.target.value as ScanVerdict | '')}>
-              <option value="">Bármilyen</option>
-              <option value="Legit">Csak LEGIT</option>
-              <option value="Inconclusive">Csak nem egyértelmű</option>
-              <option value="Unlegit">Csak UNLEGIT</option>
-            </select>
-          </label>
-          <label className="check-label">
-            <input type="checkbox" checked={purgeUnfinished} onChange={(e) => setPurgeUnfinished(e.target.checked)} />
-            Csak a befejezetlenek (lejárt, fel nem használt vagy megszakadt kódok)
-          </label>
-          <div className="purge-actions">
-            <button type="submit" className="btn-secondary" disabled={isPurging}>
-              <Icon name="trash" size={15} /> {isPurging ? 'Törlés...' : 'Törlés a feltételek szerint'}
-            </button>
-            <button type="button" className="btn-ghost btn-danger" onClick={handlePurgeAll} disabled={isPurging}>
-              Összes előzmény törlése
-            </button>
-          </div>
-        </form>
-      </section>
+      {canPurge && (
+        <section className="card section-gap stagger-in" style={{ animationDelay: '80ms' }}>
+          <h2 className="card-title"><Icon name="trash" size={18} /> Előzmények tömeges törlése</h2>
+          <p className="muted small">A feltételek együtt érvényesek. A törölt vizsgálatok az eredményükkel és a megosztó linkjeikkel együtt tűnnek el; a tevékenységnaplóban megmarad, ki és mikor törölte.</p>
+          <form className="purge-form" onSubmit={handlePurge}>
+            <label>
+              <span className="field-label">Kié</span>
+              <select value={purgeUser} onChange={(e) => setPurgeUser(e.target.value)}>
+                <option value="">Mindenkié</option>
+                {users.map((u) => <option key={u.id} value={u.id}>{u.email}</option>)}
+              </select>
+            </label>
+            <label>
+              <span className="field-label">Mikori</span>
+              <select value={purgeAge} onChange={(e) => setPurgeAge(Number(e.target.value))}>
+                {AGE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            </label>
+            <label>
+              <span className="field-label">Eredmény</span>
+              <select value={purgeVerdict} onChange={(e) => setPurgeVerdict(e.target.value as ScanVerdict | '')}>
+                <option value="">Bármilyen</option>
+                <option value="Legit">Csak LEGIT</option>
+                <option value="Inconclusive">Csak nem egyértelmű</option>
+                <option value="Unlegit">Csak UNLEGIT</option>
+              </select>
+            </label>
+            <label className="check-label">
+              <input type="checkbox" checked={purgeUnfinished} onChange={(e) => setPurgeUnfinished(e.target.checked)} />
+              Csak a befejezetlenek (lejárt, fel nem használt vagy megszakadt kódok)
+            </label>
+            <div className="purge-actions">
+              <button type="submit" className="btn-secondary" disabled={isPurging}>
+                <Icon name="trash" size={15} /> {isPurging ? 'Törlés...' : 'Törlés a feltételek szerint'}
+              </button>
+              <button type="button" className="btn-ghost btn-danger" onClick={handlePurgeAll} disabled={isPurging}>
+                Összes előzmény törlése
+              </button>
+            </div>
+          </form>
+        </section>
+      )}
     </>
   );
 }

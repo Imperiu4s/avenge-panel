@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { prefersReducedMotion } from './motion';
+import { accentChannels } from '../theme';
 
 interface Blip {
   angle: number;
@@ -86,17 +87,18 @@ export function RadarScope({ className = '' }: { className?: string }) {
       if (typeof ctx.createConicGradient === 'function') {
         const gradient = ctx.createConicGradient(angle - tail, center, center);
         const span = tail / TWO_PI;
-        gradient.addColorStop(0, 'rgba(255, 45, 55, 0)');
-        gradient.addColorStop(span * 0.75, 'rgba(255, 45, 55, 0.14)');
-        gradient.addColorStop(span, 'rgba(255, 70, 70, 0.5)');
-        gradient.addColorStop(span + 0.0001, 'rgba(255, 45, 55, 0)');
-        gradient.addColorStop(1, 'rgba(255, 45, 55, 0)');
+        const rgb = accentChannels().signal.join(', ');
+        gradient.addColorStop(0, `rgba(${rgb}, 0)`);
+        gradient.addColorStop(span * 0.75, `rgba(${rgb}, 0.14)`);
+        gradient.addColorStop(span, `rgba(${rgb}, 0.5)`);
+        gradient.addColorStop(span + 0.0001, `rgba(${rgb}, 0)`);
+        gradient.addColorStop(1, `rgba(${rgb}, 0)`);
         ctx.fillStyle = gradient;
         ctx.beginPath();
         ctx.arc(center, center, outer, 0, TWO_PI);
         ctx.fill();
       }
-      ctx.strokeStyle = 'rgba(255, 120, 100, 0.95)';
+      ctx.strokeStyle = `rgba(${accentChannels().hot.join(', ')}, 0.95)`;
       ctx.lineWidth = 1.5;
       ctx.beginPath();
       ctx.moveTo(center, center);
@@ -121,13 +123,13 @@ export function RadarScope({ className = '' }: { className?: string }) {
         if (glow <= 0) continue;
 
         const pulse = 3 + (1 - glow) * 15;
-        ctx.strokeStyle = `rgba(255, 80, 70, ${glow * 0.55})`;
+        ctx.strokeStyle = `rgba(${accentChannels().signal.join(', ')}, ${glow * 0.55})`;
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.arc(x, y, pulse, 0, TWO_PI);
         ctx.stroke();
 
-        ctx.fillStyle = `rgba(255, 96, 80, ${glow})`;
+        ctx.fillStyle = `rgba(${accentChannels().hot.join(', ')}, ${glow})`;
         ctx.beginPath();
         ctx.arc(x, y, 3.2, 0, TWO_PI);
         ctx.fill();

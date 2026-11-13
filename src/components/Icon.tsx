@@ -50,9 +50,31 @@ export type IconName =
   | 'scale'
   | 'refresh'
   | 'message'
-  | 'external';
+  | 'external'
+  | 'upload'
+  | 'cube'
+  | 'crown';
 
 const PATHS: Record<IconName, ReactElement> = {
+  upload: (
+    <>
+      <path d="M12 15V4M7.5 8.5 12 4l4.5 4.5" />
+      <path d="M4 15v3.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V15" />
+    </>
+  ),
+  cube: (
+    <>
+      <path d="m12 3 8 4.5v9L12 21l-8-4.5v-9Z" />
+      <path d="m4 7.5 8 4.5 8-4.5M12 12v9" />
+      <path d="m8 5.3 8 4.4" opacity="0.5" />
+    </>
+  ),
+  crown: (
+    <>
+      <path d="m3.5 8 4.2 3.6L12 5l4.3 6.6L20.5 8 19 18H5Z" />
+      <path d="M5.5 21h13" />
+    </>
+  ),
   settings: (
     <>
       <circle cx="12" cy="12" r="3" />

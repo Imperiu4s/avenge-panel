@@ -1,25 +1,33 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { ApiError } from '../../../api/client';
-import { storeAdminApi, storeAssetUrl, type AdminProduct, type ProductUpsert } from '../../../api/store';
+import { storeAdminApi, storeAssetUrl, type AdminProduct, type ProductKind, type ProductUpsert } from '../../../api/store';
 import { Markdown } from '../../../store/Markdown';
 import { ProductIcon } from '../../../store/ProductCard';
 import { formatBytes, formatDate, formatPrice } from '../../../store/format';
 import { Icon } from '../../Icon';
 import { Skeleton } from '../../motion';
 
-const PLATFORM_PRESETS = ['Paper', 'Spigot', 'Purpur', 'Folia', 'Bukkit', 'Velocity', 'BungeeCord', 'Waterfall', 'Fabric'];
+const PLATFORM_PRESETS: Record<ProductKind, string[]> = {
+  plugin: ['Paper', 'Spigot', 'Purpur', 'Folia', 'Bukkit', 'Velocity', 'BungeeCord', 'Waterfall', 'Fabric'],
+  model: ['ModelEngine', 'ItemsAdder', 'Oraxen', 'Nexo', 'MythicMobs', 'Resource pack', 'Blockbench', 'Java Edition', 'Bedrock Edition']
+};
+
+const KIND_TEXT: Record<ProductKind, { one: string; many: string; files: string; accept: string; created: string }> = {
+  plugin: { one: 'plugin', many: 'Pluginok', files: '.jar / .zip', accept: '.jar,.zip', created: 'Plugin létrehozva' },
+  model: { one: 'modell', many: 'Modellek', files: '.zip / .bbmodel / .jar', accept: '.zip,.bbmodel,.jar', created: 'Modell létrehozva' }
+};
 
 const EMPTY: ProductUpsert = {
   name: '', slug: '', tagline: '', description: '', category: '', price: 0,
-  supportedVersions: '', platforms: 'Paper, Spigot', isPublished: false, isFeatured: false, sortOrder: 0, tebexPackageId: ''
+  supportedVersions: '', platforms: 'Paper, Spigot', isPublished: false, isFeatured: false, sortOrder: 0, tebexPackageId: '', kind: 'plugin'
 };
 
 function toDraft(p: AdminProduct): ProductUpsert {
   return {
     name: p.name, slug: p.slug, tagline: p.tagline, description: p.description, category: p.category, price: p.price,
     supportedVersions: p.supportedVersions, platforms: p.platforms, isPublished: p.isPublished, isFeatured: p.isFeatured, sortOrder: p.sortOrder,
-    tebexPackageId: p.tebexPackageId ?? ''
+    tebexPackageId: p.tebexPackageId ?? '', kind: p.kind === 'model' ? 'model' : 'plugin'
   };
 }
 
@@ -45,6 +53,15 @@ function ProductEditor({ product, currency, onSaved, onClose }: {
   const platforms = draft.platforms.split(',').map((p) => p.trim()).filter(Boolean);
   const set = <K extends keyof ProductUpsert>(key: K, value: ProductUpsert[K]) => { setDraft((d) => ({ ...d, [key]: value })); setNotice(null); };
 
+  const text = KIND_TEXT[draft.kind];
+
+  function changeKind(kind: ProductKind) {
+    if (kind === draft.kind) return;
+    const keep = platforms.filter((p) => !PLATFORM_PRESETS[draft.kind].includes(p));
+    setDraft((d) => ({ ...d, kind, platforms: (keep.length > 0 ? keep : kind === 'model' ? ['ModelEngine'] : ['Paper', 'Spigot']).join(', ') }));
+    setNotice(null);
+  }
+
   function togglePlatform(name: string) {
     const next = platforms.includes(name) ? platforms.filter((p) => p !== name) : [...platforms, name];
     set('platforms', next.join(', '));
@@ -69,7 +86,7 @@ function ProductEditor({ product, currency, onSaved, onClose }: {
       const result = product
         ? await storeAdminApi.updateProduct(product.id, draft)
         : await storeAdminApi.createProduct(draft);
-      const base = product ? 'Mentve.' : 'Plugin létrehozva - most már feltölthetsz ikont, képeket és verziót.';
+      const base = product ? 'Mentve.' : `${text.created} - most már feltölthetsz ikont, képeket és verziót.`;
       setNotice(result.notice ? `${base} ${result.notice}` : base);
       onSaved(result.id);
     });
@@ -98,7 +115,7 @@ function ProductEditor({ product, currency, onSaved, onClose }: {
     });
   };
 
-  const remove = () => product && window.confirm(`Törlöd a(z) ${product.name} plugint? Csak a még soha el nem adott plugin törölhető.`) && run('delete', async () => {
+  const remove = () => product && window.confirm(`Törlöd a(z) ${product.name} ${text.one}t? Csak a még soha el nem adott termék törölhető.`) && run('delete', async () => {
     await storeAdminApi.deleteProduct(product.id);
     onClose();
     onSaved('');
@@ -107,7 +124,7 @@ function ProductEditor({ product, currency, onSaved, onClose }: {
   return (
     <section className="card product-editor stagger-in">
       <div className="scans-head">
-        <h2 className="card-title"><Icon name="package" size={18} /> {product ? product.name : 'Új plugin'}</h2>
+        <h2 className="card-title"><Icon name={draft.kind === 'model' ? 'cube' : 'package'} size={18} /> {product ? product.name : draft.kind === 'model' ? 'Új modell' : 'Új plugin'}</h2>
         <div className="editor-head-actions">
           {product?.isPublished && <Link to={`/store/${product.slug}`} className="btn-ghost btn-tiny" target="_blank"><Icon name="eye" size={13} /> Megtekintés</Link>}
           <button type="button" className="btn-ghost btn-tiny" onClick={onClose}><Icon name="x" size={13} /> Bezárás</button>
@@ -115,6 +132,14 @@ function ProductEditor({ product, currency, onSaved, onClose }: {
       </div>
 
       <form onSubmit={save}>
+        <span className="field-label">Típus</span>
+        <div className="segmented kind-switch" role="radiogroup" aria-label="Termék típusa">
+          {(['plugin', 'model'] as const).map((kind) => (
+            <button key={kind} type="button" role="radio" aria-checked={draft.kind === kind} className={draft.kind === kind ? 'is-active' : ''} onClick={() => changeKind(kind)}>
+              <Icon name={kind === 'model' ? 'cube' : 'package'} size={13} /> {kind === 'model' ? 'Modell' : 'Plugin'}
+            </button>
+          ))}
+        </div>
         <div className="settings-grid">
           <label>
             <span className="field-label">Név</span>
@@ -136,7 +161,7 @@ function ProductEditor({ product, currency, onSaved, onClose }: {
           </label>
           <label>
             <span className="field-label">Kategória</span>
-            <input maxLength={40} value={draft.category} onChange={(e) => set('category', e.target.value)} placeholder="pl. Minigame, Gazdaság, Admin" />
+            <input maxLength={40} value={draft.category} onChange={(e) => set('category', e.target.value)} placeholder={draft.kind === 'model' ? 'pl. Mob, Fegyver, Bútor, Kozmetika' : 'pl. Minigame, Gazdaság, Admin'} />
           </label>
           <label>
             <span className="field-label">Tebex csomag azonosító</span>
@@ -149,9 +174,9 @@ function ProductEditor({ product, currency, onSaved, onClose }: {
           </label>
         </div>
 
-        <span className="field-label">Szerverszoftver</span>
+        <span className="field-label">{draft.kind === 'model' ? 'Kompatibilitás' : 'Szerverszoftver'}</span>
         <div className="platform-picker">
-          {[...new Set([...PLATFORM_PRESETS, ...platforms])].map((name) => (
+          {[...new Set([...PLATFORM_PRESETS[draft.kind], ...platforms])].map((name) => (
             <button type="button" key={name} className={`chip-toggle ${platforms.includes(name) ? 'is-active' : ''}`} onClick={() => togglePlatform(name)}>
               {platforms.includes(name) && <Icon name="check" size={11} />} {name}
             </button>
@@ -187,7 +212,7 @@ function ProductEditor({ product, currency, onSaved, onClose }: {
         </div>
 
         <div className="settings-actions">
-          {product ? <button type="button" className="btn-ghost btn-tiny btn-danger" onClick={remove} disabled={busy !== null}><Icon name="trash" size={13} /> Plugin törlése</button> : <span />}
+          {product ? <button type="button" className="btn-ghost btn-tiny btn-danger" onClick={remove} disabled={busy !== null}><Icon name="trash" size={13} /> {draft.kind === 'model' ? 'Modell törlése' : 'Plugin törlése'}</button> : <span />}
           <button type="submit" className={`btn-primary ${busy === 'save' ? 'is-loading' : ''}`} disabled={busy !== null}>
             {busy === 'save' && <span className="btn-spinner" aria-hidden="true" />}
             {product ? 'Mentés' : 'Létrehozás'}
@@ -234,8 +259,8 @@ function ProductEditor({ product, currency, onSaved, onClose }: {
           <span className="field-label">Verziók</span>
           <form className="release-upload" onSubmit={uploadRelease}>
             <label className="btn-secondary btn-tiny file-button">
-              <Icon name="file" size={13} /> {releaseFile ? releaseFile.name : '.jar / .zip kiválasztása'}
-              <input type="file" accept=".jar,.zip" onChange={(e) => setReleaseFile(e.target.files?.[0] ?? null)} />
+              <Icon name="file" size={13} /> {releaseFile ? releaseFile.name : `${text.files} kiválasztása`}
+              <input type="file" accept={product?.kind === 'model' ? KIND_TEXT.model.accept : KIND_TEXT.plugin.accept} onChange={(e) => setReleaseFile(e.target.files?.[0] ?? null)} />
             </label>
             <input required maxLength={40} placeholder="Verzió (pl. 1.2.0)" value={releaseVersion} onChange={(e) => setReleaseVersion(e.target.value)} />
             <textarea rows={3} placeholder="Változásnapló (Markdown, nem kötelező)" value={releaseChangelog} onChange={(e) => setReleaseChangelog(e.target.value)} />
@@ -284,7 +309,7 @@ export function StoreProductsAdmin({ currency }: { currency: string }) {
     try {
       setProducts(await storeAdminApi.products());
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Nem sikerült betölteni a pluginokat.');
+      setError(err instanceof ApiError ? err.message : 'Nem sikerült betölteni a termékeket.');
     }
   }, []);
 
@@ -306,22 +331,22 @@ export function StoreProductsAdmin({ currency }: { currency: string }) {
 
       <section className="card section-gap stagger-in">
         <div className="scans-head">
-          <h2 className="card-title"><Icon name="package" size={18} /> Pluginok</h2>
-          <button type="button" className="btn-primary btn-tiny" onClick={() => setEditing('new')}><Icon name="plus" size={13} /> Új plugin</button>
+          <h2 className="card-title"><Icon name="package" size={18} /> Pluginok és modellek</h2>
+          <button type="button" className="btn-primary btn-tiny" onClick={() => setEditing('new')}><Icon name="plus" size={13} /> Új termék</button>
         </div>
         {error && <p className="error-text">{error}</p>}
         {!products && !error && <Skeleton width="100%" height={60} />}
         {products && (
           <div className="table-scroll">
             <table className="data-table">
-              <thead><tr><th>Plugin</th><th>Ár</th><th>Állapot</th><th className="align-right">Eladás</th><th className="align-right">Tulajdonos</th><th className="align-right">Letöltés</th><th>Verzió</th><th /></tr></thead>
+              <thead><tr><th>Termék</th><th>Ár</th><th>Állapot</th><th className="align-right">Eladás</th><th className="align-right">Tulajdonos</th><th className="align-right">Letöltés</th><th>Verzió</th><th /></tr></thead>
               <tbody>
                 {products.map((p) => (
                   <tr key={p.id} className={editing === p.id ? 'row-selected' : ''}>
                     <td>
                       <span className="product-cell">
                         <ProductIcon name={p.name} iconAssetId={p.iconAssetId} size={34} />
-                        <span><strong>{p.name}</strong><small className="muted">/{p.slug}</small></span>
+                        <span><strong>{p.name}</strong><small className="muted">{p.kind === 'model' ? 'Modell' : 'Plugin'} · /{p.slug}</small></span>
                       </span>
                     </td>
                     <td className="mono small">
@@ -338,7 +363,7 @@ export function StoreProductsAdmin({ currency }: { currency: string }) {
                     <td><button type="button" className="btn-ghost btn-tiny" onClick={() => { setEditing(p.id); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>Szerkesztés</button></td>
                   </tr>
                 ))}
-                {products.length === 0 && <tr><td colSpan={8} className="muted empty-row">Még nincs plugin. Kezdd az "Új plugin" gombbal.</td></tr>}
+                {products.length === 0 && <tr><td colSpan={8} className="muted empty-row">Még nincs termék. Kezdd az "Új termék" gombbal.</td></tr>}
               </tbody>
             </table>
           </div>

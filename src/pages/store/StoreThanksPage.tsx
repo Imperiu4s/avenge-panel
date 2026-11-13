@@ -69,7 +69,7 @@ export function StoreThanksPage() {
           <>
             <span className="thanks-icon" aria-hidden="true"><Icon name="check" size={34} /></span>
             <h1>Köszönjük a vásárlást!</h1>
-            <p className="muted">{isSub ? 'Az előfizetésed aktív. Az SS panelt a fiókodból egy kattintással megnyithatod; a staff belépésnél ugyanezzel az e-mail címmel és jelszóval is beléphetsz.' : 'A plugin a tiéd: a fiókodban bármikor letöltheted, a frissítéseivel együtt. A számlát a Tebex e-mailben küldi.'}</p>
+            <p className="muted">{isSub ? 'Az előfizetésed aktív. Az SS panelt a fiókodból egy kattintással megnyithatod; a staff belépésnél ugyanezzel az e-mail címmel és jelszóval is beléphetsz.' : 'A termék a tiéd: a fiókodban bármikor letöltheted, a frissítéseivel együtt. A számlát a Tebex e-mailben küldi.'}</p>
             <div className="thanks-actions">
               <Link to="/store/fiok" className="btn-primary">{isSub ? 'Fiókom és SS panel' : 'Pluginjaim'} <Icon name="arrow-right" size={16} /></Link>
               <Link to="/store" className="btn-ghost">Vissza az áruházba</Link>
