@@ -592,3 +592,23 @@ export const discordAdminApi = {
   apply: () => send<DiscordJob>(`${D}/apply`, { method: 'POST', auth: 'staff' }),
   post: () => send<DiscordJob>(`${D}/post`, { method: 'POST', auth: 'staff' })
 };
+
+export type TebexContinueResult = { checkoutUrl: string } | { loginUrl: string; message: string };
+
+export async function tebexContinue(target: { order?: string | null; subscription?: string | null }): Promise<TebexContinueResult> {
+  const token = getCustomerToken();
+  const response = await fetch(`${API_BASE}/api/store/tebex/continue`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+    body: JSON.stringify({ order: target.order ?? null, subscription: target.subscription ?? null })
+  });
+  let body: { checkoutUrl?: string; loginUrl?: string; message?: string } = {};
+  try {
+    body = await response.json();
+  } catch {
+    body = {};
+  }
+  if (response.ok && body.checkoutUrl) return { checkoutUrl: body.checkoutUrl };
+  if (response.status === 409 && body.loginUrl) return { loginUrl: body.loginUrl, message: body.message ?? '' };
+  throw new ApiError(response.status, body.message ?? `Hiba (${response.status})`);
+}
