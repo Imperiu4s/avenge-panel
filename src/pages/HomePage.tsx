@@ -132,7 +132,11 @@ export function HomePage() {
             <a href="#hogyan" className="btn-secondary btn-large">Hogyan működik?</a>
           </div>
           <p className="hero-note stagger-in" style={{ animationDelay: '580ms' }}>
-            <Icon name="lock" size={14} /> Zárt rendszer: fiókot csak az adminisztrátor hozhat létre.
+            <Icon name="lock" size={14} />
+            <span>
+              Saját szervered van? <Link to="/elofizetes" className="text-link">Havi előfizetéssel</Link> te is használhatod.
+              Pluginokat a <Link to="/store" className="text-link">Foundry</Link> áruházban találsz.
+            </span>
           </p>
         </div>
 
@@ -213,15 +217,18 @@ export function HomePage() {
 
       <section className="closing">
         <Reveal className="closing-inner">
-          <h2>{isAuthenticated ? 'Készen állsz a következő vizsgálatra?' : 'Van már fiókod?'}</h2>
+          <h2>{isAuthenticated ? 'Készen állsz a következő vizsgálatra?' : 'Használd a saját szervereden'}</h2>
           <p>
             {isAuthenticated
               ? 'Generálj egy kódot, és a játékos pár kattintással elindíthatja a vizsgálatot.'
-              : 'Az Avenge-hez csak meghívással lehet hozzáférni. Ha kaptál fiókot, itt tudsz belépni.'}
+              : 'Havi előfizetéssel saját SS panelt kapsz a csapatodnak. Ha már van fiókod, itt tudsz belépni.'}
           </p>
-          <Link to={isAuthenticated ? '/panel' : '/login'} className="btn-primary btn-large">
-            {isAuthenticated ? 'Kód generálása' : 'Belépés'} <Icon name="arrow-right" size={18} className="btn-arrow" />
-          </Link>
+          <div className="closing-actions">
+            <Link to={isAuthenticated ? '/panel' : '/elofizetes'} className="btn-primary btn-large">
+              {isAuthenticated ? 'Kód generálása' : 'Előfizetés'} <Icon name="arrow-right" size={18} className="btn-arrow" />
+            </Link>
+            {!isAuthenticated && <Link to="/login" className="btn-secondary btn-large">Belépés</Link>}
+          </div>
         </Reveal>
       </section>
     </main>

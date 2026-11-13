@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import { BladeNav } from './BladeNav';
 import { usePointerSpotlight } from './motion';
 
@@ -32,9 +32,16 @@ export function Layout() {
       </div>
 
       <footer className="site-footer">
-        <span>© {new Date().getFullYear()} Avenge</span>
+        <span>© {new Date().getFullYear()} Avenge · Avenge Foundry</span>
         <span className="site-footer-sep" aria-hidden="true" />
-        <span>Hozzáférés csak meghívással</span>
+        <nav className="site-footer-links" aria-label="Jogi információk">
+          <Link to="/jogi/aszf">ÁSZF</Link>
+          <Link to="/jogi/adatkezeles">Adatkezelés</Link>
+          <Link to="/jogi/visszaterites">Visszatérítés</Link>
+          <Link to="/jogi/licenc">Licenc</Link>
+          <Link to="/jogi/cookie">Sütik</Link>
+          <Link to="/jogi/impresszum">Impresszum</Link>
+        </nav>
       </footer>
     </div>
   );

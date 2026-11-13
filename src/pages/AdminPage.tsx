@@ -6,6 +6,8 @@ import { AdminAuditTab } from '../components/admin/AdminAuditTab';
 import { AdminOverviewTab } from '../components/admin/AdminOverviewTab';
 import { AdminScansTab } from '../components/admin/AdminScansTab';
 import { AdminSettingsTab } from '../components/admin/AdminSettingsTab';
+import { StoreAdminTab } from '../components/admin/store/StoreAdminTab';
+import { useAuth } from '../auth/AuthContext';
 import { Icon, type IconName } from '../components/Icon';
 import { useCopyFeedback } from '../components/motion';
 import { formatSecond } from '../components/timeline';
@@ -19,14 +21,16 @@ interface IssuedCredentials {
   password: string;
 }
 
-const TABS: { key: string; label: string; icon: IconName }[] = [
+const ALL_TABS: { key: string; label: string; icon: IconName; platformOnly?: boolean }[] = [
   { key: 'overview', label: 'Áttekintés', icon: 'activity' },
   { key: 'users', label: 'Felhasználók', icon: 'users' },
   { key: 'scans', label: 'Vizsgálatok', icon: 'history' },
   { key: 'settings', label: 'Beállítások', icon: 'settings' },
   { key: 'audit', label: 'Napló', icon: 'clock' },
-  { key: 'signatures', label: 'Csalásjelek', icon: 'bug' },
-  { key: 'bans', label: 'Kitiltott gépek', icon: 'ban' }
+  // A csalásjel-katalógus és az áruház közös, az egész platformra érvényes: csak az Avenge csapatáé.
+  { key: 'signatures', label: 'Csalásjelek', icon: 'bug', platformOnly: true },
+  { key: 'bans', label: 'Kitiltott gépek', icon: 'ban' },
+  { key: 'store', label: 'Áruház', icon: 'cart', platformOnly: true }
 ];
 
 function formatSize(bytes: number): string {
@@ -34,6 +38,8 @@ function formatSize(bytes: number): string {
 }
 
 export function AdminPage() {
+  const { user } = useAuth();
+  const TABS = ALL_TABS.filter((t) => !t.platformOnly || user?.isPlatformAdmin);
   const [searchParams, setSearchParams] = useSearchParams();
   const tab = TABS.some((t) => t.key === searchParams.get('tab')) ? searchParams.get('tab')! : 'overview';
   const scansUser = searchParams.get('user') ?? '';
@@ -186,7 +192,11 @@ export function AdminPage() {
       <header className="page-head stagger-in">
         <span className="eyebrow">Adminisztráció</span>
         <h1>Admin Panel</h1>
-        <p className="muted">Felhasználók, vizsgálatok, beállítások, napló, csalásjelek és kitiltott gépek.</p>
+        <p className="muted">
+          {user?.isPlatformAdmin
+            ? 'Felhasználók, vizsgálatok, beállítások, napló, csalásjelek, kitiltott gépek és az áruház.'
+            : 'Felhasználók, vizsgálatok, beállítások, napló és kitiltott gépek.'}
+        </p>
       </header>
 
       <nav className="admin-tabs stagger-in" aria-label="Admin fülek" style={{ animationDelay: '40ms' }}>
@@ -214,6 +224,8 @@ export function AdminPage() {
       {tab === 'signatures' && <SignatureCatalogSection />}
 
       {tab === 'bans' && <BannedHwidsSection />}
+
+      {tab === 'store' && <StoreAdminTab />}
 
       {tab === 'users' && (
         <div className="panel-grid">

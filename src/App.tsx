@@ -12,10 +12,19 @@ import { ChangelogsPage } from './pages/ChangelogsPage';
 import { AdminPage } from './pages/AdminPage';
 import { PlayerDownloadPage } from './pages/PlayerDownloadPage';
 import { SharedResultPage } from './pages/SharedResultPage';
+import { LegalPage } from './pages/LegalPage';
+import { StorePage } from './pages/store/StorePage';
+import { StoreProductPage } from './pages/store/StoreProductPage';
+import { StoreAccountPage } from './pages/store/StoreAccountPage';
+import { StoreThanksPage } from './pages/store/StoreThanksPage';
+import { SubscriptionPage } from './pages/store/SubscriptionPage';
+import { CustomerAuthProvider } from './store/CustomerAuth';
+import { StoreShell } from './store/StoreShell';
 
 export default function App() {
   return (
     <AuthProvider>
+      <CustomerAuthProvider>
       <Routes>
         <Route path="/" element={<Navigate to="/home" replace />} />
         <Route element={<Layout />}>
@@ -30,9 +39,20 @@ export default function App() {
           <Route path="/panel" element={<ProtectedRoute><SessionsPage /></ProtectedRoute>} />
           <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
           <Route path="/results/:resultId" element={<ProtectedRoute><ResultPage /></ProtectedRoute>} />
+          {/* Avenge Foundry: plugin-áruház és az SS tool előfizetése (vásárlói fiókkal). */}
+          <Route element={<StoreShell />}>
+            <Route path="/store" element={<StorePage />} />
+            <Route path="/store/fiok" element={<StoreAccountPage />} />
+            <Route path="/store/koszonjuk" element={<StoreThanksPage />} />
+            <Route path="/store/:slug" element={<StoreProductPage />} />
+            <Route path="/elofizetes" element={<SubscriptionPage />} />
+          </Route>
+          <Route path="/jogi" element={<Navigate to="/jogi/aszf" replace />} />
+          <Route path="/jogi/:doc" element={<LegalPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/home" replace />} />
       </Routes>
+      </CustomerAuthProvider>
     </AuthProvider>
   );
 }

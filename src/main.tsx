@@ -7,6 +7,7 @@ import '@fontsource/chakra-petch/700.css'
 import '@fontsource-variable/manrope/index.css'
 import '@fontsource-variable/jetbrains-mono/index.css'
 import './index.css'
+import './store.css'
 import App from './App.tsx'
 
 createRoot(document.getElementById('root')!).render(

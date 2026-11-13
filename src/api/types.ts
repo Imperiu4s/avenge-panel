@@ -17,6 +17,12 @@ export interface CurrentUserView {
   canDeleteOwnScans?: boolean;
   canShareResults?: boolean;
   seesOnlyOwnScans?: boolean;
+  /// Az Avenge saját csapata (áruház, globális csalásjelek kezelése).
+  isPlatformAdmin?: boolean;
+  /// Előfizetéssel kapott szervezet - csak élő előfizetéssel generálhat kódot.
+  isSubscriptionOrg?: boolean;
+  hasAccess?: boolean;
+  subscriptionEnd?: string | null;
 }
 
 export interface ClientReleaseView {

@@ -8,6 +8,17 @@ interface ChangelogEntry {
 
 const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '2.7.0',
+    date: '2026-11-13',
+    items: [
+      'Új: Avenge Foundry - az Avenge plugin-műhelye. Az avenge.hu/store oldalon saját fejlesztésű Minecraft pluginok vásárolhatók, verziókkal, változásnaplóval, képekkel és azonnali letöltéssel.',
+      'Vásárlói fiók e-mail címmel és jelszóval: a megvett pluginok és minden frissítésük a fiókban tölthetők le. Fizetés a Tebexen keresztül.',
+      'Az SS tool havi előfizetéssel is elérhető: az előfizető saját szervezetet és Admin fiókot kap, lemondás után a kifizetett hónap végéig él.',
+      'Akciók (pl. Black Friday) egy pluginra vagy az összesre, időzítve; vásárlók kitiltása, törlése, plugin vagy előfizetési napok ajándékozása az Admin Panel Áruház fülén.',
+      'Jogi oldalak: ÁSZF, adatkezelési tájékoztató, visszatérítési szabályzat, licencfeltételek, süti tájékoztató és impresszum.'
+    ]
+  },
+  {
     version: '2.6.0',
     date: '2026-11-07',
     items: [

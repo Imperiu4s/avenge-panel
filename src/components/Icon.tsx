@@ -41,7 +41,14 @@ export type IconName =
   | 'activity'
   | 'settings'
   | 'share'
-  | 'target';
+  | 'target'
+  | 'cart'
+  | 'tag'
+  | 'package'
+  | 'card'
+  | 'star'
+  | 'scale'
+  | 'refresh';
 
 const PATHS: Record<IconName, ReactElement> = {
   settings: (
@@ -252,7 +259,40 @@ const PATHS: Record<IconName, ReactElement> = {
       <path d="M3.5 4v4.5H8M12 7.5V12l3 2" />
     </>
   ),
-  activity: <path d="M2.5 12h4l3-8 5 16 3-8h4" />
+  activity: <path d="M2.5 12h4l3-8 5 16 3-8h4" />,
+  cart: (
+    <>
+      <path d="M3 4h2.4l2.3 11.2a1.5 1.5 0 0 0 1.5 1.2h8.6a1.5 1.5 0 0 0 1.4-1.1L21 8H6.2" />
+      <circle cx="9.5" cy="20" r="1.3" />
+      <circle cx="17.5" cy="20" r="1.3" />
+    </>
+  ),
+  tag: (
+    <>
+      <path d="M3.5 12.6V4.5a1 1 0 0 1 1-1h8.1l8 8a1.5 1.5 0 0 1 0 2.1l-7 7a1.5 1.5 0 0 1-2.1 0Z" />
+      <circle cx="8" cy="8" r="1.4" />
+    </>
+  ),
+  package: (
+    <>
+      <path d="m12 2.8 8.5 4.6v9.2L12 21.2l-8.5-4.6V7.4Z" />
+      <path d="m3.8 7.6 8.2 4.5 8.2-4.5M12 12.1v9M7.8 5.1l8.4 4.6" />
+    </>
+  ),
+  card: (
+    <>
+      <rect x="2.5" y="5" width="19" height="14" rx="1.5" />
+      <path d="M2.5 9.5h19M6 15h4" />
+    </>
+  ),
+  star: <path d="m12 3.2 2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 17l-5.4 2.9 1.1-6.1-4.5-4.2 6.1-.8Z" />,
+  scale: (
+    <>
+      <path d="M12 3.5v17M7 20.5h10M4.5 7h15M12 5l-7.5 2M12 5l7.5 2" />
+      <path d="M4.5 7 2 13a2.6 2.6 0 0 0 5 0ZM19.5 7 17 13a2.6 2.6 0 0 0 5 0Z" />
+    </>
+  ),
+  refresh: <path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3M19.5 4v4.2h-4.2" />
 };
 
 export function Icon({ name, size = 22, className }: { name: IconName; size?: number; className?: string }) {

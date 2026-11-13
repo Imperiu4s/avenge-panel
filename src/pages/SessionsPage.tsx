@@ -147,7 +147,9 @@ export function SessionsPage() {
       await loadSessions(1);
       await copy('code', result.code);
     } catch (err) {
-      if (!(err instanceof ApiError && err.status === 401)) {
+      if (err instanceof ApiError && err.status === 402) {
+        setGenerateError(err.message);
+      } else if (!(err instanceof ApiError && err.status === 401)) {
         setGenerateError('Nem sikerült kódot generálni.');
       }
     } finally {

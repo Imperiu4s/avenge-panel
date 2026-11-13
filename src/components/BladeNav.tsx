@@ -21,6 +21,7 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { to: '/home', label: 'Főoldal', icon: 'home', match: ['/home'], requiresAuth: false },
+  { to: '/store', label: 'Áruház', icon: 'cart', match: ['/store', '/elofizetes'], requiresAuth: false },
   { to: '/panel', label: 'Panel', icon: 'radar', match: ['/panel', '/results'], requiresAuth: true },
   { to: '/account', label: 'Fiók', icon: 'user', match: ['/account'], requiresAuth: true },
   { to: '/changelogs', label: 'Újdonságok', icon: 'history', match: ['/changelogs'], requiresAuth: true }
