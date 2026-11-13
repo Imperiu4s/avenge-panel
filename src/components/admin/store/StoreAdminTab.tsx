@@ -8,6 +8,7 @@ import {
   type AdminSubscription,
   type StoreOverview,
   type StoreSettingsUpdate,
+  type TebexConnectionTest,
   type WebhookLog
 } from '../../../api/store';
 import { formatDate, formatDateTime, formatPrice, ORDER_STATUS_LABELS, SUBSCRIPTION_STATUS_LABELS } from '../../../store/format';
@@ -50,6 +51,13 @@ function Overview({ onOpen }: { onOpen: (key: string) => void }) {
           <Icon name="alert" size={16} />
           <span>A Tebex még nincs beállítva - amíg nincs megadva a projekt-azonosító és a privát kulcs, a fizetős vásárlás és az előfizetés nem indítható.</span>
           <button type="button" className="btn-secondary btn-tiny" onClick={() => onOpen('settings')}>Beállítás</button>
+        </div>
+      )}
+      {data.lastTebexError && (
+        <div className="store-notice store-notice-warn">
+          <Icon name="alert" size={16} />
+          <span>Utolsó Tebex-hiba ({formatDateTime(data.lastTebexErrorAt)}): {data.lastTebexError}</span>
+          <button type="button" className="btn-secondary btn-tiny" onClick={() => onOpen('settings')}>Kapcsolat tesztelése</button>
         </div>
       )}
       <div className="stat-tiles">
@@ -175,6 +183,8 @@ function Settings({ onSaved }: { onSaved: (s: AdminStoreSettings) => void }) {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [hooks, setHooks] = useState<WebhookLog[]>([]);
+  const [test, setTest] = useState<TebexConnectionTest | null>(null);
+  const [testing, setTesting] = useState(false);
   const { copiedKey, copy } = useCopyFeedback();
 
   const apply = useCallback((s: AdminStoreSettings) => {
@@ -195,6 +205,19 @@ function Settings({ onSaved }: { onSaved: (s: AdminStoreSettings) => void }) {
 
   if (!draft || !settings) return error ? <p className="error-text">{error}</p> : <div className="card"><p className="muted">Betöltés...</p></div>;
   const set = <K extends keyof StoreSettingsUpdate>(key: K, value: StoreSettingsUpdate[K]) => { setDraft((d) => (d ? { ...d, [key]: value } : d)); setNotice(null); };
+
+  async function runTest() {
+    setTesting(true);
+    setTest(null);
+    setError(null);
+    try {
+      setTest(await storeAdminApi.testTebex());
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'A teszt nem futott le.');
+    } finally {
+      setTesting(false);
+    }
+  }
 
   async function save(e: FormEvent) {
     e.preventDefault();
@@ -312,6 +335,26 @@ function Settings({ onSaved }: { onSaved: (s: AdminStoreSettings) => void }) {
               <Icon name={copiedKey === 'webhook' ? 'check' : 'copy'} size={13} /> {copiedKey === 'webhook' ? 'Másolva' : 'Másolás'}
             </button>
           </div>
+        </div>
+
+        <div className="tebex-test">
+          <button type="button" className={`btn-secondary btn-tiny ${testing ? 'is-loading' : ''}`} onClick={runTest} disabled={testing || !settings.hasPrivateKey}>
+            <Icon name="activity" size={13} /> Kapcsolat tesztelése
+          </button>
+          <span className="muted small">Előbb mentsd a kulcsokat. A teszt egy próba-előfizetési kosarat is nyit fizetés nélkül, pontosan úgy, ahogy egy vásárló.</span>
+          {test && (
+            <ul className="tebex-test-results">
+              {[test.auth, test.checkout].filter((r): r is NonNullable<typeof r> => r !== null).map((r, i) => (
+                <li key={i} className={r.ok ? 'is-ok' : 'is-bad'}>
+                  <Icon name={r.ok ? 'check' : 'alert'} size={15} />
+                  <div>
+                    <strong>{r.message}</strong>
+                    {r.tebexResponse && !r.ok && <code className="mono small">{r.tebexResponse}</code>}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         <div className="settings-actions">

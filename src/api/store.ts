@@ -330,6 +330,21 @@ export interface StoreOverview {
   activeSubscriptions: number;
   revenue: { currency: string; total: number; last30Days: number }[];
   paymentsConfigured: boolean;
+  lastTebexError: string | null;
+  lastTebexErrorAt: string | null;
+}
+
+export interface TebexTestResult {
+  ok: boolean;
+  status: number;
+  message: string;
+  tebexResponse: string;
+}
+
+export interface TebexConnectionTest {
+  ok: boolean;
+  auth: TebexTestResult;
+  checkout: TebexTestResult | null;
 }
 
 export interface DiscordJob {
@@ -552,6 +567,7 @@ export const storeAdminApi = {
   refunds: () => send<RefundsOverview>(`${A}/refunds`, { auth: 'staff' }),
   refund: (invoiceId: string, reason: string) => send<RefundResult>(`${A}/refunds`, { method: 'POST', body: { invoiceId, reason }, auth: 'staff' }),
 
+  testTebex: () => send<TebexConnectionTest>(`${A}/tebex/test`, { method: 'POST', auth: 'staff' }),
   settings: () => send<AdminStoreSettings>(`${A}/settings`, { auth: 'staff' }),
   updateSettings: (body: StoreSettingsUpdate) => send<AdminStoreSettings>(`${A}/settings`, { method: 'PUT', body, auth: 'staff' }),
   webhooks: () => send<WebhookLog[]>(`${A}/webhooks`, { auth: 'staff' })
