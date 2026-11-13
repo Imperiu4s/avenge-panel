@@ -14,7 +14,8 @@ const CHANGELOG: ChangelogEntry[] = [
       'Fizetés a Tebexben létrehozott csomagokkal: az előfizetés és a pluginok a Tebex saját csomagjain keresztül vásárolhatók, az árat a rendszer a Tebexből veszi át.',
       'Akciók Tebex-kuponnal: a kuponkód automatikusan a kosárra kerül.',
       'Tebex-kapcsolat tesztelése és az utolsó Tebex-hiba az Áruház adminban.',
-      'Ha a Tebex belépést kér a fizetés előtt, a vásárló a belépés után automatikusan visszatér, és megy tovább a fizetéshez.'
+      'Ha a Tebex belépést kér a fizetés előtt, a vásárló a belépés után automatikusan visszatér, és megy tovább a fizetéshez.',
+      'Minecraft típusú Tebex-boltnál a fizetés előtt elkérjük a vásárló Minecraft-nevét, és a fiókban megjegyezzük.'
     ]
   },
   {

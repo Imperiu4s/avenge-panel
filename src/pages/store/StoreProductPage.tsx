@@ -5,6 +5,7 @@ import { storeApi, storeAssetUrl, storeDownloadUrl, type StoreProductDetail, typ
 import { Icon } from '../../components/Icon';
 import { Skeleton, useNow } from '../../components/motion';
 import { useCustomer } from '../../store/CustomerAuth';
+import { MinecraftNamePrompt, needsMinecraftName } from '../../store/MinecraftNamePrompt';
 import { Markdown } from '../../store/Markdown';
 import { PriceTag, ProductIcon } from '../../store/ProductCard';
 import { useStoreInfo } from '../../store/StoreShell';
@@ -18,13 +19,14 @@ export async function downloadRelease(release: StoreRelease) {
 export function StoreProductPage() {
   const { slug = '' } = useParams();
   const { info } = useStoreInfo();
-  const { isLoggedIn, refresh } = useCustomer();
+  const { isLoggedIn, refresh, me } = useCustomer();
   const navigate = useNavigate();
   const location = useLocation();
   const [detail, setDetail] = useState<StoreProductDetail | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [tab, setTab] = useState<'overview' | 'versions' | 'gallery'>('overview');
   const [consent, setConsent] = useState(false);
+  const [askName, setAskName] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lightbox, setLightbox] = useState<string | null>(null);
@@ -74,7 +76,7 @@ export function StoreProductPage() {
   const left = card.discountPercent > 0 ? timeLeft(card.discountEndsAt, now) : null;
   const canBuy = (info?.storeEnabled ?? true) && (info?.paymentsConfigured ?? false) || card.price === 0;
 
-  async function handleBuy() {
+  async function handleBuy(minecraftName?: string) {
     if (!isLoggedIn) {
       navigate(`/store/fiok?vissza=${encodeURIComponent(location.pathname)}`);
       return;
@@ -86,7 +88,7 @@ export function StoreProductPage() {
     setBusy(true);
     setError(null);
     try {
-      const result = await storeApi.checkout([card.id], true);
+      const result = await storeApi.checkout([card.id], true, minecraftName);
       if (result.checkoutUrl.startsWith(window.location.origin)) {
         await refresh();
         navigate(new URL(result.checkoutUrl).pathname + new URL(result.checkoutUrl).search);
@@ -94,6 +96,7 @@ export function StoreProductPage() {
         window.location.assign(result.checkoutUrl);
       }
     } catch (err) {
+      if (needsMinecraftName(err)) setAskName(true);
       setError(err instanceof ApiError ? err.message : 'Nem sikerült elindítani a fizetést.');
       setBusy(false);
     }
@@ -224,7 +227,7 @@ export function StoreProductPage() {
                     </span>
                   </label>
                 )}
-                <button type="button" className={`btn-primary btn-block btn-large ${busy ? 'is-loading' : ''}`} disabled={busy || !canBuy} onClick={handleBuy}>
+                <button type="button" className={`btn-primary btn-block btn-large ${busy ? 'is-loading' : ''}`} disabled={busy || !canBuy} onClick={() => handleBuy()}>
                   {busy && <span className="btn-spinner" aria-hidden="true" />}
                   <Icon name="cart" size={18} />
                   {!isLoggedIn ? 'Belépés a vásárláshoz' : card.price === 0 ? 'Megszerzem ingyen' : 'Megvásárlom'}
@@ -233,6 +236,7 @@ export function StoreProductPage() {
                 <p className="buy-secure small"><Icon name="lock" size={13} /> Biztonságos fizetés a Tebexen keresztül (bankkártya, PayPal és más módok).</p>
               </>
             )}
+            {askName && <MinecraftNamePrompt initial={me?.minecraftUsername ?? ''} busy={busy} onSubmit={(name) => handleBuy(name)} />}
             {error && <p className="error-text error-in">{error}</p>}
           </section>
 

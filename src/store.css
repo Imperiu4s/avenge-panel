@@ -828,3 +828,5 @@ a.product-card:hover h3 { color: #fff; }
 .tebex-test-results li.is-bad { border-color: rgba(255, 45, 55, 0.45); }
 .tebex-test-results li.is-bad svg { color: #ff8d86; }
 .tebex-test-results code { display: block; margin-top: 6px; color: var(--text-3); white-space: pre-wrap; word-break: break-word; }
+
+.mc-name-prompt { display: grid; gap: 10px; margin-top: 14px; padding: 14px; border: 1px solid rgba(255, 45, 55, 0.4); background: rgba(255, 45, 55, 0.06); }

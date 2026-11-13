@@ -5,6 +5,7 @@ import { storeApi } from '../../api/store';
 import { useAuth } from '../../auth/AuthContext';
 import { Icon, type IconName } from '../../components/Icon';
 import { useCustomer } from '../../store/CustomerAuth';
+import { MinecraftNamePrompt, needsMinecraftName } from '../../store/MinecraftNamePrompt';
 import { useStoreInfo } from '../../store/StoreShell';
 import { formatDate, formatPrice, SUBSCRIPTION_STATUS_LABELS } from '../../store/format';
 
@@ -24,13 +25,14 @@ export function SubscriptionPage() {
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [askName, setAskName] = useState(false);
 
   const currency = info?.currency ?? 'EUR';
   const sub = me?.subscription;
   const live = sub && (sub.status === 'Active' || sub.status === 'CancelPending');
   const available = (info?.subscriptionEnabled ?? false) && (info?.paymentsConfigured ?? false);
 
-  async function subscribe() {
+  async function subscribe(minecraftName?: string) {
     if (!isLoggedIn) {
       navigate('/store/fiok?vissza=/elofizetes');
       return;
@@ -38,9 +40,10 @@ export function SubscriptionPage() {
     setBusy(true);
     setError(null);
     try {
-      const { checkoutUrl } = await storeApi.subscriptionCheckout();
+      const { checkoutUrl } = await storeApi.subscriptionCheckout(minecraftName);
       window.location.assign(checkoutUrl);
     } catch (err) {
+      if (needsMinecraftName(err)) setAskName(true);
       setError(err instanceof ApiError ? err.message : 'Nem sikerült elindítani a fizetést.');
       setBusy(false);
     }
@@ -89,7 +92,7 @@ export function SubscriptionPage() {
             </>
           ) : (
             <>
-              <button type="button" className={`btn-primary btn-block btn-large ${busy ? 'is-loading' : ''}`} onClick={subscribe} disabled={busy || !available}>
+              <button type="button" className={`btn-primary btn-block btn-large ${busy ? 'is-loading' : ''}`} onClick={() => subscribe()} disabled={busy || !available}>
                 {busy && <span className="btn-spinner" aria-hidden="true" />}
                 {isLoggedIn ? 'Előfizetek' : 'Belépés az előfizetéshez'} <Icon name="arrow-right" size={17} />
               </button>
@@ -97,6 +100,7 @@ export function SubscriptionPage() {
               <p className="muted small">Az előfizetéssel elfogadod az <Link to="/jogi/aszf" className="text-link">ÁSZF</Link>-et. A díjat havonta automatikusan terheli a Tebex, amíg le nem mondod.</p>
             </>
           )}
+          {askName && !live && <MinecraftNamePrompt initial={me?.minecraftUsername ?? ''} busy={busy} onSubmit={(name) => subscribe(name)} />}
           {error && <p className="error-text error-in">{error}</p>}
         </aside>
       </section>

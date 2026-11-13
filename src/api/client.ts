@@ -36,10 +36,12 @@ export const SESSION_EXPIRED_EVENT = 'avenge:session-expired';
 
 export class ApiError extends Error {
   status: number;
+  code: string | null;
 
-  constructor(status: number, message: string) {
+  constructor(status: number, message: string, code: string | null = null) {
     super(message);
     this.status = status;
+    this.code = code;
   }
 }
 

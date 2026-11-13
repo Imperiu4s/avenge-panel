@@ -101,6 +101,7 @@ export interface CustomerMe {
   owned: CustomerOwned[];
   orders: CustomerOrder[];
   subscription: CustomerSubscription | null;
+  minecraftUsername: string | null;
 }
 
 export interface CheckoutResult {
@@ -446,12 +447,14 @@ async function send<T>(path: string, options: { method?: string; body?: unknown;
       return send<T>(path, { ...options, auth: 'none' });
     }
     let message = `Hiba (${response.status})`;
+    let code: string | null = null;
     try {
       const errorBody = await response.json();
       message = errorBody?.message ?? errorBody?.title ?? message;
+      code = typeof errorBody?.code === 'string' ? errorBody.code : null;
     } catch {
     }
-    throw new ApiError(response.status, message);
+    throw new ApiError(response.status, message, code);
   }
 
   if (response.status === 204) return undefined as T;
@@ -495,11 +498,12 @@ export const storeApi = {
   deleteAccount: (password: string) =>
     send<void>('/api/store/me/delete', { method: 'POST', body: { password }, auth: 'customer' }),
 
-  checkout: (productIds: string[], consentImmediateDelivery: boolean) =>
-    send<CheckoutResult>('/api/store/checkout', { method: 'POST', body: { productIds, consentImmediateDelivery }, auth: 'customer' }),
+  checkout: (productIds: string[], consentImmediateDelivery: boolean, minecraftUsername?: string) =>
+    send<CheckoutResult>('/api/store/checkout', { method: 'POST', body: { productIds, consentImmediateDelivery, minecraftUsername: minecraftUsername || null }, auth: 'customer' }),
   order: (id: string) => send<CustomerOrder>(`/api/store/orders/${encodeURIComponent(id)}`, { auth: 'customer' }),
 
-  subscriptionCheckout: () => send<CheckoutResult>('/api/store/subscription/checkout', { method: 'POST', auth: 'customer' }),
+  subscriptionCheckout: (minecraftUsername?: string) =>
+    send<CheckoutResult>(`/api/store/subscription/checkout${minecraftUsername ? `?minecraftUsername=${encodeURIComponent(minecraftUsername)}` : ''}`, { method: 'POST', auth: 'customer' }),
   subscriptionCancel: () => send<void>('/api/store/subscription/cancel', { method: 'POST', auth: 'customer' }),
   panelToken: () => send<CustomerToken>('/api/store/subscription/panel-token', { method: 'POST', auth: 'customer' }),
 
