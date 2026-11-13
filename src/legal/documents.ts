@@ -6,17 +6,6 @@ export interface LegalDocument {
   body: string;
 }
 
-const OPERATOR = `
-| | |
-|---|---|
-| Szolgáltató neve | [KITÖLTENDŐ: cégnév vagy egyéni vállalkozó neve] |
-| Székhely / levelezési cím | [KITÖLTENDŐ: cím] |
-| Cégjegyzékszám / nyilvántartási szám | [KITÖLTENDŐ] |
-| Adószám | [KITÖLTENDŐ] |
-| E-mail | [KITÖLTENDŐ: ügyfélszolgálati e-mail] |
-| Weboldal | https://avenge.hu |
-`;
-
 export const LEGAL_DOCUMENTS: LegalDocument[] = [
   {
     slug: 'aszf',
@@ -24,17 +13,20 @@ export const LEGAL_DOCUMENTS: LegalDocument[] = [
     short: 'ÁSZF',
     updated: '2026. november 13.',
     body: `
-Ez az Általános Szerződési Feltételek (ÁSZF) az avenge.hu weboldalon elérhető szolgáltatások igénybevételének feltételeit tartalmazza: az **Avenge SS tool** (Minecraft screenshare vizsgálóeszköz) és az **Avenge Foundry** áruház (Minecraft pluginok értékesítése). A regisztrációval, a vásárlással vagy az előfizetéssel elfogadod ezt az ÁSZF-et.
+Ez az Általános Szerződési Feltételek (ÁSZF) a(z) {{weboldal}} weboldalon elérhető, {{szolgaltatas.nev}} néven nyújtott szolgáltatások igénybevételének feltételeit tartalmazza: az **Avenge SS tool** (Minecraft screenshare vizsgálóeszköz) és az **Avenge Foundry** áruház (Minecraft pluginok értékesítése). A regisztrációval, a vásárlással vagy az előfizetéssel elfogadod ezt az ÁSZF-et.
 
 ## 1. A szolgáltató
-${OPERATOR}
+{{szolgaltato.tabla}}
+
+A fizetéseket és a számlázást viszonteladóként (merchant of record) a {{viszontelado.nev}} bonyolítja; adatai az [Impresszumban](/jogi/impresszum) találhatók.
 
 ## 2. Fogalmak
 - **Vásárló / Felhasználó**: aki az avenge.hu-n vásárlói fiókot hoz létre, pluginokat vásárol vagy előfizet.
 - **Plugin**: a Szolgáltató által fejlesztett, letölthető Minecraft szerverkiegészítő (digitális tartalom).
 - **SS tool**: az Avenge screenshare vizsgálóeszköz (Windows kliensprogram és webes panel).
 - **Előfizetés**: az SS tool havidíjas, automatikusan megújuló használati joga.
-- **Tebex**: a Tebex Limited (Egyesült Királyság), amely a fizetéseket viszonteladóként (merchant of record) bonyolítja.
+- **Szolgáltató**: {{szolgaltato.nev}} ({{szolgaltato.jogallas}}), a {{szolgaltatas.nev}} üzemeltetője.
+- **Tebex**: a {{viszontelado.nev}}, amely a fizetéseket viszonteladóként (merchant of record) bonyolítja.
 
 ## 3. Regisztráció és fiók
 1. Vásárlás és letöltés csak vásárlói fiókkal lehetséges (e-mail cím és jelszó).
@@ -45,7 +37,7 @@ ${OPERATOR}
 
 ## 4. Pluginok vásárlása
 1. A pluginok ára az adatlapjukon szerepel; az akciós ár az akció időtartama alatt érvényes. Az árak a Tebex fizetési oldalán az alkalmazandó adóval együtt jelennek meg véglegesen.
-2. A megrendelés a Tebex fizetési oldalán, a fizetés véglegesítésével jön létre. A fizetést és a számlázást a Tebex végzi; a fizetésre a Tebex saját feltételei is vonatkoznak.
+2. A megrendelés a Tebex fizetési oldalán, a fizetés véglegesítésével jön létre. A fizetést és a számlázást a Tebex végzi; a fizetésre a Tebex saját vásárlói feltételei is vonatkoznak ({{viszontelado.feltetelek}}).
 3. Sikeres fizetés után a plugin a Felhasználó fiókjában azonnal letölthetővé válik, a későbbi frissítéseivel együtt.
 4. A vásárlással a Felhasználó **nem a plugin tulajdonjogát**, hanem a [Licencfeltételek](/jogi/licenc) szerinti, nem kizárólagos használati jogot szerzi meg.
 5. A kompatibilitási adatok (Minecraft-verzió, szerverszoftver) tájékoztató jellegűek; a Felhasználó vásárlás előtt ellenőrizze, hogy a plugin megfelel-e a szerverének.
@@ -67,7 +59,7 @@ A fogyasztót a 45/2014. (II. 26.) Korm. rendelet alapján főszabályként 14 n
 3. A Szolgáltató a szolgáltatás folyamatos elérhetőségére törekszik, de karbantartás vagy üzemzavar miatt átmeneti kiesés előfordulhat.
 
 ## 8. Panaszkezelés, jogviták
-1. Panaszaidat a fenti e-mail címen jelezheted; 30 napon belül írásban válaszolunk.
+1. Panaszaidat {{kapcsolat}} jelezheted; 30 napon belül írásban válaszolunk.
 2. Fogyasztói jogvita esetén a lakóhelyed szerinti békéltető testülethez fordulhatsz, illetve az EU online vitarendezési platformját is használhatod: https://ec.europa.eu/consumers/odr.
 3. A szerződésre a magyar jog az irányadó; a fogyasztó lakóhelye szerinti kötelező fogyasztóvédelmi szabályok ettől függetlenül alkalmazandók.
 
@@ -84,7 +76,7 @@ A Szolgáltató az ÁSZF-et módosíthatja; a módosítást a weboldalon közzé
 Ez a tájékoztató az Európai Parlament és a Tanács (EU) 2016/679 rendelete (GDPR) és az Infotv. (2011. évi CXII. törvény) alapján mutatja be, milyen személyes adatokat kezelünk, miért és meddig.
 
 ## 1. Adatkezelő
-${OPERATOR}
+{{szolgaltato.tabla}}
 
 ## 2. Vásárlói fiók és áruház
 | Adat | Cél | Jogalap | Megőrzés |
@@ -97,7 +89,7 @@ ${OPERATOR}
 | Előfizetés állapota, Tebex-hivatkozás | a havi előfizetés kezelése | szerződés teljesítése | a fiók törléséig |
 | Kitiltás oka (ha van) | visszaélések megelőzése | jogos érdek | a fiók törléséig |
 
-**Bankkártya-adatot nem kezelünk**: a fizetést a Tebex Limited (Egyesült Királyság) végzi saját adatkezelőként; a fizetéshez megadott adatokra a Tebex adatvédelmi tájékoztatója vonatkozik (https://www.tebex.io/privacy). Mi a Tebextől csak a fizetés tényét, összegét, azonosítóját és a vásárló e-mail címét kapjuk meg.
+**Bankkártya-adatot nem kezelünk**: a fizetést a {{viszontelado.nev}} (Egyesült Királyság) végzi saját adatkezelőként; a fizetéshez megadott adatokra a Tebex adatvédelmi tájékoztatója vonatkozik (https://www.tebex.io/privacy). Mi a Tebextől csak a fizetés tényét, összegét, azonosítóját, a vásárló e-mail címét és - ha a Tebex kéri - a megadott Minecraft-nevet kapjuk meg. A Minecraft-nevet a következő vásárláshoz a fiókodban megjegyezzük.
 
 ## 3. Az SS tool vizsgálatai
 A vizsgálatot a játékos maga indítja el a staff tagtól kapott kóddal; a program jelzi, hogy a csatlakozással a vizsgálat elindul, és az eredményt a staff látja.
@@ -108,21 +100,22 @@ A szerverre a vizsgálat **eredménye** kerül: a találatok (fájlnév, eléré
 
 - **Cél**: a csalás kiszűrése a Minecraft szervereken.
 - **Jogalap**: a szerver jogos érdeke a tisztességes játék biztosításához (GDPR 6. cikk (1) f)), amelyet a játékos a vizsgálat önkéntes elindításával tudomásul vesz.
-- **Adatkezelő**: az a szerver (szervezet), amelynek staff tagja a vizsgálatot kérte; az Avenge ilyenkor a szerver megbízásából, adatfeldolgozóként tárolja az eredményt. Az Avenge saját szerverein végzett vizsgálatoknál az Avenge az adatkezelő.
+- **Adatkezelő**: az a szerver (szervezet), amelynek staff tagja a vizsgálatot kérte; a Szolgáltató ilyenkor a szerver megbízásából, adatfeldolgozóként tárolja az eredményt. A Szolgáltató saját szerverein végzett vizsgálatoknál a Szolgáltató az adatkezelő.
 - **Megőrzés**: a szervezet beállítása szerint (alapértelmezés szerint a szervezet törléséig, vagy a beállított napok után automatikusan törlődik). A megosztó link legfeljebb 3 napig érvényes.
 
 ## 4. Technikai adatok
-A weboldal a bejelentkezéshez a böngésző helyi tárolójában (localStorage) tárol egy belépési tokent. Követő (marketing vagy analitikai) sütit nem használunk. A szerver a biztonság érdekében naplózza a kérések IP-címét és idejét, a staff műveleteit pedig a szervezet tevékenységnaplójában rögzíti; megőrzési idő: [KITÖLTENDŐ]. Részletek: [Süti tájékoztató](/jogi/cookie).
+A weboldal a bejelentkezéshez a böngésző helyi tárolójában (localStorage) tárol egy belépési tokent. Követő (marketing vagy analitikai) sütit nem használunk. A szerver a biztonság érdekében naplózza a kérések IP-címét és idejét, a staff műveleteit pedig a szervezet tevékenységnaplójában rögzíti. {{naplo.megorzes}} Részletek: [Süti tájékoztató](/jogi/cookie).
 
 ## 5. Adatfeldolgozók, címzettek
-- **Tebex Limited** (Egyesült Királyság) - fizetés, számlázás (önálló adatkezelő).
-- **Tárhelyszolgáltató**: [KITÖLTENDŐ: a szerver üzemeltetőjének neve és címe].
-- **GitHub Inc.** (GitHub Pages) - a weboldal statikus fájljainak kiszolgálása.
+- **{{viszontelado.nev}}** (Egyesült Királyság) - fizetés, számlázás (önálló adatkezelő).
+- **Discord Inc.** (USA) - ha ticketben a Discord szerverünkön ({{kapcsolat.discord}}) keresel minket, az üzeneteidet a Discord a saját adatvédelmi tájékoztatója szerint kezeli.
+- **Tárhelyszolgáltatók** (adatfeldolgozók):
+{{tarhely.lista}}
 
-Az Egyesült Királyságba irányuló adattovábbítás az Európai Bizottság megfelelőségi határozata alapján történik.
+Az Egyesült Királyságba irányuló adattovábbítás az Európai Bizottság megfelelőségi határozata alapján, az Egyesült Államokba irányuló adattovábbítás megfelelő garanciák (EU-USA adatvédelmi keretrendszer, illetve általános szerződési feltételek) mellett történik.
 
 ## 6. Jogaid
-Kérheted a személyes adataidhoz való hozzáférést, azok helyesbítését, törlését, az adatkezelés korlátozását, tiltakozhatsz a jogos érdeken alapuló adatkezelés ellen, és kérheted az adataid hordozható formában való kiadását. Kérésedre 1 hónapon belül válaszolunk a fenti e-mail címen. A vásárlói fiókodat a Fiókom oldalon magad is törölheted.
+Kérheted a személyes adataidhoz való hozzáférést, azok helyesbítését, törlését, az adatkezelés korlátozását, tiltakozhatsz a jogos érdeken alapuló adatkezelés ellen, és kérheted az adataid hordozható formában való kiadását. Kérésedet {{kapcsolat}} jelezheted; 1 hónapon belül válaszolunk. A vásárlói fiókodat a Fiókom oldalon magad is törölheted.
 
 Panasszal a Nemzeti Adatvédelmi és Információszabadság Hatósághoz (NAIH, 1055 Budapest, Falk Miksa utca 9-11., https://naih.hu) fordulhatsz, vagy bírósághoz is.
 `
@@ -149,7 +142,7 @@ Nem adunk visszatérítést, ha a plugin a szervered beállítása, egy nem tám
 - Ha a fizetést követő 14 napon belül a szolgáltatás a mi hibánkból nem volt használható, kérésre a havi díjat visszatérítjük; ilyenkor az előfizetés azonnal megszűnik.
 
 ## 3. Hogyan kérj visszatérítést?
-Visszatérítést a fizetéstől számított **14 napon belül** kérhetsz. Írj a [KITÖLTENDŐ: ügyfélszolgálati e-mail] címre a vásárlói fiókod e-mail címéről, add meg a bizonylat számát (a fiókod Számlák részén találod) és a probléma leírását. A jogos visszatérítést a Tebexen keresztül, a teljes összegről, az eredeti fizetési módra indítjuk; a pénz általában 5-10 munkanapon belül érkezik meg. A visszatérítésről visszatérítési bizonylatot kapsz, ami a fiókodban letölthető.
+Visszatérítést a fizetéstől számított **14 napon belül** kérhetsz. Írj a **{{kapcsolat.email}}** címre a vásárlói fiókod e-mail címéről, vagy nyiss ticketet a Discord szerverünkön (**{{kapcsolat.discord}}**); add meg a bizonylat számát (a fiókod Számlák részén találod) és a probléma leírását. A jogos visszatérítést a Tebexen keresztül, a teljes összegről, az eredeti fizetési módra indítjuk; a pénz általában 5-10 munkanapon belül érkezik meg. A visszatérítésről visszatérítési bizonylatot kapsz, ami a fiókodban letölthető.
 
 ## 4. Visszaterhelés (chargeback)
 Kérjük, mielőtt a bankodnál visszaterhelést kezdeményezel, keress minket. Visszatérítés vagy visszaterhelés esetén a plugin letöltési joga megszűnik, a licenc érvényét veszti; visszaélésszerű visszaterhelésnél a fiókot felfüggeszthetjük.
@@ -178,13 +171,13 @@ A vásárlással **nem kizárólagos, át nem ruházható, határozatlan idejű*
 - A plugin felhasználása más ügyfeleknek nyújtott szolgáltatásban (pl. eladott szerver-csomag részeként) külön engedély nélkül.
 
 ## 4. Frissítések, támogatás
-A megvásárolt plugin frissítései a fiókodban díjmentesen letölthetők, amíg a plugint fejlesztjük. Támogatást a [KITÖLTENDŐ: support elérhetőség] címen nyújtunk ésszerű időn belül.
+A megvásárolt plugin frissítései a fiókodban díjmentesen letölthetők, amíg a plugint fejlesztjük. Támogatást {{kapcsolat}} nyújtunk ésszerű időn belül.
 
 ## 5. A licenc megszűnése
 A licenc megszűnik, ha megszeged ezeket a feltételeket, illetve visszatérítés vagy visszaterhelés esetén. Ilyenkor a plugint törölnöd kell a szervereidről. A jogsértő terjesztés esetén a fiókodat kitilthatjuk, és a szerzői jogi jogsértés miatt jogi lépéseket tehetünk.
 
 ## 6. Szerzői jog
-A pluginok szerzői jogai a Szolgáltatót illetik. A Minecraft a Mojang AB védjegye; az Avenge Foundry nem áll kapcsolatban a Mojanggal vagy a Microsofttal.
+A pluginok szerzői jogai a Szolgáltatót ({{szolgaltato.nev}}) illetik. A Minecraft a Mojang AB védjegye; az Avenge Foundry nem áll kapcsolatban a Mojanggal vagy a Microsofttal.
 `
   },
   {
@@ -196,22 +189,21 @@ A pluginok szerzői jogai a Szolgáltatót illetik. A Minecraft a Mojang AB véd
 Az elektronikus kereskedelmi szolgáltatásokról szóló 2001. évi CVIII. törvény alapján:
 
 ## Szolgáltató
-${OPERATOR}
+{{szolgaltato.tabla}}
 
-## Tárhelyszolgáltató
-| | |
-|---|---|
-| Backend szerver | [KITÖLTENDŐ: tárhelyszolgáltató neve, címe, e-mail címe] |
-| Weboldal | GitHub Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA (GitHub Pages) |
+## Viszonteladó (fizetés és számlázás)
+A vásárlások és az előfizetések díját viszonteladóként (merchant of record) az alábbi cég szedi be, és ő állítja ki a számlát:
 
-## Fizetési szolgáltató
-Tebex Limited, Egyesült Királyság - https://www.tebex.io
+{{viszontelado.tabla}}
+
+## Tárhelyszolgáltatók
+{{tarhely.tabla}}
 
 ## Felügyeleti szervek
 - Fogyasztóvédelem: a lakóhely szerinti kormányhivatal, illetve békéltető testület
 - Adatvédelem: Nemzeti Adatvédelmi és Információszabadság Hatóság (https://naih.hu)
 
-A Minecraft a Mojang AB védjegye. Az Avenge nem áll kapcsolatban a Mojanggal vagy a Microsofttal.
+A Minecraft a Mojang AB védjegye. A(z) {{szolgaltatas.nev}} nem áll kapcsolatban a Mojanggal vagy a Microsofttal.
 `
   },
   {

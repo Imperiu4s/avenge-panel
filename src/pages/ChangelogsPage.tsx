@@ -8,6 +8,14 @@ interface ChangelogEntry {
 
 const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '2.9.3',
+    date: '2026-11-13',
+    items: [
+      'Admin Panel / Jogi: a szolgáltató, a viszonteladó (Tebex) és a tárhelyszolgáltatók adatai, valamint minden jogi dokumentum szövege szerkeszthető, előnézettel.',
+      'A jogi oldalak kitöltve: szolgáltató, kapcsolat (e-mail és Discord ticket), a Tebex mint viszonteladó.'
+    ]
+  },
+  {
     version: '2.9.0',
     date: '2026-11-13',
     items: [

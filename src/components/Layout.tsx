@@ -38,7 +38,6 @@ export function Layout() {
           <Link to="/jogi/licenc">Licenc</Link>
           <Link to="/jogi/cookie">Sütik</Link>
           <Link to="/jogi/impresszum">Impresszum</Link>
-          <a href="/third-party-licenses.txt" target="_blank" rel="noopener">Nyílt forráskód</a>
         </nav>
       </footer>
     </div>

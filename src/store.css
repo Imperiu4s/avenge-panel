@@ -830,3 +830,16 @@ a.product-card:hover h3 { color: #fff; }
 .tebex-test-results code { display: block; margin-top: 6px; color: var(--text-3); white-space: pre-wrap; word-break: break-word; }
 
 .mc-name-prompt { display: grid; gap: 10px; margin-top: 14px; padding: 14px; border: 1px solid rgba(255, 45, 55, 0.4); background: rgba(255, 45, 55, 0.06); }
+
+.legal-admin-group { margin-top: 18px; display: grid; gap: 10px; }
+.legal-admin-group-title { color: var(--signal-hot); letter-spacing: 0.08em; text-transform: uppercase; font-size: 12px; }
+.legal-admin-wide { grid-column: 1 / -1; }
+.legal-hosting { display: grid; gap: 8px; }
+.legal-hosting-row { display: grid; grid-template-columns: 1fr 1fr 1.3fr 1fr auto; gap: 8px; align-items: center; }
+.legal-admin-actions { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; }
+.legal-admin-editor { width: 100%; min-height: 420px; font-size: 13px; line-height: 1.55; margin-top: 12px; }
+.legal-admin-preview { margin-top: 12px; padding: 18px 20px; border: 1px solid var(--line); background: rgba(0, 0, 0, 0.25); max-height: 620px; overflow: auto; }
+.legal-placeholders { margin-top: 12px; }
+.legal-placeholder-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.legal-placeholder-list .chip { cursor: pointer; }
+@media (max-width: 820px) { .legal-hosting-row { grid-template-columns: 1fr 1fr; } }
