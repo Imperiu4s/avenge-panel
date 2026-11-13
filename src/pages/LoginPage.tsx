@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { Icon } from '../components/Icon';
 import avengeLogo from '../assets/avenge-logo-crop.png';
@@ -49,7 +49,7 @@ export function LoginPage() {
             <span className="hero-logo-glint" style={{ maskImage: `url(${avengeLogo})`, WebkitMaskImage: `url(${avengeLogo})` }} aria-hidden="true" />
           </div>
           <h1>Belépés</h1>
-          <p className="muted">Fiókot az adminisztrátortól kapsz.</p>
+          <p className="muted">Fiókot az adminisztrátortól vagy <Link to="/elofizetes" className="text-link">előfizetéssel</Link> kapsz.</p>
 
           {sessionExpired && !error && (
             <p className="notice-text">
