@@ -8,6 +8,15 @@ interface ChangelogEntry {
 
 const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '2.9.0',
+    date: '2026-11-13',
+    items: [
+      'Fizetés a Tebexben létrehozott csomagokkal: az előfizetés és a pluginok a Tebex saját csomagjain keresztül vásárolhatók, az árat a rendszer a Tebexből veszi át.',
+      'Akciók Tebex-kuponnal: a kuponkód automatikusan a kosárra kerül.',
+      'Tebex-kapcsolat tesztelése és az utolsó Tebex-hiba az Áruház adminban.'
+    ]
+  },
+  {
     version: '2.8.1',
     date: '2026-11-13',
     items: [

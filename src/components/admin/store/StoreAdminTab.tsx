@@ -49,7 +49,7 @@ function Overview({ onOpen }: { onOpen: (key: string) => void }) {
       {!data.paymentsConfigured && (
         <div className="store-notice store-notice-warn">
           <Icon name="alert" size={16} />
-          <span>A Tebex még nincs beállítva - amíg nincs megadva a projekt-azonosító és a privát kulcs, a fizetős vásárlás és az előfizetés nem indítható.</span>
+          <span>A Tebex még nincs beállítva: amíg nincs megadva a Public Token (és a csomagok), a fizetős vásárlás és az előfizetés nem indítható.</span>
           <button type="button" className="btn-secondary btn-tiny" onClick={() => onOpen('settings')}>Beállítás</button>
         </div>
       )}
@@ -194,7 +194,7 @@ function Settings({ onSaved }: { onSaved: (s: AdminStoreSettings) => void }) {
       subscriptionEnabled: s.subscriptionEnabled, subscriptionName: s.subscriptionName, subscriptionPrice: s.subscriptionPrice,
       tebexProjectId: s.tebexProjectId, tebexPrivateKey: null, tebexWebhookSecret: null,
       sellerName: s.sellerName, sellerAddress: s.sellerAddress, sellerTaxNumber: s.sellerTaxNumber, sellerEmail: s.sellerEmail,
-      receiptNote: s.receiptNote
+      receiptNote: s.receiptNote, tebexPublicToken: s.tebexPublicToken, subscriptionPackageId: s.subscriptionPackageId
     });
   }, []);
 
@@ -228,7 +228,7 @@ function Settings({ onSaved }: { onSaved: (s: AdminStoreSettings) => void }) {
       const saved = await storeAdminApi.updateSettings(draft);
       apply(saved);
       onSaved(saved);
-      setNotice('Beállítások mentve.');
+      setNotice(saved.notice ? `Beállítások mentve. ${saved.notice}` : 'Beállítások mentve.');
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Nem sikerült menteni.');
     } finally {
@@ -309,10 +309,21 @@ function Settings({ onSaved }: { onSaved: (s: AdminStoreSettings) => void }) {
 
         <h2 className="card-title section-gap"><Icon name="lock" size={18} /> Tebex</h2>
         <ol className="setup-steps small muted">
-          <li>Hozz létre fiókot és webáruházat a <a className="text-link" href="https://creator.tebex.io" target="_blank" rel="noopener noreferrer">creator.tebex.io</a> oldalon, és kérd a <b>Checkout API</b> hozzáférést (a Tebex jóváhagyja).</li>
-          <li>Másold be a projekt azonosítóját (Project ID) és a privát kulcsát (Private Key).</li>
+          <li>A Tebexben (Packages) hozz létre egy csomagot az előfizetésnek: <b>Recurring Payment: havonta</b>, az ár egyezzen az itteni pénznemmel. Minden pluginnak is lehet saját csomagja.</li>
+          <li>A <a className="text-link" href="https://creator.tebex.io/developers/api-keys" target="_blank" rel="noopener noreferrer">Tebex API Keys</a> oldalról másold be a <b>Public Tokent</b>, és írd be az előfizetés csomagjának azonosítóját. Mentéskor ellenőrzöm a csomagot, és átveszem az árát.</li>
           <li>A Tebex webhookjainál add meg az alábbi URL-t, és másold be a webhook titkos kulcsát.</li>
+          <li>A Project ID és a Private Key a visszatérítéshez és az előfizetés automatikus lemondásához kell.</li>
         </ol>
+        <div className="settings-grid">
+          <label>
+            <span className="field-label">Public Token</span>
+            <input value={draft.tebexPublicToken} onChange={(e) => set('tebexPublicToken', e.target.value)} autoComplete="off" placeholder="pl. abcd-1234…" />
+          </label>
+          <label>
+            <span className="field-label">Előfizetés csomag azonosító</span>
+            <input value={draft.subscriptionPackageId} onChange={(e) => set('subscriptionPackageId', e.target.value)} autoComplete="off" placeholder="pl. 6276316" />
+          </label>
+        </div>
         <div className="settings-grid">
           <label>
             <span className="field-label">Project ID</span>
@@ -338,7 +349,7 @@ function Settings({ onSaved }: { onSaved: (s: AdminStoreSettings) => void }) {
         </div>
 
         <div className="tebex-test">
-          <button type="button" className={`btn-secondary btn-tiny ${testing ? 'is-loading' : ''}`} onClick={runTest} disabled={testing || !settings.hasPrivateKey}>
+          <button type="button" className={`btn-secondary btn-tiny ${testing ? 'is-loading' : ''}`} onClick={runTest} disabled={testing || (!settings.hasPrivateKey && !(settings.tebexPublicToken && settings.subscriptionPackageId))}>
             <Icon name="activity" size={13} /> Kapcsolat tesztelése
           </button>
           <span className="muted small">Előbb mentsd a kulcsokat. A teszt egy próba-előfizetési kosarat is nyit fizetés nélkül, pontosan úgy, ahogy egy vásárló.</span>

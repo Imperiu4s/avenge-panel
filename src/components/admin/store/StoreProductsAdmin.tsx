@@ -12,13 +12,14 @@ const PLATFORM_PRESETS = ['Paper', 'Spigot', 'Purpur', 'Folia', 'Bukkit', 'Veloc
 
 const EMPTY: ProductUpsert = {
   name: '', slug: '', tagline: '', description: '', category: '', price: 0,
-  supportedVersions: '', platforms: 'Paper, Spigot', isPublished: false, isFeatured: false, sortOrder: 0
+  supportedVersions: '', platforms: 'Paper, Spigot', isPublished: false, isFeatured: false, sortOrder: 0, tebexPackageId: ''
 };
 
 function toDraft(p: AdminProduct): ProductUpsert {
   return {
     name: p.name, slug: p.slug, tagline: p.tagline, description: p.description, category: p.category, price: p.price,
-    supportedVersions: p.supportedVersions, platforms: p.platforms, isPublished: p.isPublished, isFeatured: p.isFeatured, sortOrder: p.sortOrder
+    supportedVersions: p.supportedVersions, platforms: p.platforms, isPublished: p.isPublished, isFeatured: p.isFeatured, sortOrder: p.sortOrder,
+    tebexPackageId: p.tebexPackageId ?? ''
   };
 }
 
@@ -68,7 +69,8 @@ function ProductEditor({ product, currency, onSaved, onClose }: {
       const result = product
         ? await storeAdminApi.updateProduct(product.id, draft)
         : await storeAdminApi.createProduct(draft);
-      setNotice(product ? 'Mentve.' : 'Plugin létrehozva - most már feltölthetsz ikont, képeket és verziót.');
+      const base = product ? 'Mentve.' : 'Plugin létrehozva - most már feltölthetsz ikont, képeket és verziót.';
+      setNotice(result.notice ? `${base} ${result.notice}` : base);
       onSaved(result.id);
     });
   };
@@ -135,6 +137,11 @@ function ProductEditor({ product, currency, onSaved, onClose }: {
           <label>
             <span className="field-label">Kategória</span>
             <input maxLength={40} value={draft.category} onChange={(e) => set('category', e.target.value)} placeholder="pl. Minigame, Gazdaság, Admin" />
+          </label>
+          <label>
+            <span className="field-label">Tebex csomag azonosító</span>
+            <input maxLength={60} value={draft.tebexPackageId} onChange={(e) => set('tebexPackageId', e.target.value)} placeholder="pl. 6276316" />
+            <small className="muted">A Tebexben létrehozott csomag száma. Megadva a vásárlás ezen a csomagon át megy, és az árat a Tebexből veszi át.</small>
           </label>
           <label>
             <span className="field-label">Támogatott Minecraft-verziók</span>

@@ -139,6 +139,7 @@ export interface AdminProduct {
   updatedAt: string;
   releases: StoreRelease[];
   gallery: AdminAsset[];
+  tebexPackageId: string | null;
 }
 
 export interface ProductUpsert {
@@ -153,6 +154,7 @@ export interface ProductUpsert {
   isPublished: boolean;
   isFeatured: boolean;
   sortOrder: number;
+  tebexPackageId: string;
 }
 
 export interface AdminDiscount {
@@ -165,6 +167,7 @@ export interface AdminDiscount {
   endsAt: string;
   isActive: boolean;
   isRunning: boolean;
+  tebexCouponCode: string | null;
 }
 
 export interface DiscountUpsert {
@@ -174,6 +177,7 @@ export interface DiscountUpsert {
   startsAt: string;
   endsAt: string;
   isActive: boolean;
+  tebexCouponCode?: string | null;
 }
 
 export interface AdminCustomer {
@@ -299,6 +303,9 @@ export interface AdminStoreSettings {
   sellerTaxNumber: string;
   sellerEmail: string;
   receiptNote: string;
+  tebexPublicToken: string;
+  subscriptionPackageId: string;
+  notice: string | null;
 }
 
 export interface StoreSettingsUpdate {
@@ -318,6 +325,8 @@ export interface StoreSettingsUpdate {
   sellerTaxNumber: string;
   sellerEmail: string;
   receiptNote: string;
+  tebexPublicToken: string;
+  subscriptionPackageId: string;
 }
 
 export interface StoreOverview {
@@ -516,9 +525,9 @@ export const storeAdminApi = {
   overview: () => send<StoreOverview>(`${A}/overview`, { auth: 'staff' }),
 
   products: () => send<AdminProduct[]>(`${A}/products`, { auth: 'staff' }),
-  createProduct: (body: ProductUpsert) => send<{ id: string; slug: string }>(`${A}/products`, { method: 'POST', body, auth: 'staff' }),
+  createProduct: (body: ProductUpsert) => send<{ id: string; slug: string; notice: string | null }>(`${A}/products`, { method: 'POST', body, auth: 'staff' }),
   updateProduct: (id: string, body: ProductUpsert) =>
-    send<{ id: string; slug: string }>(`${A}/products/${id}`, { method: 'PUT', body, auth: 'staff' }),
+    send<{ id: string; slug: string; notice: string | null }>(`${A}/products/${id}`, { method: 'PUT', body, auth: 'staff' }),
   deleteProduct: (id: string) => send<void>(`${A}/products/${id}`, { method: 'DELETE', auth: 'staff' }),
   uploadRelease: (id: string, file: File, version: string, changelog: string) => {
     const form = new FormData();

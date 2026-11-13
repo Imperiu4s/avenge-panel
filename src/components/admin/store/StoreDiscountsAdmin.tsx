@@ -14,7 +14,7 @@ function defaults(): DiscountUpsert {
   const start = new Date();
   start.setSeconds(0, 0);
   const end = new Date(start.getTime() + 3 * 86400000);
-  return { name: '', percent: 20, productId: null, startsAt: start.toISOString(), endsAt: end.toISOString(), isActive: true };
+  return { name: '', percent: 20, productId: null, startsAt: start.toISOString(), endsAt: end.toISOString(), isActive: true, tebexCouponCode: '' };
 }
 
 const PRESETS: { name: string; percent: number; days: number }[] = [
@@ -67,7 +67,7 @@ export function StoreDiscountsAdmin() {
   }
 
   async function toggle(d: AdminDiscount) {
-    await storeAdminApi.updateDiscount(d.id, { name: d.name, percent: d.percent, productId: d.productId, startsAt: d.startsAt, endsAt: d.endsAt, isActive: !d.isActive }).catch(() => undefined);
+    await storeAdminApi.updateDiscount(d.id, { name: d.name, percent: d.percent, productId: d.productId, startsAt: d.startsAt, endsAt: d.endsAt, isActive: !d.isActive, tebexCouponCode: d.tebexCouponCode }).catch(() => undefined);
     load();
   }
 
@@ -110,6 +110,11 @@ export function StoreDiscountsAdmin() {
             <span className="field-label">Vége</span>
             <input type="datetime-local" required value={toLocalInput(draft.endsAt)} onChange={(e) => e.target.value && set('endsAt', new Date(e.target.value).toISOString())} />
           </label>
+          <label>
+            <span className="field-label">Tebex kuponkód</span>
+            <input maxLength={60} value={draft.tebexCouponCode ?? ''} onChange={(e) => set('tebexCouponCode', e.target.value)} placeholder="pl. BLACKFRIDAY" />
+            <small className="muted">Tebex-csomagos pluginnál kötelező: hozz létre a Tebexben azonos kedvezményű kupont, és írd be a kódját. A kosárra automatikusan rákerül.</small>
+          </label>
           <label className="toggle-row toggle-inline">
             <span className="toggle-text"><strong>Aktív</strong><small>Kikapcsolva nem érvényes, akkor sem, ha az időszak tart.</small></span>
             <input type="checkbox" className="switch" checked={draft.isActive} onChange={(e) => set('isActive', e.target.checked)} />
@@ -144,7 +149,7 @@ export function StoreDiscountsAdmin() {
                     </span>
                   </td>
                   <td className="row-actions">
-                    <button type="button" className="btn-ghost btn-tiny" onClick={() => { setEditingId(d.id); setDraft({ name: d.name, percent: d.percent, productId: d.productId, startsAt: d.startsAt, endsAt: d.endsAt, isActive: d.isActive }); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>Szerkesztés</button>
+                    <button type="button" className="btn-ghost btn-tiny" onClick={() => { setEditingId(d.id); setDraft({ name: d.name, percent: d.percent, productId: d.productId, startsAt: d.startsAt, endsAt: d.endsAt, isActive: d.isActive, tebexCouponCode: d.tebexCouponCode ?? '' }); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>Szerkesztés</button>
                     <button type="button" className="btn-ghost btn-tiny" onClick={() => toggle(d)}>{d.isActive ? 'Kikapcsol' : 'Bekapcsol'}</button>
                     <button type="button" className="btn-ghost btn-tiny btn-danger" onClick={() => remove(d)}>Törlés</button>
                   </td>
