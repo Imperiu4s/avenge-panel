@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { BladeNav } from './BladeNav';
 import { usePointerSpotlight } from './motion';
+import { SeasonalGround, SeasonalLayer } from '../seasonal/SeasonalDecor';
 
 export function Layout() {
   const location = useLocation();
@@ -19,6 +20,7 @@ export function Layout() {
         <span className="backdrop-ember backdrop-ember-b" />
         <span className="backdrop-scan" />
       </div>
+      <SeasonalLayer />
 
       <BladeNav />
 
@@ -27,6 +29,8 @@ export function Layout() {
       <div className="page-transition" key={location.pathname}>
         <Outlet />
       </div>
+
+      <SeasonalGround />
 
       <footer className="site-footer">
         <span>© {new Date().getFullYear()} Avenge · Avenge Foundry</span>
@@ -38,6 +42,7 @@ export function Layout() {
           <Link to="/jogi/licenc">Licenc</Link>
           <Link to="/jogi/cookie">Sütik</Link>
           <Link to="/jogi/impresszum">Impresszum</Link>
+          <Link to="/tamogatas">Támogatás</Link>
         </nav>
       </footer>
     </div>

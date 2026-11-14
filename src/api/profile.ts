@@ -3,7 +3,6 @@ import { send, type AuthMode } from './store';
 
 export interface ProfileView {
   avatarUrl: string | null;
-  theme: string | null;
   displayName?: string | null;
   minecraftUsername?: string | null;
 }
@@ -38,15 +37,18 @@ function uploadAvatar(path: string, auth: AuthMode, image: Blob) {
 
 export const staffProfileApi = {
   uploadAvatar: (image: Blob) => uploadAvatar('/api/auth/me/avatar', 'staff', image),
-  removeAvatar: () => send<void>('/api/auth/me/avatar', { method: 'DELETE', auth: 'staff' }),
-  setTheme: (theme: string) => send<ProfileView>('/api/auth/me/preferences', { method: 'PUT', body: { theme }, auth: 'staff' })
+  removeAvatar: () => send<void>('/api/auth/me/avatar', { method: 'DELETE', auth: 'staff' })
 };
 
 export const customerProfileApi = {
   uploadAvatar: (image: Blob) => uploadAvatar('/api/store/me/avatar', 'customer', image),
   removeAvatar: () => send<void>('/api/store/me/avatar', { method: 'DELETE', auth: 'customer' }),
-  update: (body: { minecraftUsername?: string; theme?: string }) =>
-    send<ProfileView>('/api/store/me/profile', { method: 'PUT', body, auth: 'customer' })
+  setMinecraftName: (minecraftUsername: string) =>
+    send<ProfileView>('/api/store/me/profile', { method: 'PUT', body: { minecraftUsername }, auth: 'customer' })
+};
+
+export const siteApi = {
+  setTheme: (theme: string) => send<{ theme: string; updatedAt: string | null }>('/api/admin/site/theme', { method: 'PUT', body: { theme }, auth: 'staff' })
 };
 
 export const rolesApi = {

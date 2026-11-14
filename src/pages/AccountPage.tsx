@@ -65,7 +65,7 @@ export function AccountPage() {
       <header className="page-head stagger-in">
         <span className="eyebrow">Beállítások</span>
         <h1>Fiók</h1>
-        <p className="muted">A fiókod adatai, a profilképed, a témád és a jelszavad.</p>
+        <p className="muted">A fiókod adatai, a profilképed és a jelszavad.</p>
       </header>
 
       <section className="card profile-card stagger-in" style={{ animationDelay: '80ms' }}>
@@ -84,14 +84,12 @@ export function AccountPage() {
       </section>
 
       <section className="card stagger-in section-gap-bottom" style={{ animationDelay: '120ms' }}>
-        <h2 className="card-title"><Icon name="user" size={18} /> Megjelenés</h2>
+        <h2 className="card-title"><Icon name="user" size={18} /> Profilkép</h2>
         <ProfileCustomizer
           avatarUrl={user?.avatarUrl}
           name={user?.email ?? ''}
-          theme={user?.theme}
           onUpload={async (image) => { await staffProfileApi.uploadAvatar(image); refreshUser(); }}
           onRemove={async () => { await staffProfileApi.removeAvatar(); refreshUser(); }}
-          onTheme={async (key) => { await staffProfileApi.setTheme(key); }}
         />
       </section>
 

@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { API_BASE } from '../api/config';
 import { Avatar } from './ProfileCustomizer';
+import { SeasonalHat, SeasonalNavTrim } from '../seasonal/SeasonalDecor';
 import { Icon, type IconName } from './Icon';
 import { prefersReducedMotion } from './motion';
 import { accentChannels } from '../theme';
@@ -284,6 +285,7 @@ export function BladeNav() {
         </span>
         <Link to="/home" className="blade-brand" aria-label="Avenge főoldal">
           <img src={avengeLogo} alt="" />
+          <SeasonalHat />
         </Link>
 
         <nav
@@ -350,6 +352,7 @@ export function BladeNav() {
         )}
       </div>
       <div className="blade-pommel" aria-hidden="true" />
+      <SeasonalNavTrim />
     </header>
   );
 }

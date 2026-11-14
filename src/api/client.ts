@@ -12,9 +12,7 @@ import type {
   ShareLinkView,
   SharedResultView,
   UpdateOrganizationSettingsRequest,
-  BannedHwidView,
   ClientReleaseView,
-  CreateBannedHwidRequest,
   CreateSessionResponse,
   CreateSignatureRequest,
   CreateUserRequest,
@@ -170,14 +168,6 @@ export const api = {
 
   deleteAdminSignature: (id: string) =>
     request<void>(`/api/admin/signatures/${encodeURIComponent(id)}`, { method: 'DELETE' }),
-
-  listAdminBannedHwids: () => request<BannedHwidView[]>('/api/admin/banned-hwids'),
-
-  createAdminBannedHwid: (body: CreateBannedHwidRequest) =>
-    request<BannedHwidView>('/api/admin/banned-hwids', { method: 'POST', body }),
-
-  deleteAdminBannedHwid: (id: string) =>
-    request<void>(`/api/admin/banned-hwids/${encodeURIComponent(id)}`, { method: 'DELETE' }),
 
   getAdminOverview: () => request<AdminOverviewView>('/api/admin/overview'),
 

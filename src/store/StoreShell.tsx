@@ -36,6 +36,9 @@ export function StoreShell() {
             {(info?.subscriptionEnabled ?? true) && (
               <NavLink to="/elofizetes" className={({ isActive }) => `foundry-bar-link ${isActive ? 'is-active' : ''}`}>SS tool előfizetés</NavLink>
             )}
+            <NavLink to="/tamogatas" className={({ isActive }) => `foundry-bar-link ${isActive ? 'is-active' : ''}`}>
+              Támogatás{(me?.unreadTickets ?? 0) > 0 && <span className="foundry-bar-badge" title="Új válasz érkezett">{me?.unreadTickets}</span>}
+            </NavLink>
             <NavLink to="/jogi/aszf" className={({ isActive }) => `foundry-bar-link ${isActive ? 'is-active' : ''}`}>Feltételek</NavLink>
           </nav>
           <NavLink to="/store/fiok" className={({ isActive }) => `foundry-bar-account ${isActive ? 'is-active' : ''}`}>

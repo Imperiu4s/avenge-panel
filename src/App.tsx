@@ -19,6 +19,7 @@ import { StoreAccountPage } from './pages/store/StoreAccountPage';
 import { StoreThanksPage } from './pages/store/StoreThanksPage';
 import { StoreTebexContinuePage } from './pages/store/StoreTebexContinuePage';
 import { SubscriptionPage } from './pages/store/SubscriptionPage';
+import { SupportPage } from './pages/store/SupportPage';
 import { CustomerAuthProvider } from './store/CustomerAuth';
 import { StoreShell } from './store/StoreShell';
 
@@ -45,6 +46,8 @@ export default function App() {
             <Route path="/store/tebex" element={<StoreTebexContinuePage />} />
             <Route path="/store/:slug" element={<StoreProductPage />} />
             <Route path="/elofizetes" element={<SubscriptionPage />} />
+            <Route path="/tamogatas" element={<SupportPage />} />
+            <Route path="/tamogatas/:id" element={<SupportPage />} />
           </Route>
           <Route path="/jogi" element={<Navigate to="/jogi/aszf" replace />} />
           <Route path="/jogi/:doc" element={<LegalPage />} />

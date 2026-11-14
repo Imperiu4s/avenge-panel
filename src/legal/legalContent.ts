@@ -29,7 +29,7 @@ export const LEGAL_FIELDS: { key: string; label: string; group: string; hint?: s
   { key: 'szolgaltato.adoszam', label: 'Adószám', group: 'Szolgáltató', hint: 'Üresen nem jelenik meg.' },
   { key: 'szolgaltato.nyilvantartas', label: 'Nyilvántartási / cégjegyzékszám', group: 'Szolgáltató', hint: 'Üresen nem jelenik meg.' },
   { key: 'kapcsolat.email', label: 'E-mail', group: 'Kapcsolat' },
-  { key: 'kapcsolat.discord', label: 'Discord (ticket)', group: 'Kapcsolat' },
+  { key: 'kapcsolat.discord', label: 'Discord szerver', group: 'Kapcsolat' },
   { key: 'weboldal', label: 'Weboldal', group: 'Kapcsolat' },
   { key: 'viszontelado.nev', label: 'Cégnév', group: 'Viszonteladó (fizetés)' },
   { key: 'viszontelado.szekhely', label: 'Székhely', group: 'Viszonteladó (fizetés)' },
@@ -95,8 +95,8 @@ export function renderLegal(body: string, content: LegalContentData | null): str
   const web = f.weboldal ? (f.weboldal.startsWith('http') ? f.weboldal : `https://${f.weboldal}`) : '';
   const discord = f['kapcsolat.discord'];
   const special: Record<string, string> = {
-    kapcsolat: [f['kapcsolat.email'] ? `a **${f['kapcsolat.email']}** e-mail címen` : '', discord ? `ticketben a Discord szerverünkön (**${discord}**)` : '']
-      .filter(Boolean).join(' vagy '),
+    kapcsolat: [f['kapcsolat.email'] ? `a **${f['kapcsolat.email']}** e-mail címen` : '', 'ticketben a weboldal **Támogatás** oldalán (avenge.hu/tamogatas)', discord ? `a Discord szerverünkön (**${discord}**)` : '']
+      .filter(Boolean).join(', ').replace(/, ([^,]*)$/, ' vagy $1'),
     'szolgaltato.tabla': table([
       ['Szolgáltató', `${f['szolgaltato.nev']}${jogallas}`],
       ['A szolgáltatás neve', f['szolgaltatas.nev']],
@@ -104,7 +104,7 @@ export function renderLegal(body: string, content: LegalContentData | null): str
       ['Adószám', f['szolgaltato.adoszam']],
       ['Nyilvántartási szám', f['szolgaltato.nyilvantartas']],
       ['E-mail', f['kapcsolat.email']],
-      ['Ügyfélszolgálat', discord ? `ticket a Discord szerverünkön: ${discord}` : ''],
+      ['Ügyfélszolgálat', `ticket a weboldalon: ${web ? `${web}/tamogatas` : 'Támogatás oldal'}${discord ? `, Discord: ${discord}` : ''}`],
       ['Weboldal', web]
     ]),
     'viszontelado.tabla': table([

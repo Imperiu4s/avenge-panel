@@ -9,6 +9,7 @@ import { Icon } from '../../components/Icon';
 import { Skeleton } from '../../components/motion';
 import { ProfileCustomizer } from '../../components/ProfileCustomizer';
 import { MINECRAFT_NAME_PATTERN } from '../../store/MinecraftNamePrompt';
+import { SubscriptionCancel } from '../../store/SubscriptionCancel';
 import { useCustomer } from '../../store/CustomerAuth';
 import { InvoiceTable } from '../../store/InvoiceTable';
 import { ProductIcon } from '../../store/ProductCard';
@@ -180,26 +181,18 @@ function MyInvoices({ refreshKey }: { refreshKey: string }) {
 }
 
 function ProfileSection({ me, refresh }: { me: CustomerMe; refresh: () => Promise<void> }) {
-  const [name, setName] = useState(me.minecraftUsername ?? '');
-  const [savedName, setSavedName] = useState(me.minecraftUsername ?? '');
+  const [name, setName] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
-
-  if ((me.minecraftUsername ?? '') !== savedName) {
-    setSavedName(me.minecraftUsername ?? '');
-    setName(me.minecraftUsername ?? '');
-  }
 
   async function saveName(e: FormEvent) {
     e.preventDefault();
+    if (!window.confirm(`A Minecraft-neved ez lesz: ${name.trim()}. Később nem módosíthatod. Biztosan jó?`)) return;
     setBusy(true);
     setError(null);
-    setNotice(null);
     try {
-      await customerProfileApi.update({ minecraftUsername: name.trim() });
+      await customerProfileApi.setMinecraftName(name.trim());
       await refresh();
-      setNotice('Minecraft-név mentve. A következő fizetésnél már ezt használjuk.');
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Nem sikerült menteni.');
     } finally {
@@ -213,28 +206,34 @@ function ProfileSection({ me, refresh }: { me: CustomerMe; refresh: () => Promis
       <ProfileCustomizer
         avatarUrl={me.avatarUrl}
         name={me.minecraftUsername ?? me.displayName ?? me.email}
-        theme={me.theme}
         onUpload={async (image) => { await customerProfileApi.uploadAvatar(image); await refresh(); }}
         onRemove={async () => { await customerProfileApi.removeAvatar(); await refresh(); }}
-        onTheme={async (key) => { await customerProfileApi.update({ theme: key }); }}
       />
-      <form className="account-form mc-name-form" onSubmit={saveName}>
-        <span className="field-label">Minecraft-név</span>
-        <div className="mc-name-row">
-          <input
-            value={name}
-            maxLength={32}
-            pattern={MINECRAFT_NAME_PATTERN}
-            title="3-32 karakter: betűk, számok, alulvonás (Bedrock-névnél . vagy * előtag)"
-            placeholder="pl. Steve"
-            onChange={(e) => { setName(e.target.value); setNotice(null); }}
-          />
-          <button type="submit" className={`btn-secondary btn-tiny ${busy ? 'is-loading' : ''}`} disabled={busy || name.trim() === savedName}>Mentés</button>
+      {me.minecraftUsername ? (
+        <div className="mc-name-locked">
+          <span className="field-label">Minecraft-név</span>
+          <span className="mc-name-value"><Icon name="lock" size={14} /> <strong>{me.minecraftUsername}</strong></span>
+          <small className="muted">Ezzel a névvel regisztráltál, és nem módosítható: a Tebex ehhez köti a vásárlásaidat. Ha elírtad, nyiss <Link to="/tamogatas" className="text-link">ticketet</Link>.</small>
         </div>
-        <small className="muted">A Tebex ehhez a névhez köti a vásárlást; előfizetésnél és vásárlásnál már nem kérjük újra.</small>
-        {notice && <p className="success-text"><Icon name="check" size={15} /> {notice}</p>}
-        {error && <p className="error-text error-in">{error}</p>}
-      </form>
+      ) : (
+        <form className="account-form mc-name-form" onSubmit={saveName}>
+          <span className="field-label">Minecraft-név</span>
+          <div className="mc-name-row">
+            <input
+              value={name}
+              maxLength={32}
+              required
+              pattern={MINECRAFT_NAME_PATTERN}
+              title="3-32 karakter: betűk, számok, alulvonás (Bedrock-névnél . vagy * előtag)"
+              placeholder="pl. Steve"
+              onChange={(e) => setName(e.target.value)}
+            />
+            <button type="submit" className={`btn-secondary btn-tiny ${busy ? 'is-loading' : ''}`} disabled={busy || name.trim().length < 3}>Mentés</button>
+          </div>
+          <small className="muted">Csak egyszer adható meg, utána nem módosítható. A Tebex ehhez köti a vásárlásaidat.</small>
+          {error && <p className="error-text error-in">{error}</p>}
+        </form>
+      )}
     </section>
   );
 }
@@ -275,15 +274,6 @@ function Dashboard() {
     staff.replaceToken(token);
     navigate('/panel');
   });
-
-  const cancel = () => {
-    if (!window.confirm('Lemondod az előfizetést? A már kifizetett időszak végéig megmarad a hozzáférésed, utána nem terhelünk többet.')) return;
-    run('cancel', async () => {
-      await storeApi.subscriptionCancel();
-      await refresh();
-      setNotice('Előfizetés lemondva. A kifizetett időszak végéig használhatod.');
-    });
-  };
 
   const changePassword = (e: FormEvent) => {
     e.preventDefault();
@@ -345,6 +335,13 @@ function Dashboard() {
 
       <aside className="side-stack">
         <ProfileSection me={me} refresh={refresh} />
+        <section className="card stagger-in support-mini" style={{ animationDelay: '30ms' }}>
+          <h2 className="card-title"><Icon name="message" size={18} /> Támogatás</h2>
+          {(me.unreadTickets ?? 0) > 0
+            ? <p className="success-text"><Icon name="message" size={15} /> {me.unreadTickets} ticketedre új válasz érkezett.</p>
+            : <p className="muted small">Kérdésed van, vagy hibát találtál? Nyiss ticketet, és a staff itt, a weboldalon válaszol.</p>}
+          <Link to="/tamogatas" className="btn-secondary btn-block">Ticketjeim</Link>
+        </section>
         <section className={`card sub-card stagger-in ${subLive ? 'sub-card-live' : ''}`} style={{ animationDelay: '40ms' }}>
           <h2 className="card-title"><Icon name="radar" size={18} /> SS tool előfizetés</h2>
           {sub ? (
@@ -360,9 +357,7 @@ function Dashboard() {
                   <Icon name="radar" size={16} /> Belépés az SS panelbe
                 </button>
               )}
-              {sub.status === 'Active' && (
-                <button type="button" className="btn-ghost btn-tiny btn-danger" onClick={cancel} disabled={busy !== null}>Előfizetés lemondása</button>
-              )}
+              {subLive && <SubscriptionCancel subscription={sub} onChanged={refresh} />}
               {!subLive && <Link to="/elofizetes" className="btn-secondary btn-block">Újra előfizetek</Link>}
             </>
           ) : (

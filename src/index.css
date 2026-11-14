@@ -2567,3 +2567,6 @@ input[type='checkbox'].switch:focus-visible { outline: 2px solid var(--signal-ho
 .role-locked { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 6px; color: #ffd76a; background: rgba(255, 196, 0, 0.12); }
 .role-custom-dot { display: inline-block; width: 6px; height: 6px; margin-left: 6px; border-radius: 50%; background: var(--warn); vertical-align: middle; }
 .roles-reset { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.discord-bot-status { display: inline-flex; align-items: center; gap: 8px; }
+

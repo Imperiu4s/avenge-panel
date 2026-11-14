@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { SignatureCatalogSection } from '../components/SignatureCatalogSection';
-import { BannedHwidsSection } from '../components/BannedHwidsSection';
 import { AdminAuditTab } from '../components/admin/AdminAuditTab';
 import { AdminOverviewTab } from '../components/admin/AdminOverviewTab';
 import { AdminScansTab } from '../components/admin/AdminScansTab';
@@ -10,6 +9,9 @@ import { StoreAdminTab } from '../components/admin/store/StoreAdminTab';
 import { DiscordAdminTab } from '../components/admin/DiscordAdminTab';
 import { LegalAdminTab } from '../components/admin/LegalAdminTab';
 import { RolesAdminTab } from '../components/admin/RolesAdminTab';
+import { ThemesAdminTab } from '../components/admin/ThemesAdminTab';
+import { TicketsAdminTab } from '../components/admin/TicketsAdminTab';
+import { supportAdminApi } from '../api/support';
 import { useAuth } from '../auth/AuthContext';
 import { canAny, ROLE_LABELS } from '../auth/permissions';
 import { Icon, type IconName } from '../components/Icon';
@@ -33,10 +35,11 @@ const ALL_TABS: { key: string; label: string; icon: IconName; perms: string[] }[
   { key: 'settings', label: 'Beállítások', icon: 'settings', perms: ['settings.view', 'settings.edit', 'sharelinks.manage'] },
   { key: 'audit', label: 'Napló', icon: 'clock', perms: ['audit.view'] },
   { key: 'signatures', label: 'Csalásjelek', icon: 'bug', perms: ['signatures.view', 'platform.signatures'] },
-  { key: 'bans', label: 'Kitiltott gépek', icon: 'ban', perms: ['bans.view', 'bans.manage'] },
   { key: 'store', label: 'Áruház', icon: 'cart', perms: ['platform.store'] },
   { key: 'discord', label: 'Discord', icon: 'message', perms: ['platform.discord'] },
-  { key: 'legal', label: 'Jogi', icon: 'scale', perms: ['platform.legal'] }
+  { key: 'legal', label: 'Jogi', icon: 'scale', perms: ['platform.legal'] },
+  { key: 'themes', label: 'Témák', icon: 'star', perms: ['platform.theme'] },
+  { key: 'tickets', label: 'Ticketek', icon: 'message', perms: ['platform.tickets'] }
 ];
 
 const ROLE_OPTIONS: UserRole[] = ['Staff', 'Admin', 'Owner'];
@@ -69,6 +72,17 @@ export function AdminPage() {
   const [issued, setIssued] = useState<IssuedCredentials | null>(null);
 
   const [release, setRelease] = useState<ClientReleaseView | null>(null);
+  const [waitingTickets, setWaitingTickets] = useState(0);
+  const canTickets = can('platform.tickets');
+
+  useEffect(() => {
+    if (!canTickets) return;
+    let alive = true;
+    const load = () => supportAdminApi.summary().then((s) => { if (alive) setWaitingTickets(s.waiting); }).catch(() => undefined);
+    load();
+    const timer = window.setInterval(load, 60000);
+    return () => { alive = false; window.clearInterval(timer); };
+  }, [canTickets, tab]);
   const [isReleaseLoaded, setIsReleaseLoaded] = useState(false);
 
   const { copiedKey, copy } = useCopyFeedback();
@@ -218,6 +232,7 @@ export function AdminPage() {
             aria-current={tab === t.key ? 'page' : undefined}
           >
             <Icon name={t.icon} size={15} /> {t.label}
+            {t.key === 'tickets' && waitingTickets > 0 && <span className="admin-tab-badge">{waitingTickets}</span>}
           </button>
         ))}
       </nav>
@@ -234,11 +249,12 @@ export function AdminPage() {
 
       {tab === 'signatures' && <SignatureCatalogSection canEdit={can('platform.signatures')} />}
 
-      {tab === 'bans' && <BannedHwidsSection canEdit={can('bans.manage')} />}
 
       {tab === 'store' && <StoreAdminTab />}
       {tab === 'discord' && <DiscordAdminTab />}
       {tab === 'legal' && <LegalAdminTab />}
+      {tab === 'themes' && <ThemesAdminTab />}
+      {tab === 'tickets' && <TicketsAdminTab />}
 
       {tab === 'users' && (
         <div className="panel-grid">

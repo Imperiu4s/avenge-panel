@@ -8,12 +8,13 @@ import '@fontsource-variable/manrope/index.css'
 import '@fontsource-variable/jetbrains-mono/index.css'
 import './index.css'
 import './store.css'
+import './seasonal.css'
 import App from './App.tsx'
 import { installProtection, shouldProtect } from './protect'
-import { initTheme } from './theme'
+import { initSiteTheme } from './theme'
 
 if (shouldProtect()) installProtection()
-initTheme()
+initSiteTheme()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

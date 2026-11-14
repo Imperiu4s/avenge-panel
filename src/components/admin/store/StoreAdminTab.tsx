@@ -156,7 +156,12 @@ function Subscriptions() {
             {subs.map((s) => (
               <tr key={s.id}>
                 <td className="small">{s.customerEmail}{s.note && <small className="muted"><br />{s.note}</small>}</td>
-                <td><span className={`status-pill status-${s.status.toLowerCase()}`}>{SUBSCRIPTION_STATUS_LABELS[s.status]}</span></td>
+                <td>
+                  <span className={`status-pill status-${s.status.toLowerCase()}`}>{SUBSCRIPTION_STATUS_LABELS[s.status]}</span>
+                  {s.status === 'CancelPending' && s.tebexCancelStatus === 'failed' && (
+                    <small className="notice-inline" title="A vásárló lemondta, de a Tebex nem fogadta el az automatikus lemondást. Mondd le kézzel a Tebex Creator Panelen."><br />Tebexnél kézzel lemondandó</small>
+                  )}
+                </td>
                 <td className="mono small">{formatPrice(s.price, s.currency)}</td>
                 <td className="small muted">{formatDate(s.startedAt)}</td>
                 <td className="small">{formatDate(s.currentPeriodEnd)}</td>

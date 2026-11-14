@@ -44,6 +44,12 @@ function CustomerDetail({ id, currency, products, onChanged, onClose }: {
     run(() => storeAdminApi.ban(c.id, reason));
   };
 
+  const fixName = () => {
+    const name = window.prompt(`${c.email} Minecraft-neve (a vásárló nem módosíthatja, csak te):`, c.minecraftUsername ?? '');
+    if (name === null || name.trim() === (c.minecraftUsername ?? '')) return;
+    run(() => storeAdminApi.setMinecraftName(c.id, name.trim()));
+  };
+
   const remove = () => {
     if (!window.confirm(`Véglegesen törlöd ${c.email} fiókját? A letöltési jogai megszűnnek, az előfizetése leáll, a rendelései név nélkül, a bizonylatai változatlanul megmaradnak. Ez nem vonható vissza.`)) return;
     run(async () => { await storeAdminApi.deleteCustomer(c.id); onClose(); }, false);
@@ -57,7 +63,7 @@ function CustomerDetail({ id, currency, products, onChanged, onClose }: {
       </div>
 
       <dl className="detail-facts">
-        <div><dt>Név</dt><dd>{c.displayName ?? '-'}</dd></div>
+        <div><dt>Minecraft-név</dt><dd className="mono">{c.minecraftUsername ?? c.displayName ?? '-'}</dd></div>
         <div><dt>Regisztrált</dt><dd>{formatDateTime(c.createdAt)}</dd></div>
         <div><dt>Utolsó belépés</dt><dd>{formatDateTime(c.lastLoginAt)}</dd></div>
         <div><dt>ÁSZF elfogadva</dt><dd>{detail.acceptedTermsVersion ? `${detail.acceptedTermsVersion} (${formatDate(detail.acceptedTermsAt)})` : '-'}</dd></div>
@@ -69,6 +75,7 @@ function CustomerDetail({ id, currency, products, onChanged, onClose }: {
         {c.isBanned
           ? <button type="button" className="btn-secondary btn-tiny" disabled={busy} onClick={() => run(() => storeAdminApi.unban(c.id))}><Icon name="check" size={13} /> Kitiltás feloldása</button>
           : <button type="button" className="btn-ghost btn-tiny btn-danger" disabled={busy} onClick={ban}><Icon name="ban" size={13} /> Kitiltás</button>}
+        <button type="button" className="btn-ghost btn-tiny" disabled={busy} onClick={fixName}><Icon name="user" size={13} /> Minecraft-név javítása</button>
         <button type="button" className="btn-ghost btn-tiny btn-danger" disabled={busy} onClick={remove}><Icon name="trash" size={13} /> Fiók törlése</button>
       </div>
 

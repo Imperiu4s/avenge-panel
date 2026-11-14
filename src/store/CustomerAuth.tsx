@@ -8,7 +8,6 @@ import {
   storeCustomerToken,
   type CustomerMe
 } from '../api/store';
-import { applyTheme } from '../theme';
 
 interface CustomerAuthValue {
   isLoggedIn: boolean;
@@ -61,9 +60,7 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
     if (!getCustomerToken()) return;
     setIsLoadingMe(true);
     try {
-      const next = await storeApi.me();
-      setMe(next);
-      if (next.theme) applyTheme(next.theme);
+      setMe(await storeApi.me());
     } catch (err) {
       if (!(err instanceof ApiError && err.status === 401)) throw err;
     } finally {

@@ -108,11 +108,24 @@ export function DiscordAdminTab() {
       <section className="card stagger-in">
         <div className="scans-head">
           <h2 className="card-title"><Icon name="message" size={18} /> Discord bot</h2>
-          {connected
-            ? <span className="status-pill status-active">Kapcsolódva{settings.botName ? `: ${settings.botName}` : ''}</span>
-            : <span className="status-pill status-pending">{settings.hasToken ? 'Hibás kapcsolat' : 'Nincs beállítva'}</span>}
+          <span className="discord-bot-status">
+            {connected
+              ? <span className="status-pill status-active">Kapcsolódva{settings.botName ? `: ${settings.botName}` : ''}</span>
+              : <span className="status-pill status-pending">{settings.hasToken ? 'Hibás kapcsolat' : 'Nincs beállítva'}</span>}
+            {settings.gateway && (
+              <span className={`status-pill ${settings.gateway.state === 'connected' ? 'status-active' : 'status-pending'}`} title="A bot folyamatos kapcsolata a Discorddal (online állapot)">
+                {settings.gateway.state === 'connected' ? `Online${settings.gateway.latencyMs !== null ? ` · ${settings.gateway.latencyMs} ms` : ''}` : settings.gateway.state === 'no-token' ? 'Offline' : 'Csatlakozik...'}
+              </span>
+            )}
+            {settings.hasToken && (
+              <button type="button" className="btn-ghost btn-tiny" title="Bot újracsatlakoztatása" onClick={() => discordAdminApi.restartGateway().then(load).catch(() => undefined)}>
+                <Icon name="refresh" size={13} />
+              </button>
+            )}
+          </span>
         </div>
         {settings.botError && <p className="error-text">{settings.botError}</p>}
+        {settings.gateway?.lastError && settings.gateway.state !== 'connected' && <p className="error-text small">{settings.gateway.lastError}</p>}
 
         <ol className="setup-steps small muted">
           <li>A <a className="text-link" href="https://discord.com/developers/applications" target="_blank" rel="noopener noreferrer">Discord Developer Portalon</a> hozz létre egy alkalmazást, a <b>Bot</b> fülön kérj új tokent (Reset Token), és másold be ide.</li>

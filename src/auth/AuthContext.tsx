@@ -10,7 +10,6 @@ import {
 import type { CurrentUserView } from '../api/types';
 import { disconnectScanHub } from '../realtime/scanHub';
 import { decodeStaffToken } from './jwt';
-import { applyTheme } from '../theme';
 import { can as userCan, canOpenAdmin } from './permissions';
 
 interface AuthContextValue {
@@ -83,7 +82,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .then((me) => {
         if (cancelled) return;
         setUser(me);
-        if (me.theme) applyTheme(me.theme);
       })
       .catch(() => { });
     return () => { cancelled = true; };

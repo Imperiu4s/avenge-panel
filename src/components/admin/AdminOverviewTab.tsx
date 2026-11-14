@@ -39,14 +39,14 @@ export function AdminOverviewTab({ onOpenTab }: Props) {
 
   const maxDay = Math.max(1, ...overview.daily.map((d) => d.scans));
   const tiles: { label: string; value: number; tone?: string; hint?: string; tab?: string }[] = [
-    { label: 'Befejezett vizsgálat', value: overview.completed, hint: `${overview.unfinished} befejezetlen kód`, tab: 'scans' },
+    { label: 'Befejezett vizsgálat', value: overview.completed, tab: 'scans' },
     { label: 'Unlegit', value: overview.unlegit, tone: 'kpi-hot', tab: 'scans' },
     { label: 'Nem egyértelmű', value: overview.inconclusive, tone: 'kpi-warm', tab: 'scans' },
     { label: 'Legit', value: overview.legit, tone: 'kpi-cool', tab: 'scans' },
     { label: 'Elmúlt 24 óra', value: overview.last24Hours, hint: `7 nap: ${overview.last7Days} · 30 nap: ${overview.last30Days}` },
     { label: 'Felhasználó', value: overview.users, hint: `${overview.activeUsers} aktív · ${overview.admins} admin`, tab: 'users' },
     { label: 'Aktív megosztó link', value: overview.activeShareLinks, tab: 'settings' },
-    { label: 'Kitiltott gép', value: overview.bannedHwids, tab: 'bans' }
+    { label: 'Befejezetlen kód', value: overview.unfinished, hint: 'lejárt, fel nem használt vagy megszakadt', tab: 'scans' }
   ];
 
   return (

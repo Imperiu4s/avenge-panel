@@ -8,6 +8,22 @@ interface ChangelogEntry {
 
 const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '3.1.0',
+    date: '2026-11-14',
+    items: [
+      'Ünnepi témák: Alap, Karácsonyi, Húsvéti és Halloween. Az Admin Panel Témák fülén egy kattintással mindenkinek átállítható, előnézettel.',
+      'Karácsony: hóesés, hullócsillag, fényfüzér a menün, mikulássapka a logón, havas kártyák magyallal, cukorbot-csíkos gombok, fenyős-ajándékos lábléc.',
+      'Húsvét: pasztell színek, hulló szirmok és pillangók, zászlófüzér, nyuszifül a logón, virágos kártyák, festett tojások és kikukucskáló nyuszi.',
+      'Halloween: telihold és köd, denevérek, hulló falevelek, pókhálók és lógó pók, boszorkánykalap, világító tökök és sírkövek.',
+      'Ticketrendszer a weboldalon: a Támogatás oldalon témát választva ticketet nyithatsz, képet csatolhatsz, és a staff ott válaszol. Új válasznál jelzést kapsz a fiókodban. Egyszerre egy nyitott ticket lehet, újat 3 naponta nyithatsz.',
+      'Admin Panel / Ticketek: válaszadás, átvétel, lezárás és újranyitás, a vásárló adataival együtt.',
+      'A Discord-bot folyamatosan online.',
+      'Az előfizetés egy gombbal lemondható az Előfizetés és a Fiókom oldalon is.',
+      'A regisztrációkor megadott Minecraft-név nem módosítható; elírás esetén az admin javítja.',
+      'A fiókonkénti színtéma és a kitiltott gépek funkció megszűnt.'
+    ]
+  },
+  {
     version: '3.0.0',
     date: '2026-11-13',
     items: [

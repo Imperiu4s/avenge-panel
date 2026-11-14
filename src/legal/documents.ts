@@ -31,7 +31,7 @@ A fizetéseket és a számlázást viszonteladóként (merchant of record) a {{v
 - **Tebex**: a {{viszontelado.nev}}, amely a fizetéseket viszonteladóként (merchant of record) bonyolítja.
 
 ## 3. Regisztráció és fiók
-1. Vásárlás és letöltés csak vásárlói fiókkal lehetséges (e-mail cím, jelszó és Minecraft-név). A Minecraft-nevet a Tebex a fizetés azonosítására használja.
+1. Vásárlás és letöltés csak vásárlói fiókkal lehetséges (e-mail cím, jelszó és Minecraft-név). A Minecraft-nevet a Tebex a fizetés azonosítására használja, ezért a regisztrációkor megadott név utólag nem módosítható; elírás esetén az ügyfélszolgálat javítja.
 2. A Felhasználó felel a megadott adatok valódiságáért és a jelszava titokban tartásáért.
 3. Egy személy egy fiókot használhat; a fiók nem ruházható át, és nem adható tovább.
 4. A Szolgáltató a fiókot felfüggesztheti vagy törölheti, ha a Felhasználó megszegi az ÁSZF-et vagy a Licencfeltételeket (pl. egy Termék jogosulatlan terjesztése, visszaélésszerű visszaterhelés, csalás).
@@ -47,7 +47,7 @@ A fizetéseket és a számlázást viszonteladóként (merchant of record) a {{v
 ## 5. Az SS tool előfizetés
 1. Az előfizetés havidíjas, és a Felhasználó lemondásáig **havonta automatikusan megújul**; a díjat a Tebex terheli a megadott fizetési módra.
 2. Az első sikeres fizetés után a Felhasználó saját szervezetet és Tulajdonos rangú hozzáférést kap az SS panelhez, ahol a csapata Admin és Staff rangjainak jogait maga állíthatja be.
-3. Az előfizetés bármikor lemondható a Fiókom oldalon; a már kifizetett időszak végéig a hozzáférés megmarad, utána újabb terhelés nem történik.
+3. Az előfizetés bármikor, egy gombbal lemondható az Előfizetés vagy a Fiókom oldalon; a már kifizetett időszak végéig a hozzáférés megmarad, utána újabb terhelés nem történik. Ha a lemondás után a Tebex mégis terhelne, a terhelést visszatérítjük.
 4. Lejárt előfizetéssel új vizsgálati kód nem generálható; a korábbi eredmények a szervezet megőrzési beállításai szerint maradnak meg.
 5. Az SS tool csak olyan személy vizsgálatára használható, aki a vizsgálatot maga indítja el a kapott kóddal. A Felhasználó (szerver) felel azért, hogy a vizsgálatot jogszerűen, a játékos megfelelő tájékoztatása mellett végezze, és az eredményeket csak a csalás kiszűrésére használja.
 6. Az SS tool eredménye szakmai segítség a döntéshez, nem tévedhetetlen: a végső döntés (pl. kitiltás) a szerver staffjáé.
@@ -84,7 +84,7 @@ Ez a tájékoztató az Európai Parlament és a Tanács (EU) 2016/679 rendelete 
 | Adat | Cél | Jogalap | Megőrzés |
 |---|---|---|---|
 | E-mail cím, jelszó (csak hash-elve), Minecraft-név | fiók, belépés, kapcsolattartás, a Tebex-fizetés azonosítása | szerződés teljesítése (GDPR 6. cikk (1) b)) | a fiók törléséig |
-| Profilkép és választott színtéma (ha megadod) | a fiók személyre szabása | hozzájárulás (GDPR 6. cikk (1) a)), bármikor törölhető a Fiókom oldalon | a törlésig vagy a fiók törléséig |
+| Profilkép (ha feltöltesz) | a fiók személyre szabása | hozzájárulás (GDPR 6. cikk (1) a)), bármikor törölhető a Fiókom oldalon | a törlésig vagy a fiók törléséig |
 | ÁSZF-elfogadás ideje és verziója | a hozzájárulás igazolása | jogi kötelezettség / jogos érdek | a fiók törléséig |
 | Rendelések (tételek, összeg, időpont, Tebex-azonosító) | teljesítés, könyvelés, visszaélés-megelőzés | jogi kötelezettség (számviteli törvény) | 8 év; a fiók törlése után név nélkül |
 | Vásárlási és visszatérítési bizonylatok (név, e-mail cím, tételek, összeg, időpont, Tebex-azonosító) | a fizetések és visszatérítések igazolása, elszámolás, könyvelés | jogi kötelezettség (számviteli törvény), jogos érdek (jogviták rendezése) | 8 év; a fiók törlése után is változatlanul |
@@ -92,7 +92,9 @@ Ez a tájékoztató az Európai Parlament és a Tanács (EU) 2016/679 rendelete 
 | Előfizetés állapota, Tebex-hivatkozás | a havi előfizetés kezelése | szerződés teljesítése | a fiók törléséig |
 | Kitiltás oka (ha van) | visszaélések megelőzése | jogos érdek | a fiók törléséig |
 
-**Bankkártya-adatot nem kezelünk**: a fizetést a {{viszontelado.nev}} (Egyesült Királyság) végzi saját adatkezelőként; a fizetéshez megadott adatokra a Tebex adatvédelmi tájékoztatója vonatkozik (https://www.tebex.io/privacy). Mi a Tebextől csak a fizetés tényét, összegét, azonosítóját és a vásárló e-mail címét kapjuk meg; a Tebexnek a fizetéshez a fiókodban megadott Minecraft-nevet adjuk át, amit a Fiókom oldalon bármikor módosíthatsz.
+**Ügyfélszolgálati ticketek**: ha a weboldal Támogatás oldalán ticketet nyitsz, a vásárlói fiókodhoz rögzítjük a ticket témáját, tárgyát, a megadott azonosítót (pl. bizonylatszám), a veled folytatott levelezést és a csatolt képeket, valamint a nyitás, a válaszok és a lezárás idejét. Cél: a kérésed megválaszolása és a „egyszerre egy nyitott ticket, újat 3 naponta” szabály betartatása; jogalap: a kérésed teljesítése (GDPR 6. cikk (1) b)) és jogos érdek (f)). A ticketeket a lezárásuktól számított 1 évig őrizzük, a fiókod törlésekor pedig a csatolmányokkal együtt azonnal töröljük. Csatolmányként csak képet fogadunk el; ne küldj jelszót vagy bankkártyaadatot.
+
+**Bankkártya-adatot nem kezelünk**: a fizetést a {{viszontelado.nev}} (Egyesült Királyság) végzi saját adatkezelőként; a fizetéshez megadott adatokra a Tebex adatvédelmi tájékoztatója vonatkozik (https://www.tebex.io/privacy). Mi a Tebextől csak a fizetés tényét, összegét, azonosítóját és a vásárló e-mail címét kapjuk meg; a Tebexnek a fizetéshez a regisztrációkor megadott Minecraft-nevet adjuk át.
 
 ## 3. Az SS tool vizsgálatai
 A vizsgálatot a játékos maga indítja el a staff tagtól kapott kóddal; a program jelzi, hogy a csatlakozással a vizsgálat elindul, és az eredményt a staff látja.
@@ -107,11 +109,11 @@ A szerverre a vizsgálat **eredménye** kerül: a találatok (fájlnév, eléré
 - **Megőrzés**: a szervezet beállítása szerint (alapértelmezés szerint a szervezet törléséig, vagy a beállított napok után automatikusan törlődik). A megosztó link legfeljebb 3 napig érvényes.
 
 ## 4. Technikai adatok
-A weboldal a bejelentkezéshez a böngésző helyi tárolójában (localStorage) tárol egy belépési tokent, és megjegyzi a választott színtémát. Követő (marketing vagy analitikai) sütit nem használunk. A szerver a biztonság érdekében naplózza a kérések IP-címét és idejét, a staff műveleteit pedig a szervezet tevékenységnaplójában rögzíti. {{naplo.megorzes}} Részletek: [Süti tájékoztató](/jogi/cookie).
+A weboldal a bejelentkezéshez a böngésző helyi tárolójában (localStorage) tárol egy belépési tokent, és megjegyzi az oldal aktuális témáját. Követő (marketing vagy analitikai) sütit nem használunk. A szerver a biztonság érdekében naplózza a kérések IP-címét és idejét, a staff műveleteit pedig a szervezet tevékenységnaplójában rögzíti. {{naplo.megorzes}} Részletek: [Süti tájékoztató](/jogi/cookie).
 
 ## 5. Adatfeldolgozók, címzettek
 - **{{viszontelado.nev}}** (Egyesült Királyság) - fizetés, számlázás (önálló adatkezelő).
-- **Discord Inc.** (USA) - ha ticketben a Discord szerverünkön ({{kapcsolat.discord}}) keresel minket, az üzeneteidet a Discord a saját adatvédelmi tájékoztatója szerint kezeli.
+- **Discord Inc.** (USA) - ha a Discord szerverünkön ({{kapcsolat.discord}}) keresel minket, az üzeneteidet a Discord a saját adatvédelmi tájékoztatója szerint kezeli.
 - **Tárhelyszolgáltatók** (adatfeldolgozók):
 {{tarhely.lista}}
 
@@ -145,7 +147,7 @@ Nem adunk visszatérítést, ha a Termék a szervered beállítása, egy nem tá
 - Ha a fizetést követő 14 napon belül a szolgáltatás a mi hibánkból nem volt használható, kérésre a havi díjat visszatérítjük; ilyenkor az előfizetés azonnal megszűnik.
 
 ## 3. Hogyan kérj visszatérítést?
-Visszatérítést a fizetéstől számított **14 napon belül** kérhetsz. Írj a **{{kapcsolat.email}}** címre a vásárlói fiókod e-mail címéről, vagy nyiss ticketet a Discord szerverünkön (**{{kapcsolat.discord}}**); add meg a bizonylat számát (a fiókod Számlák részén találod) és a probléma leírását. A jogos visszatérítést a Tebexen keresztül, a teljes összegről, az eredeti fizetési módra indítjuk; a pénz általában 5-10 munkanapon belül érkezik meg. A visszatérítésről visszatérítési bizonylatot kapsz, ami a fiókodban letölthető.
+Visszatérítést a fizetéstől számított **14 napon belül** kérhetsz. Írj a **{{kapcsolat.email}}** címre a vásárlói fiókod e-mail címéről, vagy nyiss ticketet a weboldal **Támogatás** oldalán (avenge.hu/tamogatas); add meg a bizonylat számát (a fiókod Számlák részén találod) és a probléma leírását. A jogos visszatérítést a Tebexen keresztül, a teljes összegről, az eredeti fizetési módra indítjuk; a pénz általában 5-10 munkanapon belül érkezik meg. A visszatérítésről visszatérítési bizonylatot kapsz, ami a fiókodban letölthető.
 
 ## 4. Visszaterhelés (chargeback)
 Kérjük, mielőtt a bankodnál visszaterhelést kezdeményezel, keress minket. Visszatérítés vagy visszaterhelés esetén a Termék letöltési joga megszűnik, a licenc érvényét veszti; visszaélésszerű visszaterhelésnél a fiókot felfüggeszthetjük.
@@ -227,7 +229,7 @@ A működéshez szükséges, a böngésző helyi tárolójában (localStorage) t
 |---|---|---|
 | \`avenge_customer_token\` | vásárlói bejelentkezés | legfeljebb 7 nap, vagy kijelentkezésig |
 | \`avenge_staff_token\` | staff (SS panel) bejelentkezés | legfeljebb 8 óra, vagy kijelentkezésig |
-| \`avenge.theme\` | a választott színtéma megjegyzése | amíg nem törlöd |
+| \`avenge.siteTheme\` | az oldal aktuális (ünnepi) témájának megjegyzése, hogy betöltéskor ne villanjon | amíg nem törlöd |
 
 Ezek a bejelentkezéshez, illetve a kért megjelenéshez feltétlenül szükségesek (az ePrivacy irányelv 5. cikk (3) bekezdése szerinti kivétel), és csak a te böngésződben vannak.
 

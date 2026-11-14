@@ -20,7 +20,6 @@ export interface CurrentUserView {
   permissions?: string[];
   isPlatformOrg?: boolean;
   avatarUrl?: string | null;
-  theme?: string | null;
 }
 
 export interface ClientReleaseView {
@@ -160,18 +159,6 @@ export interface UpdateSignatureRequest {
   isActive?: boolean;
 }
 
-export interface BannedHwidView {
-  id: string;
-  hwid: string;
-  reason: string | null;
-  createdAt: string;
-}
-
-export interface CreateBannedHwidRequest {
-  hwid: string;
-  reason?: string;
-}
-
 export interface CreateShareLinkResponse {
   id: string;
   token: string;
@@ -223,7 +210,6 @@ export interface AdminOverviewView {
   last7Days: number;
   last30Days: number;
   activeShareLinks: number;
-  bannedHwids: number;
   daily: DailyCount[];
   staff: StaffActivity[];
 }

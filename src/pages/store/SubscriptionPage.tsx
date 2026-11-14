@@ -7,20 +7,21 @@ import { Icon, type IconName } from '../../components/Icon';
 import { useCustomer } from '../../store/CustomerAuth';
 import { MinecraftNamePrompt, needsMinecraftName } from '../../store/MinecraftNamePrompt';
 import { useStoreInfo } from '../../store/StoreShell';
+import { SubscriptionCancel } from '../../store/SubscriptionCancel';
 import { formatDate, formatPrice, SUBSCRIPTION_STATUS_LABELS } from '../../store/format';
 
 const FEATURES: { icon: IconName; title: string; text: string }[] = [
   { icon: 'radar', title: 'Saját SS panel', text: 'Külön szervezet a szerverednek: a vizsgálatokat élőben követed, az eredmények csak nálatok látszanak.' },
   { icon: 'key', title: 'Korlátlan vizsgálati kód', text: 'Annyi játékost vizsgálsz, amennyit akarsz - nincs darabszám-korlát.' },
-  { icon: 'users', title: 'Staff fiókok', text: 'Admin és Staff rangú csapattagokat hozhatsz létre, saját jogosultsági beállításokkal.' },
+  { icon: 'users', title: 'Staff fiókok', text: 'Tulajdonosként Admin és Staff rangú csapattagokat hozhatsz létre, és jogonként beállíthatod, mit tehetnek.' },
   { icon: 'share', title: 'Megosztható eredmény', text: '3 napig érvényes link az eredményhez, hogy a játékos vagy a vezetőség is lássa.' },
   { icon: 'bolt', title: 'Folyamatos frissítések', text: 'Az új csalások felismerése automatikusan érkezik, neked nincs teendőd.' },
-  { icon: 'shield', title: 'Admin Panel', text: 'Előzmények, kitiltott gépek, napló és megőrzési idő - mind a te kezedben.' }
+  { icon: 'shield', title: 'Admin Panel', text: 'Előzmények, rangok és jogok, napló és megőrzési idő - mind a te kezedben.' }
 ];
 
 export function SubscriptionPage() {
   const { info } = useStoreInfo();
-  const { isLoggedIn, me } = useCustomer();
+  const { isLoggedIn, me, refresh } = useCustomer();
   const staff = useAuth();
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
@@ -88,7 +89,8 @@ export function SubscriptionPage() {
                   <Icon name="radar" size={18} /> SS panel megnyitása
                 </button>
               )}
-              <Link to="/store/fiok" className="btn-ghost btn-block">Előfizetés kezelése</Link>
+              <SubscriptionCancel subscription={sub} onChanged={refresh} />
+              <Link to="/store/fiok" className="btn-ghost btn-block">Fiókom</Link>
             </>
           ) : (
             <>
@@ -119,11 +121,11 @@ export function SubscriptionPage() {
         <h2 className="card-title"><Icon name="info" size={18} /> Gyakori kérdések</h2>
         <details>
           <summary>Hogyan jutok be a panelbe?</summary>
-          <p className="muted">Az első sikeres fizetés után automatikusan kapsz egy saját szervezetet és egy Admin fiókot ugyanazzal az e-mail címmel és jelszóval, mint a vásárlói fiókod. A fiókodból egy kattintással is beléphetsz.</p>
+          <p className="muted">Az első sikeres fizetés után automatikusan kapsz egy saját szervezetet és egy Tulajdonos rangú fiókot ugyanazzal az e-mail címmel és jelszóval, mint a vásárlói fiókod. A fiókodból egy kattintással is beléphetsz.</p>
         </details>
         <details>
           <summary>Mi történik, ha lemondom?</summary>
-          <p className="muted">A már kifizetett időszak végéig minden működik, utána nem generálhatsz új vizsgálati kódot. A korábbi eredményeid a beállított megőrzési ideig megmaradnak.</p>
+          <p className="muted">Egy gombbal lemondhatod itt vagy a Fiókom oldalon. A már kifizetett időszak végéig minden működik, utána nem generálhatsz új vizsgálati kódot, és nem terhelünk többet. A korábbi eredményeid a beállított megőrzési ideig megmaradnak.</p>
         </details>
         <details>
           <summary>Mit lát a vizsgált játékos?</summary>

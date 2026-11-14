@@ -95,6 +95,14 @@ export interface CustomerSubscription {
   cancelledAt: string | null;
   hasPanelAccess: boolean;
   note: string | null;
+  tebexCancelPending?: boolean;
+}
+
+export interface SubscriptionCancelResult {
+  tebexConfirmed: boolean;
+  message: string;
+  manageUrl: string | null;
+  subscription: CustomerSubscription;
 }
 
 export interface CustomerMe {
@@ -107,7 +115,7 @@ export interface CustomerMe {
   subscription: CustomerSubscription | null;
   minecraftUsername: string | null;
   avatarUrl?: string | null;
-  theme?: string | null;
+  unreadTickets?: number;
 }
 
 export interface CheckoutResult {
@@ -203,6 +211,7 @@ export interface AdminCustomer {
   spent: number;
   subscriptionStatus: SubscriptionStatus | null;
   subscriptionEnd: string | null;
+  minecraftUsername?: string | null;
 }
 
 export interface AdminOrderItem {
@@ -241,6 +250,7 @@ export interface AdminSubscription {
   cancelledAt: string | null;
   endedAt: string | null;
   note: string | null;
+  tebexCancelStatus?: string | null;
 }
 
 export type InvoiceKind = 'purchase' | 'subscription' | 'refund';
@@ -387,6 +397,7 @@ export interface DiscordSettings {
   lastRunKind: string;
   lastRunLog: string;
   job: DiscordJob;
+  gateway?: { state: string; botName: string | null; guilds: number; latencyMs: number | null; connectedAt: string | null; lastError: string | null; lastErrorAt: string | null } | null;
 }
 
 export interface WebhookLog {
@@ -512,7 +523,7 @@ export const storeApi = {
 
   subscriptionCheckout: (minecraftUsername?: string) =>
     send<CheckoutResult>(`/api/store/subscription/checkout${minecraftUsername ? `?minecraftUsername=${encodeURIComponent(minecraftUsername)}` : ''}`, { method: 'POST', auth: 'customer' }),
-  subscriptionCancel: () => send<void>('/api/store/subscription/cancel', { method: 'POST', auth: 'customer' }),
+  subscriptionCancel: () => send<SubscriptionCancelResult>('/api/store/subscription/cancel', { method: 'POST', auth: 'customer' }),
   panelToken: () => send<CustomerToken>('/api/store/subscription/panel-token', { method: 'POST', auth: 'customer' }),
 
   downloadTicket: (releaseId: string) =>
@@ -566,6 +577,8 @@ export const storeAdminApi = {
   customer: (id: string) => send<AdminCustomerDetail>(`${A}/customers/${id}`, { auth: 'staff' }),
   ban: (id: string, reason: string) => send<void>(`${A}/customers/${id}/ban`, { method: 'POST', body: { reason }, auth: 'staff' }),
   unban: (id: string) => send<void>(`${A}/customers/${id}/unban`, { method: 'POST', auth: 'staff' }),
+  setMinecraftName: (id: string, minecraftUsername: string) =>
+    send<void>(`${A}/customers/${id}/minecraft`, { method: 'PUT', body: { minecraftUsername }, auth: 'staff' }),
   deleteCustomer: (id: string) => send<void>(`${A}/customers/${id}`, { method: 'DELETE', auth: 'staff' }),
   grant: (id: string, productId: string) => send<void>(`${A}/customers/${id}/grant`, { method: 'POST', body: { productId }, auth: 'staff' }),
   revoke: (id: string, productId: string) => send<void>(`${A}/customers/${id}/revoke`, { method: 'POST', body: { productId }, auth: 'staff' }),
@@ -602,7 +615,8 @@ export const discordAdminApi = {
   job: () => send<DiscordJob>(`${D}/job`, { auth: 'staff' }),
   structure: () => send<{ lines: string[] }>(`${D}/structure`, { auth: 'staff' }),
   apply: () => send<DiscordJob>(`${D}/apply`, { method: 'POST', auth: 'staff' }),
-  post: () => send<DiscordJob>(`${D}/post`, { method: 'POST', auth: 'staff' })
+  post: () => send<DiscordJob>(`${D}/post`, { method: 'POST', auth: 'staff' }),
+  restartGateway: () => send<void>(`${D}/gateway/restart`, { method: 'POST', auth: 'staff' })
 };
 
 export type TebexContinueResult = { checkoutUrl: string } | { loginUrl: string; message: string };
