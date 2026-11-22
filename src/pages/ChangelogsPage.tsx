@@ -8,6 +8,16 @@ interface ChangelogEntry {
 
 const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '3.2.0',
+    date: '2026-11-22',
+    items: [
+      'Avenge SS Velocity-plugin (Minecraft 1.19.4 - 1.21.x): a /ss paranccsal a játékos az SS szerverre kerül, befagyasztja, és címben, bossbaron, akciósávon és chatben kapja az utasításokat. Minden szöveg átírható a messages.yml-ben.',
+      'A plugin automatikusan Avenge-kódot kér a játékosnak, és a staff élőben látja a chatben, mikor indul a vizsgálat, hol tart, és mi lett az eredmény.',
+      'Ha a játékos SS közben kilép, a staff azonnal értesítést kap, és beállítható, milyen parancs fusson ilyenkor (pl. kitiltás).',
+      'Admin Panel / Plugin: a plugin letöltése, telepítési útmutató és a plugin-kulcsok kezelése.'
+    ]
+  },
+  {
     version: '3.1.0',
     date: '2026-11-14',
     items: [

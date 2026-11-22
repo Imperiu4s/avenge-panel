@@ -11,6 +11,7 @@ import { LegalAdminTab } from '../components/admin/LegalAdminTab';
 import { RolesAdminTab } from '../components/admin/RolesAdminTab';
 import { ThemesAdminTab } from '../components/admin/ThemesAdminTab';
 import { TicketsAdminTab } from '../components/admin/TicketsAdminTab';
+import { PluginAdminTab } from '../components/admin/PluginAdminTab';
 import { supportAdminApi } from '../api/support';
 import { useAuth } from '../auth/AuthContext';
 import { canAny, ROLE_LABELS } from '../auth/permissions';
@@ -39,7 +40,8 @@ const ALL_TABS: { key: string; label: string; icon: IconName; perms: string[] }[
   { key: 'discord', label: 'Discord', icon: 'message', perms: ['platform.discord'] },
   { key: 'legal', label: 'Jogi', icon: 'scale', perms: ['platform.legal'] },
   { key: 'themes', label: 'Témák', icon: 'star', perms: ['platform.theme'] },
-  { key: 'tickets', label: 'Ticketek', icon: 'message', perms: ['platform.tickets'] }
+  { key: 'tickets', label: 'Ticketek', icon: 'message', perms: ['platform.tickets'] },
+  { key: 'plugin', label: 'Plugin', icon: 'package', perms: ['pluginkeys.manage'] }
 ];
 
 const ROLE_OPTIONS: UserRole[] = ['Staff', 'Admin', 'Owner'];
@@ -255,6 +257,7 @@ export function AdminPage() {
       {tab === 'legal' && <LegalAdminTab />}
       {tab === 'themes' && <ThemesAdminTab />}
       {tab === 'tickets' && <TicketsAdminTab />}
+      {tab === 'plugin' && <PluginAdminTab />}
 
       {tab === 'users' && (
         <div className="panel-grid">

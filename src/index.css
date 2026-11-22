@@ -2570,3 +2570,19 @@ input[type='checkbox'].switch:focus-visible { outline: 2px solid var(--signal-ho
 
 .discord-bot-status { display: inline-flex; align-items: center; gap: 8px; }
 
+
+.plugin-steps code, .plugin-reference code { font-size: 0.92em; }
+.plugin-reference { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 14px; }
+.plugin-list { display: grid; gap: 6px; margin: 0; }
+.plugin-list div { display: grid; grid-template-columns: minmax(150px, auto) minmax(0, 1fr); gap: 10px; font-size: 13px; }
+.plugin-list dt { color: var(--signal-hot); }
+.plugin-list dd { margin: 0; color: var(--text-2); }
+.plugin-key-form { margin: 12px 0; max-width: 520px; }
+.plugin-created { display: grid; gap: 8px; margin-bottom: 14px; }
+.plugin-key-value { display: block; padding: 10px 12px; font-family: var(--font-mono); font-size: 13px; overflow-wrap: anywhere; border: 1px dashed rgba(var(--signal-rgb), 0.5); border-radius: 8px; background: rgba(0, 0, 0, 0.3); }
+.plugin-created-actions { display: flex; gap: 8px; }
+
+@media (max-width: 760px) {
+  .plugin-reference { grid-template-columns: minmax(0, 1fr); }
+  .plugin-list div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+}

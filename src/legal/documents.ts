@@ -107,6 +107,7 @@ A szerverre a vizsgálat **eredménye** kerül: a találatok (fájlnév, eléré
 - **Jogalap**: a szerver jogos érdeke a tisztességes játék biztosításához (GDPR 6. cikk (1) f)), amelyet a játékos a vizsgálat önkéntes elindításával tudomásul vesz.
 - **Adatkezelő**: az a szerver (szervezet), amelynek staff tagja a vizsgálatot kérte; a Szolgáltató ilyenkor a szerver megbízásából, adatfeldolgozóként tárolja az eredményt. A Szolgáltató saját szerverein végzett vizsgálatoknál a Szolgáltató az adatkezelő.
 - **Megőrzés**: a szervezet beállítása szerint (alapértelmezés szerint a szervezet törléséig, vagy a beállított napok után automatikusan törlődik). A megosztó link legfeljebb 3 napig érvényes.
+- **Minecraft-plugin**: ha a szerver az Avenge Velocity-pluginját használja, a vizsgálati kód kérésekor a játékos nevét és UUID-ját, a vizsgálatot kérő staff nevét és a szerver nevét a szervezet tevékenységnaplója rögzíti.
 
 ## 4. Technikai adatok
 A weboldal a bejelentkezéshez a böngésző helyi tárolójában (localStorage) tárol egy belépési tokent, és megjegyzi az oldal aktuális témáját. Követő (marketing vagy analitikai) sütit nem használunk. A szerver a biztonság érdekében naplózza a kérések IP-címét és idejét, a staff műveleteit pedig a szervezet tevékenységnaplójában rögzíti. {{naplo.megorzes}} Részletek: [Süti tájékoztató](/jogi/cookie).
