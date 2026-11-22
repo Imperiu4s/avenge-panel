@@ -73,7 +73,7 @@ A Szolgáltató az ÁSZF-et módosíthatja; a módosítást a weboldalon közzé
     slug: 'adatkezeles',
     title: 'Adatkezelési tájékoztató',
     short: 'Adatkezelés',
-    updated: '2026. november 13.',
+    updated: '2026. november 22.',
     body: `
 Ez a tájékoztató az Európai Parlament és a Tanács (EU) 2016/679 rendelete (GDPR) és az Infotv. (2011. évi CXII. törvény) alapján mutatja be, milyen személyes adatokat kezelünk, miért és meddig.
 
@@ -107,14 +107,14 @@ A szerverre a vizsgálat **eredménye** kerül: a találatok (fájlnév, eléré
 - **Jogalap**: a szerver jogos érdeke a tisztességes játék biztosításához (GDPR 6. cikk (1) f)), amelyet a játékos a vizsgálat önkéntes elindításával tudomásul vesz.
 - **Adatkezelő**: az a szerver (szervezet), amelynek staff tagja a vizsgálatot kérte; a Szolgáltató ilyenkor a szerver megbízásából, adatfeldolgozóként tárolja az eredményt. A Szolgáltató saját szerverein végzett vizsgálatoknál a Szolgáltató az adatkezelő.
 - **Megőrzés**: a szervezet beállítása szerint (alapértelmezés szerint a szervezet törléséig, vagy a beállított napok után automatikusan törlődik). A megosztó link legfeljebb 3 napig érvényes.
-- **Minecraft-plugin**: ha a szerver az Avenge Velocity-pluginját használja, a vizsgálati kód kérésekor a játékos nevét és UUID-ját, a vizsgálatot kérő staff nevét és a szerver nevét a szervezet tevékenységnaplója rögzíti.
+- **Minecraft-plugin**: ha a szerver az Avenge Velocity-pluginját használja, a vizsgálati kód kérésekor a játékos nevét és UUID-ját, a vizsgálatot kérő staff nevét és a szerver nevét a szervezet tevékenységnaplója rögzíti. Az SS eseményeiről (indulás, a vizsgálat elkezdése, eredménye és legfontosabb találatai, megtagadása, automatikus kitiltás, kilépés, az SS vége) naplóüzenet kerül a Szolgáltató Discord szerverére, és ha a szerver beállította, a szerver saját Discord szerverére is. Az üzenet tartalmazza a játékos és a staff nevét, a szerver és a szervezet nevét, a vizsgálati kódot, az eredményt és az eredmény linkjét. Cél: a vizsgálatok és a visszaélések nyomon követése; jogalap: a Szolgáltató és a szerver jogos érdeke (GDPR 6. cikk (1) f)).
 
 ## 4. Technikai adatok
 A weboldal a bejelentkezéshez a böngésző helyi tárolójában (localStorage) tárol egy belépési tokent, és megjegyzi az oldal aktuális témáját. Követő (marketing vagy analitikai) sütit nem használunk. A szerver a biztonság érdekében naplózza a kérések IP-címét és idejét, a staff műveleteit pedig a szervezet tevékenységnaplójában rögzíti. {{naplo.megorzes}} Részletek: [Süti tájékoztató](/jogi/cookie).
 
 ## 5. Adatfeldolgozók, címzettek
 - **{{viszontelado.nev}}** (Egyesült Királyság) - fizetés, számlázás (önálló adatkezelő).
-- **Discord Inc.** (USA) - ha a Discord szerverünkön ({{kapcsolat.discord}}) keresel minket, az üzeneteidet a Discord a saját adatvédelmi tájékoztatója szerint kezeli.
+- **Discord Inc.** (USA) - ha a Discord szerverünkön ({{kapcsolat.discord}}) keresel minket, az üzeneteidet a Discord a saját adatvédelmi tájékoztatója szerint kezeli. A Minecraft-plugin SS-naplójának üzeneteit is a Discord tárolja.
 - **Tárhelyszolgáltatók** (adatfeldolgozók):
 {{tarhely.lista}}
 

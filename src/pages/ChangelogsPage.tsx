@@ -8,6 +8,16 @@ interface ChangelogEntry {
 
 const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '3.4.0',
+    date: '2026-11-22',
+    items: [
+      'Automatikus kitiltás: ha a játékos a /ss után 5 percen belül nem kezdi el a vizsgálatot, vagy közben bezárja a programot, a plugin a staff nevében lefuttatja a kitiltó parancsot (alapból /tempban <játékos> SS-megtagadása, LiteBans sablonnal). Egy perccel előtte a játékos figyelmeztetést kap. Az idő és a parancs a configban állítható.',
+      'Discord napló: minden SS-esemény (indulás, elkezdte, eredmény, megtagadta, kitiltás, kilépés, vége) Discordra kerül. Az eredménynél látszik, hogy a játékos átment vagy megbukott, hány találata volt, mik a legfontosabbak, és ott a link az eredményhez.',
+      'A napló az Avenge Discord szerverére mindig megy, a saját szerveredre pedig a plugin config webhook.url beállításával küldheted ugyanezt.',
+      'Az adatkezelési tájékoztató kiegészült a Discord naplóval.'
+    ]
+  },
+  {
     version: '3.3.0',
     date: '2026-11-22',
     items: [

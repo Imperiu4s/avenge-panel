@@ -17,7 +17,7 @@ const COMMANDS: [string, string][] = [
 ];
 
 const PERMISSIONS: [string, string][] = [
-  ['avengess.use', 'SS indítása, felengedése, kódkérés, SS chat'],
+  ['avengess.use', 'SS indítása, felengedése, kódkérés, SS chat (az automatikus kitiltáshoz a kitiltó parancs joga is kell)'],
   ['avengess.spy', 'belelát a többi staff SS chatjébe'],
   ['avengess.notify', 'értesítés minden SS-eseményről (elkezdte, befejezte, megtagadta, kilépett)'],
   ['avengess.admin', '/ss reload'],
@@ -80,6 +80,8 @@ export function PluginAdminTab() {
           A <b>/ss</b> paranccsal SS-re hívhatod a játékost. A plugin befagyasztja (mozgás, forgás, vakság), és megjeleníti az utasításokat (cím, bossbar, folyamatos akciósáv, chat).
           SS alatt a játékos és a staff külön SS chatben beszél, a játékos nem látja a közös chatet, a többi staff pedig spy módban belelát.
           Ha megadsz egy kulcsot, automatikusan Avenge-kódot is kér neki (kattintással másolható), és a chatben látod, ha elkezdte, befejezte vagy megtagadta a vizsgálatot. A részletek a panelen vannak.
+          Ha a játékos 5 percen belül nem kezdi el a vizsgálatot, vagy közben bezárja a programot, a plugin a staff nevében automatikusan kitiltja (alapból <code>/tempban &lt;játékos&gt; SS-megtagadása</code>, LiteBans sablonnal).
+          Minden SS-esemény az eredménnyel együtt (átment vagy megbukott) Discordra is naplózódik: az Avenge naplójába mindig, a saját szerveredére pedig a config <code>webhook.url</code> beállításával.
           Minecraft 1.19.4 - 1.21.x, Velocity 3.3 vagy újabb.
           {data?.pluginAvailable && data.pluginSize !== null && ` · ${formatBytes(data.pluginSize)}${data.pluginUpdatedAt ? `, frissítve: ${formatDateTime(data.pluginUpdatedAt)}` : ''}`}
         </p>
