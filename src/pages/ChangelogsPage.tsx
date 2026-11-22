@@ -8,6 +8,19 @@ interface ChangelogEntry {
 
 const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '3.3.0',
+    date: '2026-11-22',
+    items: [
+      'SS chat: SS alatt a játékos és a staff külön chatben beszél, amit csak ők látnak. A többi staff spy módban belelát, a játékos pedig nem látja a közös chatet.',
+      'Erősebb befagyasztás: a játékos nem tud mozogni és forogni sem, és vakságot kap.',
+      'Az akciósáv SS alatt végig látható, és felülírja a szerver többi akciósávos üzenetét.',
+      'Az SS szerver és a fallback szerver használata kikapcsolható: ilyenkor a játékos ott marad, ahol van.',
+      'A vizsgálati kód a chatben egy kattintással másolható.',
+      'Ingame már csak az látszik, hogy a játékos elkezdte, befejezte vagy megtagadta a vizsgálatot. A részletek a panelen vannak.',
+      'Ha a játékos vizsgálat közben bezárja az Avenge programot, a vizsgálat azonnal Megszakadt állapotba kerül, és a staff ingame is értesítést kap.'
+    ]
+  },
+  {
     version: '3.2.0',
     date: '2026-11-22',
     items: [

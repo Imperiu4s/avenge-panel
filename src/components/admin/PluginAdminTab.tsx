@@ -6,16 +6,20 @@ import { Icon } from '../Icon';
 import { useCopyFeedback } from '../motion';
 
 const COMMANDS: [string, string][] = [
-  ['/ss <játékos>', 'SS indítása: átküldi az SS szerverre, befagyasztja, és Avenge-kódot kér neki'],
+  ['/ss <játékos>', 'SS indítása: befagyasztja, megnyitja az SS chatet, és Avenge-kódot kér neki'],
   ['/ss release <játékos>', 'felengedés (rövidebben: /unss <játékos>)'],
   ['/ss code <játékos>', 'új Avenge-kód, ha a régi lejárt'],
+  ['/ss chat [játékos]', 'a chated váltása az SS chat és a közös chat között'],
+  ['/ssc [játékos] <üzenet>', 'írás az SS chatbe'],
+  ['/ss spy', 'a többi SS chat figyelésének ki- és bekapcsolása'],
   ['/ss list', 'a folyamatban lévő SS-ek'],
   ['/ss reload', 'a config.yml és a messages.yml újratöltése']
 ];
 
 const PERMISSIONS: [string, string][] = [
-  ['avengess.use', 'SS indítása, felengedése, kódkérés'],
-  ['avengess.notify', 'értesítés minden SS-eseményről (állapot, eredmény, kilépés)'],
+  ['avengess.use', 'SS indítása, felengedése, kódkérés, SS chat'],
+  ['avengess.spy', 'belelát a többi staff SS chatjébe'],
+  ['avengess.notify', 'értesítés minden SS-eseményről (elkezdte, befejezte, megtagadta, kilépett)'],
   ['avengess.admin', '/ss reload'],
   ['avengess.exempt', 'őt nem lehet SS-re hívni']
 ];
@@ -73,18 +77,19 @@ export function PluginAdminTab() {
           </button>
         </div>
         <p className="muted small">
-          A <b>/ss</b> paranccsal SS-re hívhatod a játékost. A plugin átküldi az SS szerverre, ott befagyasztja, és megjeleníti az utasításokat (cím, bossbar, akciósáv, chat).
-          Ha megadsz egy kulcsot, automatikusan Avenge-kódot is kér neki, és a chatben élőben látod a vizsgálat állapotát és az eredményt.
+          A <b>/ss</b> paranccsal SS-re hívhatod a játékost. A plugin befagyasztja (mozgás, forgás, vakság), és megjeleníti az utasításokat (cím, bossbar, folyamatos akciósáv, chat).
+          SS alatt a játékos és a staff külön SS chatben beszél, a játékos nem látja a közös chatet, a többi staff pedig spy módban belelát.
+          Ha megadsz egy kulcsot, automatikusan Avenge-kódot is kér neki (kattintással másolható), és a chatben látod, ha elkezdte, befejezte vagy megtagadta a vizsgálatot. A részletek a panelen vannak.
           Minecraft 1.19.4 - 1.21.x, Velocity 3.3 vagy újabb.
           {data?.pluginAvailable && data.pluginSize !== null && ` · ${formatBytes(data.pluginSize)}${data.pluginUpdatedAt ? `, frissítve: ${formatDateTime(data.pluginUpdatedAt)}` : ''}`}
         </p>
 
         <ol className="setup-steps small plugin-steps">
           <li>Tedd az <code>AvengeSS.jar</code>-t a <b>Velocity proxy</b> <code>plugins</code> mappájába, és indítsd újra a proxyt.</li>
-          <li>A <code>velocity.toml</code>-ban legyen egy SS szerver (pl. <code>ss = "127.0.0.1:30070"</code>), és a nevét írd a <code>plugins/avengess/config.yml</code> <code>ss-server</code> sorába.</li>
-          <li>Ugyanezt a jart tedd fel az <b>SS szerverre</b> (Paper 1.19.4+) is. Ez fagyasztja be ténylegesen a játékost: a proxy önmagában nem tudja megállítani a mozgást.</li>
+          <li>SS szerver (nem kötelező): a <code>velocity.toml</code>-ban szereplő nevét írd a <code>plugins/avengess/config.yml</code> <code>ss-server.name</code> sorába, vagy kapcsold ki (<code>ss-server.enabled: false</code>), és a játékos a mostani szerverén marad. A visszaküldés és a fallback szerver a <code>return</code> részben kapcsolható.</li>
+          <li>Ugyanezt a jart tedd fel azokra a <b>Paper szerverekre</b> (1.19.4+) is, ahol SS-elsz. Ez fagyasztja be ténylegesen a játékost és kezeli az SS chatet: a proxy önmagában erre nem képes.</li>
           <li>Hozz létre lent egy kulcsot, írd a config <code>avenge.api-key</code> mezőjébe, majd <code>/ss reload</code>.</li>
-          <li>Az üzeneteket a <code>plugins/avengess/messages.yml</code>-ben írhatod át (MiniMessage vagy &-es színkódok).</li>
+          <li>Az üzeneteket a <code>plugins/avengess/messages.yml</code>-ben írhatod át (MiniMessage vagy &-es színkódok). Frissítéskor a régi config és messages fájlról mentés készül, a beállításaid megmaradnak.</li>
         </ol>
 
         <div className="plugin-reference">
