@@ -97,6 +97,7 @@ const ACTION_TONES: [RegExp, string][] = [
   [/törölve|eltávolította|karantén/i, 'tl-action-danger'],
   [/átnevezve|létrehozva|letöltve|lomtárba/i, 'tl-action-warm'],
   [/gomb|makró|profil|beállítás/i, 'tl-action-hot'],
+  [/minecraft elindult/i, 'tl-action-game'],
   [/elindítva|telepítve/i, 'tl-action-ok'],
   [/módosult|módosítva|írás|tartalom/i, 'tl-action-info']
 ];

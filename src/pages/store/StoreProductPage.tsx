@@ -223,9 +223,9 @@ export function StoreProductPage() {
                   <label className="consent-check">
                     <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
                     <span>
-                      Kérem a digitális tartalom azonnali szolgáltatását, és tudomásul veszem, hogy a letöltés
-                      megkezdésével elveszítem a 14 napos elállási jogomat. Elfogadom az <Link to="/jogi/aszf">ÁSZF</Link>-et
-                      és a <Link to="/jogi/licenc">licencfeltételeket</Link>.
+                      Kérem a digitális tartalom azonnali szolgáltatását, és tudomásul veszem, hogy ezzel elveszítem az
+                      elállási jogomat: visszatérítést csak a még le nem töltött termékre, a fizetéstől számított 3 napon belül
+                      kérhetek. Elfogadom az <Link to="/jogi/aszf">ÁSZF</Link>-et és a <Link to="/jogi/licenc">licencfeltételeket</Link>.
                     </span>
                   </label>
                 )}

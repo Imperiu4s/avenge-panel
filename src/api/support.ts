@@ -121,6 +121,7 @@ export const supportAdminApi = {
   close: (id: string) => send<SupportTicketDetail>(`${A}/${encodeURIComponent(id)}/close`, { method: 'POST', auth: 'staff' }),
   reopen: (id: string) => send<SupportTicketDetail>(`${A}/${encodeURIComponent(id)}/reopen`, { method: 'POST', auth: 'staff' }),
   waive: (id: string) => send<SupportTicketDetail>(`${A}/${encodeURIComponent(id)}/waive`, { method: 'POST', auth: 'staff' }),
+  remove: (id: string) => send<void>(`${A}/${encodeURIComponent(id)}`, { method: 'DELETE', auth: 'staff' }),
   settings: (body: { enabled?: boolean; cooldownHours?: number }) => send<void>(`${A}/settings`, { method: 'PUT', body, auth: 'staff' })
 };
 

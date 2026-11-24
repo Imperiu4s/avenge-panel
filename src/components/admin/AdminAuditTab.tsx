@@ -53,6 +53,9 @@ function summary(entry: AuditEntryView): string | null {
     if (data.all === true) parts.push('az összes');
     if (typeof data.clientVersion === 'string') parts.push(`kliens ${data.clientVersion}`);
     if (typeof data.organization === 'string') parts.push(data.organization);
+    if (typeof data.reason === 'string') parts.push(({ 'subscription-expired': 'lejárt előfizetés', 'account-deleted': 'törölt vásárlói fiók', admin: 'kézzel' } as Record<string, string>)[data.reason] ?? data.reason);
+    if (typeof data.channel === 'string') parts.push(`#${data.channel}`);
+    if (typeof data.Subject === 'string') parts.push(data.Subject);
     if (typeof data.code === 'string') parts.push(`#${data.code}`);
     if (typeof data.expiresAt === 'string') parts.push(`lejár ${formatSecond(data.expiresAt)}`);
     if (entry.action === 'settings.update') {

@@ -3,6 +3,7 @@ import type { FindingDto, ScanResultView } from '../api/types';
 import { Icon, type IconName } from './Icon';
 import { CountUp } from './motion';
 import { MouseSoftwareSection } from './MouseSoftwareSection';
+import { sessionLabel } from './minecraftSessions';
 import { PrimaryHitCard } from './PrimaryHitCard';
 import { ScanTimeline } from './ScanTimeline';
 import { actionTone, beforeScan, eventTiming, formatSecond, parseEvents } from './timeline';
@@ -139,6 +140,21 @@ export function ResultReport({ result, aside }: Props) {
             <div><dt>Vizsgálat ideje</dt><dd>{formatSecond(result.createdAt)}</dd></div>
             <div><dt>Időtartam</dt><dd>{formatDuration(result.scanDurationMs)}</dd></div>
             <div><dt>Kliens verzió</dt><dd className="mono">{result.clientVersion}</dd></div>
+            {result.minecraftSessions && (
+              <div className="fact-wide">
+                <dt>Minecraft elindítva</dt>
+                <dd>
+                  {result.minecraftSessions.length === 0
+                    ? <span className="muted">A vizsgálatkor nem futott Minecraft.</span>
+                    : result.minecraftSessions.map((s) => (
+                      <span key={`${s.processId}-${s.startedAt}`} className="mc-session">
+                        <span className="mono">{formatSecond(s.startedAt)}</span> · {sessionLabel(s)}
+                        <small className="muted"> · {beforeScan(s.startedAt, result.createdAt)}{s.processName ? ` · ${s.processName}${s.processId ? ` (PID ${s.processId})` : ''}` : ''}</small>
+                      </span>
+                    ))}
+                </dd>
+              </div>
+            )}
           </dl>
         </section>
       </div>
@@ -273,7 +289,7 @@ export function ResultReport({ result, aside }: Props) {
         <MouseSoftwareSection findings={mouseFindings} scanTime={result.createdAt} clientVersion={result.clientVersion} />
       </div>
 
-      <ScanTimeline findings={result.findings} scanTime={result.createdAt} />
+      <ScanTimeline findings={result.findings} scanTime={result.createdAt} minecraftSessions={result.minecraftSessions ?? null} />
 
       <div className="accordion-grid">
         {ACCORDION_CATEGORIES.map(({ category, label, icon }, index) => {

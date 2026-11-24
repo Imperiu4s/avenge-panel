@@ -277,6 +277,7 @@ export interface StoreInvoice {
   reason: string | null;
   refundable: boolean;
   refundableUntil: string | null;
+  downloaded?: boolean;
   periodStart: string | null;
   periodEnd: string | null;
 }
@@ -599,7 +600,7 @@ export const storeAdminApi = {
   },
   downloadInvoice: (invoice: StoreInvoice) => downloadFile(`${A}/invoices/${invoice.id}/pdf`, 'staff', invoiceFileName(invoice)),
   refunds: () => send<RefundsOverview>(`${A}/refunds`, { auth: 'staff' }),
-  refund: (invoiceId: string, reason: string) => send<RefundResult>(`${A}/refunds`, { method: 'POST', body: { invoiceId, reason }, auth: 'staff' }),
+  refund: (invoiceId: string, reason: string, exceptional = false) => send<RefundResult>(`${A}/refunds`, { method: 'POST', body: { invoiceId, reason, exceptional }, auth: 'staff' }),
 
   testTebex: () => send<TebexConnectionTest>(`${A}/tebex/test`, { method: 'POST', auth: 'staff' }),
   settings: () => send<AdminStoreSettings>(`${A}/settings`, { auth: 'staff' }),
@@ -609,6 +610,37 @@ export const storeAdminApi = {
 
 const D = '/api/admin/discord';
 
+export interface DiscordChannel {
+  id: string;
+  name: string;
+  type: number;
+  category: string | null;
+}
+
+export interface DiscordEmbedFieldInput {
+  name: string;
+  value: string;
+  inline: boolean;
+}
+
+export interface DiscordSendRequest {
+  channelId: string;
+  content: string | null;
+  embed: {
+    title: string;
+    description: string;
+    url: string;
+    color: string;
+    imageUrl: string;
+    thumbnailUrl: string;
+    footer: string;
+    timestamp: boolean;
+    fields: DiscordEmbedFieldInput[];
+  } | null;
+  buttons: { label: string; url: string }[];
+  allowMentions: boolean;
+}
+
 export const discordAdminApi = {
   get: () => send<DiscordSettings>(D, { auth: 'staff' }),
   update: (body: { botToken?: string | null; guildId?: string | null }) => send<void>(D, { method: 'PUT', body, auth: 'staff' }),
@@ -616,7 +648,9 @@ export const discordAdminApi = {
   structure: () => send<{ lines: string[] }>(`${D}/structure`, { auth: 'staff' }),
   apply: () => send<DiscordJob>(`${D}/apply`, { method: 'POST', auth: 'staff' }),
   post: () => send<DiscordJob>(`${D}/post`, { method: 'POST', auth: 'staff' }),
-  restartGateway: () => send<void>(`${D}/gateway/restart`, { method: 'POST', auth: 'staff' })
+  restartGateway: () => send<void>(`${D}/gateway/restart`, { method: 'POST', auth: 'staff' }),
+  channels: () => send<DiscordChannel[]>(`${D}/channels`, { auth: 'staff' }),
+  send: (body: DiscordSendRequest) => send<{ id: string; url: string }>(`${D}/send`, { method: 'POST', body, auth: 'staff' })
 };
 
 export type TebexContinueResult = { checkoutUrl: string } | { loginUrl: string; message: string };

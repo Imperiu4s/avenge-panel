@@ -17,6 +17,7 @@ export interface AdminOrganizationRow {
   lastScanAt: string | null;
   pluginOwned: boolean;
   activePluginKeys: number;
+  deletesAt: string | null;
 }
 
 export interface AdminOrgOwner {
@@ -51,6 +52,7 @@ export interface AdminOrgMember {
 }
 
 export interface AdminOrgKey {
+  id: string;
   name: string;
   prefix: string;
   createdAt: string;
@@ -96,5 +98,10 @@ export const organizationsApi = {
     if (params.q) query.set('q', params.q);
     if (params.verdict) query.set('verdict', params.verdict);
     return send<AdminSessionPage>(`${O}/${encodeURIComponent(id)}/sessions?${query.toString()}`, { auth: 'staff' });
-  }
+  },
+  rename: (id: string, name: string) => send<void>(`${O}/${encodeURIComponent(id)}`, { method: 'PUT', body: { name }, auth: 'staff' }),
+  remove: (id: string, confirm: string) => send<void>(`${O}/${encodeURIComponent(id)}?confirm=${encodeURIComponent(confirm)}`, { method: 'DELETE', auth: 'staff' }),
+  updateMember: (id: string, userId: string, change: { role?: string; isActive?: boolean }) =>
+    send<void>(`${O}/${encodeURIComponent(id)}/members/${encodeURIComponent(userId)}`, { method: 'POST', body: change, auth: 'staff' }),
+  revokeKey: (id: string, keyId: string) => send<void>(`${O}/${encodeURIComponent(id)}/keys/${encodeURIComponent(keyId)}/revoke`, { method: 'POST', auth: 'staff' })
 };

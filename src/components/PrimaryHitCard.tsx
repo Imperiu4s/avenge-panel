@@ -1,6 +1,7 @@
 import type { FindingDto, ScanResultView } from '../api/types';
 import { Icon } from './Icon';
 import { HIT_KIND_LABELS, isSignal, rankHits, type PrimaryHit } from './primaryHit';
+import { relationToGame } from './minecraftSessions';
 import { beforeScan, formatSecond } from './timeline';
 
 const SEVERITY_LABELS: Record<string, string> = {
@@ -26,6 +27,7 @@ export function PrimaryHitCard({ result, onReveal }: Props) {
   const cheatCount = signals.filter((h) => h.kind === 'cheat').length;
   const clickerCount = signals.filter((h) => h.kind === 'autoclicker').length;
   const faint = primary ? null : ranked[0] ?? null;
+  const relation = primary ? relationToGame(primary.when, result.minecraftSessions) : null;
 
   if (!primary) {
     return (
@@ -97,6 +99,14 @@ export function PrimaryHitCard({ result, onReveal }: Props) {
                 </dd>
               </div>
             )}
+            {relation && (
+              <div className="primary-hit-wide">
+                <dt>A Minecrafthez képest</dt>
+                <dd className={relation.during ? 'mc-relation mc-during' : 'mc-relation'}>
+                  {relation.during && <Icon name="alert" size={14} />} {relation.text}
+                </dd>
+              </div>
+            )}
             <div>
               <dt>Forrás</dt>
               <dd>{primary.finding.source}</dd>
@@ -113,7 +123,7 @@ export function PrimaryHitCard({ result, onReveal }: Props) {
           <span className="primary-hit-others-title">Ezen kívül még</span>
           <ul>
             {others.slice(0, MAX_OTHERS).map((hit, index) => (
-              <OtherHit key={`${hit.finding.label}-${index}`} hit={hit} onReveal={onReveal} />
+              <OtherHit key={`${hit.finding.label}-${index}`} hit={hit} sessions={result.minecraftSessions} onReveal={onReveal} />
             ))}
           </ul>
           {others.length > MAX_OTHERS && (
@@ -125,7 +135,8 @@ export function PrimaryHitCard({ result, onReveal }: Props) {
   );
 }
 
-function OtherHit({ hit, onReveal }: { hit: PrimaryHit; onReveal: (finding: FindingDto) => void }) {
+function OtherHit({ hit, sessions, onReveal }: { hit: PrimaryHit; sessions: ScanResultView['minecraftSessions']; onReveal: (finding: FindingDto) => void }) {
+  const relation = relationToGame(hit.when, sessions);
   return (
     <li>
       <button type="button" className="primary-hit-other" onClick={() => onReveal(hit.finding)}>
@@ -134,6 +145,7 @@ function OtherHit({ hit, onReveal }: { hit: PrimaryHit; onReveal: (finding: Find
         <span className={`severity-badge severity-${hit.finding.severity.toLowerCase()}`}>
           {SEVERITY_LABELS[hit.finding.severity]}
         </span>
+        {relation?.during && <span className="mc-chip">a játék mellett</span>}
       </button>
     </li>
   );

@@ -48,12 +48,14 @@ A fizetéseket és a számlázást viszonteladóként (merchant of record) a {{v
 1. Az előfizetés havidíjas, és a Felhasználó lemondásáig **havonta automatikusan megújul**; a díjat a Tebex terheli a megadott fizetési módra.
 2. Az első sikeres fizetés után a Felhasználó saját szervezetet és Tulajdonos rangú hozzáférést kap a PC Check panelhez, ahol a csapata Admin és Staff rangjainak jogait maga állíthatja be.
 3. Az előfizetés bármikor, egy gombbal lemondható az Előfizetés vagy a Fiókom oldalon; a már kifizetett időszak végéig a hozzáférés megmarad, utána újabb terhelés nem történik. Ha a lemondás után a Tebex mégis terhelne, a terhelést visszatérítjük.
-4. Lejárt előfizetéssel új vizsgálati kód nem generálható; a korábbi eredmények a szervezet megőrzési beállításai szerint maradnak meg.
+4. Ha az előfizetés lejár (a kifizetett időszak vége után 3 nap türelmi idővel), a szervezet egy nappal később **minden adatával** (tagok, vizsgálatok és eredmények, plugin-kulcsok, tevékenységnapló) véglegesen törlődik; a vásárlói fiók törlésekor ez azonnal megtörténik. Új előfizetéssel a Felhasználó új, üres szervezetet kap.
 5. A PC Check csak olyan személy vizsgálatára használható, aki a vizsgálatot maga indítja el a kapott kóddal. A Felhasználó (szerver) felel azért, hogy a vizsgálatot jogszerűen, a játékos megfelelő tájékoztatása mellett végezze, és az eredményeket csak a csalás kiszűrésére használja.
 6. A PC Check eredménye szakmai segítség a döntéshez, nem tévedhetetlen: a végső döntés (pl. kitiltás) a szerver staffjáé.
 
 ## 6. Elállási jog
-A fogyasztót a 45/2014. (II. 26.) Korm. rendelet alapján főszabályként 14 napos elállási jog illeti meg. **Nem tárgyi adathordozón nyújtott digitális tartalom** (plugin, modell) esetén azonban az elállási jog megszűnik, ha a teljesítés a fogyasztó kifejezett előzetes beleegyezésével kezdődött meg, és a fogyasztó tudomásul vette, hogy ezzel elveszíti az elállási jogát (29. § (1) m) pont). Ezt a hozzájárulást a vásárlás előtt külön jelölőnégyzettel kérjük. Részletek: [Visszatérítési szabályzat](/jogi/visszaterites).
+A fogyasztót a 45/2014. (II. 26.) Korm. rendelet alapján főszabályként 14 napos elállási jog illeti meg. **Nem tárgyi adathordozón nyújtott digitális tartalom** (plugin, modell) esetén azonban az elállási jog megszűnik, ha a teljesítés a fogyasztó kifejezett előzetes beleegyezésével kezdődött meg, és a fogyasztó tudomásul vette, hogy ezzel elveszíti az elállási jogát (29. § (1) m) pont). Ezt a hozzájárulást a vásárlás előtt külön jelölőnégyzettel kérjük; a Termék a fizetés után azonnal letölthetővé válik.
+
+Ettől függetlenül a **még le nem töltött** Terméket a fizetéstől számított **3 napon belül** kérésre visszatérítjük. A letöltés után, illetve 3 nap elteltével a vásárlás nem téríthető vissza; a hibás teljesítésből eredő, törvényes jogaidat ez nem érinti. Részletek: [Visszatérítési szabályzat](/jogi/visszaterites).
 
 ## 7. Szavatosság, felelősség
 1. A Szolgáltató a Termékeket a leírásuk szerinti működéssel nyújtja, és a hibákat a frissítések keretében javítja. Hibás teljesítés esetén a fogyasztót a Ptk. és a 373/2021. (VI. 30.) Korm. rendelet szerinti jogok illetik meg.
@@ -101,12 +103,12 @@ A vizsgálatot a játékos maga indítja el a staff tagtól kapott kóddal; a pr
 
 A vizsgálat során a program a számítógépen ismert csalóprogramok és autoclickerek nyomait keresi. Ehhez elemzi a **számítógépen tárolt fájlokat** (nevüket, méretüket, ujjlenyomatukat és - jar fájloknál - a tartalmukat), a **futtatási előzményeket és rendszernaplókat** (pl. Prefetch, Windows-naplók, törölt fájlok nyomai), a **futó folyamatokat** (a Minecraft memóriájával együtt), a **telepített programokat és beállításaikat** (pl. egérszoftverek makrói), valamint a böngésző- és DNS-előzmények csalással kapcsolatos bejegyzéseit.
 
-A szerverre a vizsgálat **eredménye** kerül: a találatok (fájlnév, elérési út, időbélyeg, súlyosság és a találatot alátámasztó részletek - pl. egy egérmakró lépései, egy csalással kapcsolatos böngésző- vagy DNS-bejegyzés), a Minecraft-felhasználónév, a gép hardverazonosítójából képzett lenyomat, a vizsgálat ideje és az IP-cím. Személyes dokumentumokat, képeket, üzeneteket vagy jelszavakat nem gyűjtünk.
+A szerverre a vizsgálat **eredménye** kerül: a találatok (fájlnév, elérési út, időbélyeg, súlyosság és a találatot alátámasztó részletek - pl. egy egérmakró lépései, egy csalással kapcsolatos böngésző- vagy DNS-bejegyzés), a Minecraft-felhasználónév, a vizsgálatkor futó Minecraft indítási ideje, kliense és verziója, a gép hardverazonosítójából képzett lenyomat, a vizsgálat ideje és az IP-cím. Személyes dokumentumokat, képeket, üzeneteket vagy jelszavakat nem gyűjtünk.
 
 - **Cél**: a csalás kiszűrése a Minecraft szervereken.
 - **Jogalap**: a szerver jogos érdeke a tisztességes játék biztosításához (GDPR 6. cikk (1) f)), amelyet a játékos a vizsgálat önkéntes elindításával tudomásul vesz.
 - **Adatkezelő**: az a szerver (szervezet), amelynek staff tagja a vizsgálatot kérte; a Szolgáltató ilyenkor a szerver megbízásából, adatfeldolgozóként tárolja az eredményt. A Szolgáltató saját szerverein végzett vizsgálatoknál a Szolgáltató az adatkezelő.
-- **Megőrzés**: a szervezet beállítása szerint (alapértelmezés szerint a szervezet törléséig, vagy a beállított napok után automatikusan törlődik). A megosztó link legfeljebb 3 napig érvényes.
+- **Megőrzés**: a szervezet beállítása szerint (alapértelmezés szerint a szervezet törléséig, vagy a beállított napok után automatikusan törlődik). Előfizetéses szervezetnél a szervezet minden adatával együtt az előfizetés lejárta után (3 nap türelmi idő és további 1 nap) automatikusan törlődik, a vásárlói fiók törlésekor pedig azonnal. A megosztó link legfeljebb 3 napig érvényes.
 - **A Szolgáltató hozzáférése**: a szolgáltatás üzemeltetése, a hibaelhárítás és a visszaélések kivizsgálása érdekében a Szolgáltató megtekintheti a szervezetek adatait (tagok, vizsgálatok és eredmények, előfizetés, plugin-kulcsok). Minden ilyen megtekintést naplózunk.
 - **Minecraft-plugin**: ha a szerver az Avenge Velocity-pluginját használja, a vizsgálati kód kérésekor a játékos nevét és UUID-ját, a vizsgálatot kérő staff nevét és a szerver nevét a szervezet tevékenységnaplója rögzíti. A PC Check eseményeiről (indulás, a vizsgálat elkezdése, eredménye és legfontosabb találatai, megtagadása, automatikus kitiltás, kilépés, a PC Check vége) naplóüzenet kerül a Szolgáltató Discord szerverére, és ha a szerver beállította, a szerver saját Discord szerverére is. Az üzenet tartalmazza a játékos és a staff nevét, a szerver és a szervezet nevét, a vizsgálati kódot, az eredményt és az eredmény linkjét. Cél: a vizsgálatok és a visszaélések nyomon követése; jogalap: a Szolgáltató és a szerver jogos érdeke (GDPR 6. cikk (1) f)).
 
@@ -134,22 +136,25 @@ Panasszal a Nemzeti Adatvédelmi és Információszabadság Hatósághoz (NAIH, 
     updated: '2026. november 24.',
     body: `
 ## 1. Pluginok és modellek (digitális tartalom)
-A pluginok és a modellek nem tárgyi adathordozón nyújtott digitális tartalmak: a fizetés után azonnal letölthetők. A vásárlás előtt kifejezetten hozzájárulsz a teljesítés azonnali megkezdéséhez, és tudomásul veszed, hogy ezzel **elveszíted a 14 napos elállási jogodat** (45/2014. (II. 26.) Korm. rendelet 29. § (1) m) pont).
+A pluginok és a modellek nem tárgyi adathordozón nyújtott digitális tartalmak: a fizetés után azonnal letölthetők. A vásárlás előtt kifejezetten hozzájárulsz a teljesítés azonnali megkezdéséhez, és tudomásul veszed, hogy ezzel **elveszíted a törvényes elállási jogodat** (45/2014. (II. 26.) Korm. rendelet 29. § (1) m) pont).
 
-Ettől függetlenül visszatérítést adunk, ha:
-- a Termék a leírásában szereplő, támogatott környezetben **lényegesen hibásan működik** (a modell pl. hibásan töltődik be vagy hiányos), és a hibát a bejelentéstől számított 14 napon belül nem javítjuk;
+**Visszatérítés letöltés előtt, 3 napig:** ha a Terméket **még nem töltötted le**, a fizetéstől számított **3 napon belül** kérésedre a teljes árát visszatérítjük. Az első letöltést a rendszer rögzíti; letöltött Terméket, illetve 3 nap elteltével a vásárlást nem térítjük vissza.
+
+Ezen kívül csak akkor adunk visszatérítést, ha:
+- a Termék a leírásában szereplő, támogatott környezetben **lényegesen hibásan működik** (a modell pl. hibásan töltődik be vagy hiányos), és a hibát a bejelentéstől számított 14 napon belül nem javítjuk (a hibás teljesítésből eredő, törvényes jogaidat ez a szabályzat nem korlátozza);
 - **kétszer fizettél** ugyanazért a Termékért;
 - a fizetés után a Termék **nem vált letölthetővé**, és ezt 48 órán belül nem orvosoljuk.
 
-Nem adunk visszatérítést, ha a Termék a szervered beállítása, egy nem támogatott verzió, egy hiányzó modellkezelő plugin vagy egy másik plugin miatt nem működik, illetve ha egyszerűen meggondoltad magad a letöltés után.
+Nem adunk visszatérítést, ha a Terméket már letöltötted, vagy ha a Termék a szervered beállítása, egy nem támogatott verzió, egy hiányzó modellkezelő plugin vagy egy másik plugin miatt nem működik, illetve ha egyszerűen meggondoltad magad a letöltés után.
 
 ## 2. PC Check előfizetés
 - Az előfizetést bármikor lemondhatod; a következő hónapra már nem terhelünk.
 - A megkezdett hónap díját nem térítjük vissza, de a hónap végéig használhatod a szolgáltatást.
-- Ha a fizetést követő 14 napon belül a szolgáltatás a mi hibánkból nem volt használható, kérésre a havi díjat visszatérítjük; ilyenkor az előfizetés azonnal megszűnik.
+- Ha a fizetést követő 3 napon belül a szolgáltatás a mi hibánkból nem volt használható, kérésre a havi díjat visszatérítjük; ilyenkor az előfizetés azonnal megszűnik.
+- A lejárt előfizetéshez tartozó szervezet a lejárat után (3 nap türelmi idő és további 1 nap) minden adatával törlődik.
 
 ## 3. Hogyan kérj visszatérítést?
-Visszatérítést a fizetéstől számított **14 napon belül** kérhetsz. Írj a **{{kapcsolat.email}}** címre a vásárlói fiókod e-mail címéről, vagy nyiss ticketet a weboldal **Támogatás** oldalán (avenge.hu/tamogatas); add meg a bizonylat számát (a fiókod Számlák részén találod) és a probléma leírását. A jogos visszatérítést a Tebexen keresztül, a teljes összegről, az eredeti fizetési módra indítjuk; a pénz általában 5-10 munkanapon belül érkezik meg. A visszatérítésről visszatérítési bizonylatot kapsz, ami a fiókodban letölthető.
+A még le nem töltött Termék visszatérítését a fizetéstől számított **3 napon belül** kérheted; hibás Termék vagy dupla fizetés esetén a probléma észlelése után minél előbb jelezd. Írj a **{{kapcsolat.email}}** címre a vásárlói fiókod e-mail címéről, vagy nyiss ticketet a weboldal **Támogatás** oldalán (avenge.hu/tamogatas); add meg a bizonylat számát (a fiókod Számlák részén találod) és a probléma leírását. A jogos visszatérítést a Tebexen keresztül, a teljes összegről, az eredeti fizetési módra indítjuk; a pénz általában 5-10 munkanapon belül érkezik meg. A visszatérítésről visszatérítési bizonylatot kapsz, ami a fiókodban letölthető.
 
 ## 4. Visszaterhelés (chargeback)
 Kérjük, mielőtt a bankodnál visszaterhelést kezdeményezel, keress minket. Visszatérítés vagy visszaterhelés esetén a Termék letöltési joga megszűnik, a licenc érvényét veszti; visszaélésszerű visszaterhelésnél a fiókot felfüggeszthetjük.

@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
-import type { FindingDto } from '../api/types';
+import type { FindingDto, MinecraftSession } from '../api/types';
+import { sessionLabel } from './minecraftSessions';
 import { Icon } from './Icon';
 import { actionTone, beforeScan, eventTiming, parseEvents, type TimelineEvent } from './timeline';
 
@@ -10,7 +11,8 @@ interface Entry extends TimelineEvent {
 
 const FILTERS: { key: string; label: string; match: (e: Entry) => boolean }[] = [
   { key: 'all', label: 'Mind', match: () => true },
-  { key: 'run', label: 'Indítások', match: (e) => /elindítva/i.test(e.action) },
+  { key: 'run', label: 'Indítások', match: (e) => /elindítva|elindult/i.test(e.action) },
+  { key: 'minecraft', label: 'Minecraft', match: (e) => e.action === 'Minecraft elindult' },
   { key: 'file', label: 'Fájlműveletek', match: (e) => /létrehozva|módosít|átnevezve|letöltve|tartalom/i.test(e.action) },
   { key: 'delete', label: 'Törlések', match: (e) => /törölve|lomtárba|eltávolította/i.test(e.action) },
   { key: 'mouse', label: 'Egér: gomb, makró, profil', match: (e) => /gomb|makró|profil|beállítás/i.test(e.action) },
@@ -19,7 +21,7 @@ const FILTERS: { key: string; label: string; match: (e: Entry) => boolean }[] = 
 
 const PAGE = 60;
 
-export function ScanTimeline({ findings, scanTime }: { findings: FindingDto[]; scanTime: string }) {
+export function ScanTimeline({ findings, scanTime, minecraftSessions }: { findings: FindingDto[]; scanTime: string; minecraftSessions?: MinecraftSession[] | null }) {
   const [filter, setFilter] = useState('all');
   const [visible, setVisible] = useState(PAGE);
 
@@ -31,6 +33,18 @@ export function ScanTimeline({ findings, scanTime }: { findings: FindingDto[]; s
         severity: f.severity
       }))
     );
+    for (const s of minecraftSessions ?? []) {
+      all.push({
+        time: s.startedAt,
+        action: 'Minecraft elindult',
+        source: 'Futó folyamat',
+        text: `${sessionLabel(s)}${s.processName ? ` (${s.processName}${s.processId ? `, PID ${s.processId}` : ''})` : ''} - a vizsgálatkor is futott`,
+        precision: 'pontos',
+        notBefore: null,
+        finding: 'Minecraft',
+        severity: 'Info'
+      });
+    }
     const seen = new Set<string>();
     return all
       .filter((e) => {
@@ -40,7 +54,7 @@ export function ScanTimeline({ findings, scanTime }: { findings: FindingDto[]; s
         return true;
       })
       .sort((a, b) => b.time.localeCompare(a.time));
-  }, [findings]);
+  }, [findings, minecraftSessions]);
 
   if (entries.length === 0) {
     return null;
@@ -76,7 +90,7 @@ export function ScanTimeline({ findings, scanTime }: { findings: FindingDto[]; s
         {filtered.slice(0, visible).map((e, i) => {
           const timing = eventTiming(e);
           return (
-            <li key={`${e.time}-${i}`} className={`scan-timeline-item scan-timeline-${e.severity.toLowerCase()}`}>
+            <li key={`${e.time}-${i}`} className={`scan-timeline-item scan-timeline-${e.severity.toLowerCase()}${e.action === 'Minecraft elindult' ? ' scan-timeline-game' : ''}`}>
               <time className="scan-timeline-time mono">{timing.text}</time>
               <span className={`tl-action ${actionTone(e.action)}`}>{e.action}</span>
               <div className="scan-timeline-body">

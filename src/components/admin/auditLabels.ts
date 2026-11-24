@@ -22,5 +22,13 @@ export const AUDIT_ACTION_LABELS: Record<string, string> = {
   'plugin.key.create': 'Plugin-kulcsot hozott létre',
   'plugin.key.revoke': 'Plugin-kulcsot vont vissza',
   'platform.organization.view': 'Megnézett egy szervezetet',
-  'platform.result.view': 'Más szervezet eredményét nyitotta meg'
+  'platform.result.view': 'Más szervezet eredményét nyitotta meg',
+  'platform.organization.rename': 'Átnevezett egy szervezetet',
+  'platform.organization.delete': 'Törölt egy szervezetet',
+  'platform.organization.auto_delete': 'Szervezet automatikusan törölve (lejárt előfizetés vagy törölt fiók)',
+  'platform.organization.member': 'Módosította egy szervezet tagját',
+  'platform.organization.key_revoke': 'Visszavonta egy szervezet plugin-kulcsát',
+  'support.ticket.delete': 'Ticketet törölt',
+  'discord.send': 'Discord-üzenetet küldött',
+  'subscription.provision': 'Előfizetéssel létrejött a szervezet'
 };

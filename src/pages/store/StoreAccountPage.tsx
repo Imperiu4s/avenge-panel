@@ -307,6 +307,7 @@ function Dashboard() {
           {me.owned.length === 0
             ? <p className="muted">Még nincs pluginod vagy modelled. <Link to="/store" className="text-link">Nézz körül az áruházban.</Link></p>
             : <div className="owned-list">{me.owned.map((item) => <OwnedPlugin key={item.productId} item={item} onError={setError} />)}</div>}
+          {me.owned.length > 0 && <p className="muted small">A még le nem töltött terméket a fizetéstől számított 3 napon belül visszatérítjük; letöltés után a vásárlás már nem téríthető vissza.</p>}
         </section>
 
         <section className="card section-gap stagger-in" style={{ animationDelay: '60ms' }}>

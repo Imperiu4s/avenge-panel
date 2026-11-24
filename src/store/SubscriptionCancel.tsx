@@ -13,7 +13,7 @@ export function SubscriptionCancel({ subscription, onChanged }: { subscription: 
   const [manageUrl, setManageUrl] = useState<string | null>(null);
 
   async function cancel() {
-    if (!window.confirm(`Lemondod az előfizetést? ${formatDate(subscription.currentPeriodEnd)}-ig még használhatod, utána nem terhelünk többet.`)) return;
+    if (!window.confirm(`Lemondod az előfizetést? ${formatDate(subscription.currentPeriodEnd)}-ig még használhatod, utána nem terhelünk többet. A lejárat után (3 nap türelmi idővel) a szervezeted minden vizsgálatával együtt törlődik.`)) return;
     setBusy(true);
     setError(null);
     try {

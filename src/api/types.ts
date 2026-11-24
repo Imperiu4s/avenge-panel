@@ -102,6 +102,14 @@ export interface FindingDto {
 
 export type ScanVerdict = 'Legit' | 'Unlegit' | 'Inconclusive';
 
+export interface MinecraftSession {
+  startedAt: string;
+  client: string | null;
+  version: string | null;
+  processId: number | null;
+  processName: string | null;
+}
+
 export interface ScanResultView {
   id: string;
   verdict: ScanVerdict;
@@ -114,6 +122,7 @@ export interface ScanResultView {
   minecraftUsername: string | null;
   sessionCode?: string | null;
   foreignOrganization?: string | null;
+  minecraftSessions?: MinecraftSession[] | null;
 }
 
 export type UserRole = 'Owner' | 'Admin' | 'Staff';

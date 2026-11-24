@@ -8,6 +8,18 @@ interface ChangelogEntry {
 
 const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '3.6.0',
+    date: '2026-11-24',
+    items: [
+      'Visszatérítés: a pluginok és a modellek a fizetéstől számított 3 napon belül téríthetők vissza, ha még nem töltötted le őket. A letöltést a rendszer rögzíti. Az ÁSZF és a visszatérítési szabályzat ennek megfelelően frissült.',
+      'Admin Panel / Szervezetek: a szervezetek átnevezhetők és törölhetők, a tagjaik rangja és állapota módosítható, a plugin-kulcsaik visszavonhatók, és az előfizetésük napokkal meghosszabbítható.',
+      'Ha egy előfizetés lejár (3 nap türelmi idővel), a szervezet egy nappal később minden adatával automatikusan törlődik; a vásárlói fiók törlésekor azonnal. A Szervezetek fülön látszik, melyik szervezet mikor törlődik.',
+      'Admin Panel / Discord: a bottal bármelyik csatornába írhatsz sima szöveget vagy színes embedet mezőkkel, képpel és link-gombokkal, élő előnézettel. Az info-üzenetek szövegei és linkjei frissültek (PC Check, plugin, visszatérítés, ticketek).',
+      'A vizsgálat eredményében látszik, mikor indult el a játékos Minecraftja (kliens és verzió), és a talált csalásnál az is, hogy ugyanabban a játékmenetben futott-e. Az idővonalon is megjelenik. Ehhez az Avenge program 2.8.0-s verziója kell.',
+      'A ticketek törölhetők az Admin Panel Ticketek fülén.'
+    ]
+  },
+  {
     version: '3.5.0',
     date: '2026-11-24',
     items: [

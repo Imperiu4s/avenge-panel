@@ -21,7 +21,7 @@ const COOLDOWNS = [
   { hours: 168, label: 'hetente' }
 ];
 
-function TicketDetail({ id, onChanged }: { id: string; onChanged: () => void }) {
+function TicketDetail({ id, onChanged, onDeleted }: { id: string; onChanged: () => void; onDeleted: () => void }) {
   const [detail, setDetail] = useState<SupportTicketDetail | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -87,6 +87,25 @@ function TicketDetail({ id, onChanged }: { id: string; onChanged: () => void }) 
           onClick={() => act(() => supportAdminApi.waive(id))}
         >
           {t.cooldownWaived ? 'Várakozás visszaállítása' : 'Várakozás elengedése'}
+        </button>
+        <button
+          type="button"
+          className="btn-ghost btn-tiny btn-danger ticket-delete"
+          disabled={busy}
+          onClick={async () => {
+            if (!window.confirm(`Véglegesen törlöd a(z) ${ticketNumber(t.number)} ticketet az összes üzenetével és csatolt képével? Ez nem vonható vissza, és a vásárlónál is eltűnik.`)) return;
+            setBusy(true);
+            setError(null);
+            try {
+              await supportAdminApi.remove(id);
+              onDeleted();
+            } catch (err) {
+              setError(err instanceof ApiError ? err.message : 'Nem sikerült törölni.');
+              setBusy(false);
+            }
+          }}
+        >
+          <Icon name="trash" size={13} /> Törlés
         </button>
       </div>
 
@@ -194,7 +213,7 @@ export function TicketsAdminTab() {
         </section>
 
         {selected
-          ? <TicketDetail key={selected} id={selected} onChanged={load} />
+          ? <TicketDetail key={selected} id={selected} onChanged={load} onDeleted={() => { setSelected(null); load(); }} />
           : <section className="card ticket-admin-detail ticket-admin-empty"><Icon name="message" size={28} /><p className="muted">Válassz egy ticketet a listából.</p></section>}
       </div>
     </>

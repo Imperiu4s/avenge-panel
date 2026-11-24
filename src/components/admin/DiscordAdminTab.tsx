@@ -3,6 +3,7 @@ import { ApiError } from '../../api/client';
 import { discordAdminApi, type DiscordJob, type DiscordSettings } from '../../api/store';
 import { formatDateTime } from '../../store/format';
 import { Icon } from '../Icon';
+import { DiscordComposer } from './DiscordComposer';
 
 const KIND_LABELS: Record<string, string> = { apply: 'Szerver berendezése', post: 'Info-üzenetek' };
 
@@ -187,7 +188,8 @@ export function DiscordAdminTab() {
             </button>
           </div>
           <p className="muted small">
-            A berendezés újrafuttatható: a meglévő elemeket frissíti, nem duplikál, és semmit nem töröl.
+            A berendezés újrafuttatható: a meglévő elemeket frissíti, nem duplikál, és semmit nem töröl. Az info-üzenetek
+            (üdvözlés, szabályzat, hogyan működik, előfizetés, GYIK, Foundry, support) a már kint lévő üzeneteket szerkesztik át a mostani szövegekre és linkekre.
             {settings.lastRunAt && ` Utolsó futás: ${KIND_LABELS[settings.lastRunKind] ?? settings.lastRunKind}, ${formatDateTime(settings.lastRunAt)}.`}
           </p>
 
@@ -213,6 +215,8 @@ export function DiscordAdminTab() {
           )}
         </section>
       )}
+
+      {connected && selected && <DiscordComposer />}
 
       {notice && <p className="success-text"><Icon name="check" size={15} /> {notice}</p>}
       {error && <p className="error-text error-in">{error}</p>}
