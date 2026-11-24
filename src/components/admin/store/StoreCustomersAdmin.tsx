@@ -100,7 +100,7 @@ function CustomerDetail({ id, currency, products, onChanged, onClose }: {
           </div>
         </div>
         <div>
-          <span className="field-label">SS előfizetés</span>
+          <span className="field-label">PC Check előfizetés</span>
           <ul className="plain-list">
             {detail.subscriptions.map((s) => (
               <li key={s.id}>
@@ -114,7 +114,7 @@ function CustomerDetail({ id, currency, products, onChanged, onClose }: {
           </ul>
           <div className="inline-form">
             <input type="number" min={1} max={3650} value={days} onChange={(e) => setDays(Number(e.target.value))} aria-label="Napok száma" />
-            <button type="button" className="btn-secondary btn-tiny" disabled={busy} onClick={() => window.confirm(`${days} nap ingyenes SS-hozzáférést adsz ${c.email} részére?`) && run(() => storeAdminApi.grantSubscription(c.id, days))}>
+            <button type="button" className="btn-secondary btn-tiny" disabled={busy} onClick={() => window.confirm(`${days} nap ingyenes PC Check-hozzáférést adsz ${c.email} részére?`) && run(() => storeAdminApi.grantSubscription(c.id, days))}>
               Nap jóváírása
             </button>
           </div>

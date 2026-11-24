@@ -8,6 +8,16 @@ interface ChangelogEntry {
 
 const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '3.5.0',
+    date: '2026-11-24',
+    items: [
+      'Az Avenge SS új neve Avenge PC Check: a weboldalon, az áruházban, a pluginban, a Discord naplóban és a programban is.',
+      'Admin Panel / Szervezetek: az összes szervezet egy helyen, az előfizetőkével együtt. Látszanak a tagok, a vizsgálatok az eredményekkel, az előfizetés, a plugin és a plugin-kulcsok, valamint a szervezet tevékenységnaplója. Csak megtekintés, és minden megnyitás naplózódik.',
+      'A PC Check plugin az áruházban vásárolható meg: az előfizetők a Plugin fülön a letöltés helyett a Vásárlás gombot látják, és kulcsot is csak a vásárlás után hozhatnak létre.',
+      'Letisztultabb témák: eltűnt a háttérben folyamatosan futó csík, a hóesés, a szirmok és a levelek a tartalom mögé kerültek és ritkábbak lettek, a díszek nem mozognak és nem takarják el a tartalmat.'
+    ]
+  },
+  {
     version: '3.4.0',
     date: '2026-11-22',
     items: [

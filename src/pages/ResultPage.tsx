@@ -59,8 +59,9 @@ export function ResultPage() {
     );
   }
 
-  const canShare = user?.canShareResults === true;
-  const canDelete = Boolean(result.sessionCode) && (can('scans.delete.all') || user?.canDeleteOwnScans === true);
+  const foreign = result.foreignOrganization ?? null;
+  const canShare = !foreign && user?.canShareResults === true;
+  const canDelete = !foreign && Boolean(result.sessionCode) && (can('scans.delete.all') || user?.canDeleteOwnScans === true);
 
   async function handleDelete() {
     if (!result?.sessionCode) return;
@@ -85,6 +86,9 @@ export function ResultPage() {
         )}
       </div>
       {deleteError && <p className="error-text">{deleteError}</p>}
+      {foreign && (
+        <p className="foreign-org-banner"><Icon name="layers" size={15} /> Ez a(z) <strong>{foreign}</strong> szervezet vizsgálata. Csak megtekintheted; a megnyitás bekerült a tevékenységnaplódba.</p>
+      )}
 
       <ResultReport result={result} aside={canShare ? <ShareLinkPanel resultId={resultId} /> : null} />
     </main>

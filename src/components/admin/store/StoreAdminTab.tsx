@@ -148,7 +148,7 @@ function Subscriptions() {
 
   return (
     <section className="card stagger-in">
-      <h2 className="card-title"><Icon name="radar" size={18} /> SS tool előfizetések</h2>
+      <h2 className="card-title"><Icon name="radar" size={18} /> PC Check előfizetések</h2>
       <div className="table-scroll">
         <table className="data-table">
           <thead><tr><th>Vásárló</th><th>Állapot</th><th>Díj</th><th>Indult</th><th>Eddig él</th><th>Tebex ref.</th><th /></tr></thead>
@@ -270,7 +270,7 @@ function Settings({ onSaved }: { onSaved: (s: AdminStoreSettings) => void }) {
           </label>
         </div>
 
-        <h2 className="card-title section-gap"><Icon name="radar" size={18} /> SS tool előfizetés</h2>
+        <h2 className="card-title section-gap"><Icon name="radar" size={18} /> PC Check előfizetés</h2>
         <div className="settings-grid">
           <label>
             <span className="field-label">Megnevezés (a Tebex-számlán)</span>

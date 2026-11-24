@@ -5,7 +5,7 @@ export const ROLE_LABELS: Record<string, string> = { Owner: 'Tulajdonos', Admin:
 export const ADMIN_ENTRY_PERMISSIONS = [
   'admin.overview', 'admin.scans', 'users.view', 'users.create', 'settings.view', 'settings.edit', 'audit.view',
   'signatures.view', 'pluginkeys.manage', 'sharelinks.manage', 'scans.purge',
-  'platform.signatures', 'platform.store', 'platform.discord', 'platform.legal', 'platform.theme', 'platform.tickets', 'roles.manage'
+  'platform.signatures', 'platform.store', 'platform.discord', 'platform.legal', 'platform.theme', 'platform.tickets', 'platform.organizations', 'roles.manage'
 ];
 
 export function can(user: CurrentUserView | null | undefined, permission: string): boolean {

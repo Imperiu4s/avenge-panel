@@ -151,17 +151,6 @@ dl, dd, ul, ol { margin: 0; padding: 0; }
   animation: ember-drift-b 32s ease-in-out infinite alternate;
 }
 
-.backdrop-scan {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 170px;
-  background: linear-gradient(180deg, transparent, rgba(var(--signal-rgb), 0.05) 88%, rgba(var(--signal-hot-rgb), 0.2) 100%);
-  animation: scan-down 11s linear infinite;
-  will-change: transform;
-}
-
 .route-sweep {
   position: fixed;
   z-index: 90;
@@ -1929,7 +1918,6 @@ select option { background: var(--ink-2); color: var(--text); }
 @keyframes hex-flicker { to { background-position: 96px 0, 0 54px; } }
 @keyframes print-scan { 0%, 100% { transform: translateY(6px); } 50% { transform: translateY(76px); } }
 @keyframes route-sweep { from { transform: translateY(0); opacity: 1; } to { transform: translateY(100vh); opacity: 0; } }
-@keyframes scan-down { from { transform: translateY(-180px); } to { transform: translateY(100vh); } }
 @keyframes ember-drift-a { from { transform: translate(0, 0) scale(1); } to { transform: translate(180px, 90px) scale(1.2); } }
 @keyframes ember-drift-b { from { transform: translate(0, 0) scale(1.1); } to { transform: translate(-200px, -120px) scale(0.9); } }
 
@@ -2502,7 +2490,7 @@ input[type='checkbox'].switch:focus-visible { outline: 2px solid var(--signal-ho
     transition-duration: 0.001ms !important;
   }
   html { scroll-behavior: auto; }
-  .backdrop-scan, .steps-beam, .timeline-beam, .blade-glint { display: none; }
+  .steps-beam, .timeline-beam, .blade-glint { display: none; }
 }
 
 .discord-token-form input { flex: 1; min-width: 240px; }
@@ -2586,3 +2574,15 @@ input[type='checkbox'].switch:focus-visible { outline: 2px solid var(--signal-ho
   .plugin-reference { grid-template-columns: minmax(0, 1fr); }
   .plugin-list div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
 }
+
+.org-back { background: none; border: 0; padding: 0; margin: 0 0 14px; cursor: pointer; font: inherit; }
+.org-row { cursor: pointer; }
+.org-row:hover td, .org-row:focus-visible td { background: rgba(var(--signal-rgb), 0.06); }
+.org-row:focus-visible { outline: 1px solid rgba(var(--signal-rgb), 0.5); outline-offset: -1px; }
+.org-facts { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px 22px; margin: 6px 0 0; }
+.org-facts div { display: grid; gap: 3px; min-width: 0; }
+.org-facts dt { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3); }
+.org-facts dd { margin: 0; overflow-wrap: anywhere; }
+.foreign-org-banner { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 0 0 16px; padding: 10px 14px; border: 1px dashed rgba(var(--signal-rgb), 0.55); border-radius: 10px; background: rgba(var(--signal-rgb), 0.07); }
+.plugin-buy { display: grid; gap: 10px; justify-items: start; padding: 14px 16px; margin: 12px 0 14px; border: 1px solid rgba(var(--signal-rgb), 0.4); border-radius: 12px; background: rgba(var(--signal-rgb), 0.07); }
+.plugin-buy p { margin: 0; }

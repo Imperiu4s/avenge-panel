@@ -221,7 +221,7 @@ export function HomePage() {
           <p>
             {isAuthenticated
               ? 'Generálj egy kódot, és a játékos pár kattintással elindíthatja a vizsgálatot.'
-              : 'Havi előfizetéssel saját SS panelt kapsz a csapatodnak. Ha már van fiókod, itt tudsz belépni.'}
+              : 'Havi előfizetéssel saját PC Check panelt kapsz a csapatodnak. Ha már van fiókod, itt tudsz belépni.'}
           </p>
           <div className="closing-actions">
             <Link to={isAuthenticated ? '/panel' : '/elofizetes'} className="btn-primary btn-large">

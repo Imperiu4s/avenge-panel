@@ -18,6 +18,8 @@ export interface PluginKeys {
   pluginFileName: string | null;
   pluginSize: number | null;
   pluginUpdatedAt: string | null;
+  pluginOwned: boolean;
+  storeSlug: string | null;
 }
 
 const P = '/api/admin/plugin';

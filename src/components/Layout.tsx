@@ -18,7 +18,6 @@ export function Layout() {
         <span className="backdrop-grid" />
         <span className="backdrop-ember backdrop-ember-a" />
         <span className="backdrop-ember backdrop-ember-b" />
-        <span className="backdrop-scan" />
       </div>
       <SeasonalLayer />
 

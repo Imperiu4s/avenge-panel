@@ -34,7 +34,7 @@ export function StoreShell() {
           <nav className="foundry-bar-links" aria-label="Áruház menü">
             <NavLink to="/store" end className={({ isActive }) => `foundry-bar-link ${isActive ? 'is-active' : ''}`}>Termékek</NavLink>
             {(info?.subscriptionEnabled ?? true) && (
-              <NavLink to="/elofizetes" className={({ isActive }) => `foundry-bar-link ${isActive ? 'is-active' : ''}`}>SS tool előfizetés</NavLink>
+              <NavLink to="/elofizetes" className={({ isActive }) => `foundry-bar-link ${isActive ? 'is-active' : ''}`}>PC Check előfizetés</NavLink>
             )}
             <NavLink to="/tamogatas" className={({ isActive }) => `foundry-bar-link ${isActive ? 'is-active' : ''}`}>
               Támogatás{(me?.unreadTickets ?? 0) > 0 && <span className="foundry-bar-badge" title="Új válasz érkezett">{me?.unreadTickets}</span>}

@@ -5,7 +5,7 @@
 .seasonal-particles {
   position: fixed;
   inset: 0;
-  z-index: 70;
+  z-index: -1;
   width: 100vw;
   height: 100vh;
   pointer-events: none;
@@ -84,14 +84,14 @@
 
 .seasonal-moon {
   position: absolute;
-  top: 120px;
-  right: 7%;
-  width: 150px;
-  height: 150px;
+  top: 84px;
+  right: 2.5%;
+  width: 96px;
+  height: 96px;
   border-radius: 50%;
   background: radial-gradient(circle at 36% 34%, #fff6dc, #f4dca3 55%, #caa76a 100%);
-  box-shadow: 0 0 70px 18px rgba(255, 214, 140, 0.22), 0 0 160px 60px rgba(123, 47, 214, 0.18);
-  opacity: 0.82;
+  box-shadow: 0 0 40px 10px rgba(255, 214, 140, 0.12), 0 0 110px 40px rgba(123, 47, 214, 0.12);
+  opacity: 0.38;
 }
 
 .seasonal-moon::before {
@@ -100,9 +100,9 @@
   inset: 0;
   border-radius: 50%;
   background:
-    radial-gradient(circle at 62% 40%, rgba(150, 120, 70, 0.35) 0 11px, transparent 12px),
-    radial-gradient(circle at 40% 66%, rgba(150, 120, 70, 0.28) 0 16px, transparent 17px),
-    radial-gradient(circle at 72% 70%, rgba(150, 120, 70, 0.25) 0 7px, transparent 8px);
+    radial-gradient(circle at 62% 40%, rgba(150, 120, 70, 0.35) 0 7px, transparent 8px),
+    radial-gradient(circle at 40% 66%, rgba(150, 120, 70, 0.28) 0 10px, transparent 11px),
+    radial-gradient(circle at 72% 70%, rgba(150, 120, 70, 0.25) 0 5px, transparent 6px);
 }
 
 .seasonal-fog {
@@ -122,19 +122,20 @@
 .seasonal-corners {
   position: fixed;
   inset: 0;
-  z-index: 60;
+  z-index: -1;
   pointer-events: none;
   display: none;
+  opacity: 0.7;
 }
 
-@media (min-width: 1440px) {
+@media (min-width: 1600px) {
   .seasonal-corners { display: block; }
 }
 
 .seasonal-corner {
   position: absolute;
   top: 0;
-  width: clamp(80px, calc((100vw - 1260px) / 2), 160px);
+  width: clamp(70px, calc((100vw - 1400px) / 2), 130px);
   height: auto;
 }
 
@@ -142,30 +143,16 @@
 .seasonal-corner-right { right: 0; transform: scaleX(-1); }
 .seasonal-corner-bottom { top: auto; bottom: 0; }
 
-.bauble { animation: seasonal-swing 3.6s ease-in-out infinite alternate; }
-.tulip { animation: seasonal-sway 4.2s ease-in-out infinite alternate; }
-
-.seasonal-web { width: clamp(90px, calc((100vw - 1260px) / 2), 170px); }
-
-.seasonal-spider {
-  position: absolute;
-  top: 0;
-  right: calc((100vw - 1260px) / 4);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  animation: seasonal-spider 11s ease-in-out infinite;
-}
-
-.seasonal-spider-thread { width: 1px; height: 180px; background: linear-gradient(rgba(230, 220, 255, 0.1), rgba(230, 220, 255, 0.55)); }
-.seasonal-spider-body { width: 34px; height: 30px; margin-top: -2px; filter: drop-shadow(0 0 6px rgba(255, 122, 26, 0.35)); }
+.seasonal-web { width: clamp(70px, calc((100vw - 1400px) / 2), 130px); }
 
 .seasonal-trim {
   position: absolute;
   left: 76px;
   right: 30px;
-  bottom: -12px;
-  height: 18px;
+  bottom: 0;
+  height: 12px;
+  overflow: hidden;
+  opacity: 0.75;
   z-index: 3;
   display: flex;
   justify-content: space-between;
@@ -188,16 +175,15 @@
 
 .seasonal-lights span {
   position: relative;
-  width: 6px;
-  height: 10px;
-  margin-top: 6px;
+  width: 5px;
+  height: 7px;
+  margin-top: 4px;
   border-radius: 50% 50% 46% 46%;
   background: var(--bulb);
-  box-shadow: 0 0 8px 2px var(--bulb);
-  animation: seasonal-blink 1.7s ease-in-out infinite alternate;
+  box-shadow: 0 0 5px 1px var(--bulb);
 }
 
-.seasonal-lights span:nth-child(even) { margin-top: 3px; }
+.seasonal-lights span:nth-child(even) { margin-top: 2px; }
 
 .seasonal-lights span::before {
   content: '';
@@ -223,12 +209,10 @@
 }
 
 .seasonal-bunting span {
-  width: 13px;
-  height: 15px;
+  width: 10px;
+  height: 11px;
   clip-path: polygon(0 0, 100% 0, 50% 100%);
-  transform-origin: 50% 0;
-  animation: seasonal-flutter 2.6s ease-in-out infinite alternate;
-  opacity: 0.92;
+  opacity: 0.85;
 }
 
 .seasonal-hat {
@@ -243,8 +227,6 @@
 .seasonal-hat-easter { width: 34px; top: -22px; left: 10px; }
 .seasonal-hat-halloween { width: 38px; top: -20px; left: -10px; transform: rotate(-14deg); filter: drop-shadow(0 0 5px rgba(255, 122, 26, 0.65)); }
 .seasonal-hat-christmas { filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5)); }
-.bunny-ear { transform-box: fill-box; transform-origin: 50% 100%; animation: seasonal-ear 4s ease-in-out infinite; }
-.bunny-ear-right { animation-delay: 0.3s; }
 
 .seasonal-ground {
   position: relative;
@@ -273,53 +255,47 @@
 
 .seasonal-ground-christmas .seasonal-greeting { color: #1d2b4a; text-shadow: 0 0 10px rgba(255, 255, 255, 0.8); bottom: 6px; }
 
-.tree-light { animation: seasonal-blink 1.4s ease-in-out infinite alternate; }
-.pumpkin-glow { animation: seasonal-flicker 2.2s steps(6) infinite; }
-.peek-bunny { animation: seasonal-peek 6s ease-in-out infinite; }
 
 html[data-site-theme='christmas'] .card::before {
   background:
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 16' preserveAspectRatio='none'><path d='M0 0H200V6Q190 13 178 7T156 9T134 6T112 11T90 7T68 10T46 6T24 11T0 8Z' fill='%23eef4ff' fill-opacity='0.82'/></svg>") top left / 100% 13px no-repeat,
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 32'><path d='M22 16C14 6 4 10 2 4C8 4 10 0 14 2C14 6 20 6 22 16Z' fill='%231d7a45'/><path d='M22 16C30 6 40 10 42 4C36 4 34 0 30 2C30 6 24 6 22 16Z' fill='%23238a50'/><circle cx='19' cy='18' r='4' fill='%23e3263a'/><circle cx='26' cy='18' r='4' fill='%23e3263a'/><circle cx='22.5' cy='23' r='4' fill='%23c8102e'/><circle cx='18' cy='16.5' r='1.2' fill='%23fff' fill-opacity='0.7'/></svg>") top 10px right 12px / 40px 29px no-repeat,
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 16' preserveAspectRatio='none'><path d='M0 0H200V6Q190 13 178 7T156 9T134 6T112 11T90 7T68 10T46 6T24 11T0 8Z' fill='%23eef4ff' fill-opacity='0.4'/></svg>") top left / 100% 7px no-repeat,
     linear-gradient(170deg, #161419, #0f0d12);
 }
 
 html[data-site-theme='easter'] .card::before {
   background:
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 34'><g transform='translate(14 14)'><ellipse cx='0' cy='-6' rx='3.6' ry='6.5' fill='%23ffc4dd'/><ellipse cx='0' cy='-6' rx='3.6' ry='6.5' fill='%23ffc4dd' transform='rotate(72)'/><ellipse cx='0' cy='-6' rx='3.6' ry='6.5' fill='%23ffc4dd' transform='rotate(144)'/><ellipse cx='0' cy='-6' rx='3.6' ry='6.5' fill='%23ffc4dd' transform='rotate(216)'/><ellipse cx='0' cy='-6' rx='3.6' ry='6.5' fill='%23ffc4dd' transform='rotate(288)'/><circle r='3.2' fill='%23ffd84d'/></g><g transform='translate(36 20) scale(0.8)'><ellipse cx='0' cy='-6' rx='3.6' ry='6.5' fill='%23d9c8ff'/><ellipse cx='0' cy='-6' rx='3.6' ry='6.5' fill='%23d9c8ff' transform='rotate(72)'/><ellipse cx='0' cy='-6' rx='3.6' ry='6.5' fill='%23d9c8ff' transform='rotate(144)'/><ellipse cx='0' cy='-6' rx='3.6' ry='6.5' fill='%23d9c8ff' transform='rotate(216)'/><ellipse cx='0' cy='-6' rx='3.6' ry='6.5' fill='%23d9c8ff' transform='rotate(288)'/><circle r='3.2' fill='%23fff1c7'/></g></svg>") top 10px right 12px / 46px 30px no-repeat,
-    radial-gradient(circle at 20% 30%, rgba(255, 216, 77, 0.06) 0 1.6px, transparent 2px) 0 0 / 22px 22px,
+    linear-gradient(90deg, rgba(255, 156, 203, 0.5), rgba(255, 224, 138, 0.5), rgba(201, 184, 255, 0.5)) top left / 100% 2px no-repeat,
     linear-gradient(170deg, #17131a, #110e14);
 }
 
 html[data-site-theme='halloween'] .card::before {
   background:
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 70 70'><g stroke='%23d8ccf2' stroke-opacity='0.32' fill='none' stroke-width='0.8'><path d='M70 0L0 0M70 0L10 34M70 0L36 70M70 0L70 70'/><path d='M58 0Q62 6 64 12Q66 8 70 8'/><path d='M44 0Q52 12 54 22Q62 16 70 18'/><path d='M30 0Q40 18 44 34Q58 28 70 30'/><path d='M16 0Q30 26 34 46Q54 40 70 44'/></g><line x1='52' y1='0' x2='52' y2='40' stroke='%23d8ccf2' stroke-opacity='0.35' stroke-width='0.6'/><ellipse cx='52' cy='44' rx='3.6' ry='4.2' fill='%23120a18'/><circle cx='52' cy='39.5' r='2.4' fill='%23120a18'/><g stroke='%23120a18' stroke-width='1' fill='none'><path d='M49 43L45 40M49 45L44 46M49 47L45 50M55 43L59 40M55 45L60 46M55 47L59 50'/></g></svg>") top right / 74px 74px no-repeat,
-    radial-gradient(500px 160px at 50% 110%, rgba(123, 47, 214, 0.1), transparent 70%),
+    linear-gradient(90deg, rgba(255, 122, 26, 0.45), rgba(123, 47, 214, 0.45)) top left / 100% 2px no-repeat,
     linear-gradient(170deg, #15111a, #0e0b12);
 }
 
 html[data-site-theme='christmas'] .btn-primary::before {
-  background: repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.17) 0 7px, transparent 7px 16px), linear-gradient(180deg, var(--btn-top) 0%, var(--btn-mid) 55%, var(--btn-bot) 100%);
+  background: repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.08) 0 7px, transparent 7px 16px), linear-gradient(180deg, var(--btn-top) 0%, var(--btn-mid) 55%, var(--btn-bot) 100%);
 }
 
 html[data-site-theme='easter'] .btn-primary::before {
-  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3) 0 2px, transparent 2.6px) 0 0 / 13px 13px, linear-gradient(180deg, var(--btn-top) 0%, var(--btn-mid) 55%, var(--btn-bot) 100%);
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.14) 0 2px, transparent 2.6px) 0 0 / 13px 13px, linear-gradient(180deg, var(--btn-top) 0%, var(--btn-mid) 55%, var(--btn-bot) 100%);
 }
 
 html[data-site-theme='halloween'] .btn-primary::before {
-  background: repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.17) 0 6px, transparent 6px 14px), linear-gradient(180deg, var(--btn-top) 0%, var(--btn-mid) 55%, var(--btn-bot) 100%);
+  background: repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.1) 0 6px, transparent 6px 14px), linear-gradient(180deg, var(--btn-top) 0%, var(--btn-mid) 55%, var(--btn-bot) 100%);
 }
 
 html[data-site-theme='christmas'] .blade-grip {
-  background: repeating-linear-gradient(112deg, rgba(255, 255, 255, 0.24) 0 10px, transparent 10px 24px), linear-gradient(180deg, var(--grip-top) 0%, var(--grip-mid) 52%, var(--grip-bot) 100%);
+  background: repeating-linear-gradient(112deg, rgba(255, 255, 255, 0.12) 0 10px, transparent 10px 24px), linear-gradient(180deg, var(--grip-top) 0%, var(--grip-mid) 52%, var(--grip-bot) 100%);
 }
 
 html[data-site-theme='easter'] .blade-grip {
-  background: repeating-linear-gradient(112deg, rgba(255, 255, 255, 0.2) 0 8px, transparent 8px 20px), linear-gradient(90deg, var(--grip-top), var(--grip-mid) 55%, var(--grip-bot));
+  background: repeating-linear-gradient(112deg, rgba(255, 255, 255, 0.1) 0 8px, transparent 8px 20px), linear-gradient(90deg, var(--grip-top), var(--grip-mid) 55%, var(--grip-bot));
 }
 
 html[data-site-theme='halloween'] .blade-grip {
-  background: repeating-linear-gradient(112deg, rgba(0, 0, 0, 0.42) 0 10px, transparent 10px 22px), linear-gradient(180deg, var(--grip-top) 0%, var(--grip-mid) 52%, var(--grip-bot) 100%);
+  background: repeating-linear-gradient(112deg, rgba(0, 0, 0, 0.22) 0 10px, transparent 10px 22px), linear-gradient(180deg, var(--grip-top) 0%, var(--grip-mid) 52%, var(--grip-bot) 100%);
 }
 
 html[data-site-theme] .page-head .eyebrow:not(:has(svg))::before {
@@ -355,20 +331,9 @@ html[data-site-theme='easter'] .page-head h1 { text-shadow: 0 0 30px rgba(255, 1
 @keyframes seasonal-aurora { from { transform: translateX(-4%) skewX(-6deg); } to { transform: translateX(5%) skewX(6deg); } }
 @keyframes seasonal-spin { to { transform: rotate(360deg); } }
 @keyframes seasonal-fog { from { transform: translateX(-6%); } to { transform: translateX(6%); } }
-@keyframes seasonal-swing { from { transform: rotate(-4deg); } to { transform: rotate(4deg); } }
-@keyframes seasonal-sway { from { transform: rotate(-3deg); } to { transform: rotate(3deg); } }
-@keyframes seasonal-blink { from { opacity: 1; filter: brightness(1.2); } to { opacity: 0.4; filter: brightness(0.8); } }
-@keyframes seasonal-flutter { from { transform: rotate(-6deg); } to { transform: rotate(6deg); } }
-@keyframes seasonal-ear { 0%, 70%, 100% { transform: rotate(0deg); } 78% { transform: rotate(-12deg); } 86% { transform: rotate(8deg); } }
-@keyframes seasonal-flicker { 0%, 100% { opacity: 1; } 20% { opacity: 0.75; } 40% { opacity: 0.95; } 60% { opacity: 0.6; } 80% { opacity: 0.9; } }
-@keyframes seasonal-peek { 0%, 55%, 100% { transform: translate(1250px, 70px); } 65%, 90% { transform: translate(1250px, 52px); } }
-@keyframes seasonal-spider {
-  0%, 100% { transform: translateY(-120px); }
-  45%, 60% { transform: translateY(40px); }
-}
 
 @media (max-width: 760px) {
-  .seasonal-moon { width: 84px; height: 84px; top: 90px; right: -22px; opacity: 0.45; }
+  .seasonal-moon { width: 64px; height: 64px; top: 80px; right: -16px; opacity: 0.3; }
   .seasonal-sun { width: 380px; height: 380px; top: -180px; left: -160px; }
   .seasonal-trim { left: 46px; right: 12px; }
   .seasonal-ground { height: 110px; }
@@ -376,7 +341,6 @@ html[data-site-theme='easter'] .page-head h1 { text-shadow: 0 0 30px rgba(255, 1
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .bauble, .tulip, .seasonal-spider, .seasonal-lights span, .seasonal-bunting span, .bunny-ear, .tree-light, .pumpkin-glow, .peek-bunny,
   .seasonal-aurora, .seasonal-sun, .seasonal-fog, .seasonal-sky-christmas::before { animation: none; }
 }
 

@@ -116,7 +116,7 @@ export function StorePage() {
         {info?.subscriptionEnabled && (
           <Link to="/elofizetes" className="foundry-sub-cta">
             <Icon name="radar" size={18} />
-            <span><strong>Avenge SS tool</strong><small>havi előfizetéssel, {formatPrice(info.subscriptionPrice, currency)}/hó</small></span>
+            <span><strong>Avenge PC Check</strong><small>havi előfizetéssel, {formatPrice(info.subscriptionPrice, currency)}/hó</small></span>
             <Icon name="arrow-right" size={16} />
           </Link>
         )}
@@ -153,7 +153,7 @@ export function StorePage() {
             : (
               <div className="markdown">
                 <h2>Az Avenge csapat műhelye</h2>
-                <p>Az Avenge elsősorban screenshare (SS) eszköz Minecraft szervereknek. A Foundry ennek a kiegészítése: itt adjuk ki a saját fejlesztésű pluginjainkat és modelljeinket, ugyanazzal a gondossággal, amivel a csalásokat keressük.</p>
+                <p>Az Avenge elsősorban PC Check eszköz Minecraft szervereknek. A Foundry ennek a kiegészítése: itt adjuk ki a saját fejlesztésű pluginjainkat és modelljeinket, ugyanazzal a gondossággal, amivel a csalásokat keressük.</p>
                 <ul>
                   <li>Minden pluginhoz és modellhez azonnali letöltés és frissítések a fiókodban</li>
                   <li>Biztonságos fizetés a Tebexen keresztül</li>
@@ -245,7 +245,7 @@ export function StorePage() {
               <div className="card store-empty">
                 <Icon name={kindTab === 'model' ? 'cube' : 'package'} size={30} />
                 <h3>{all.length === 0 ? (kindTab === 'model' ? 'Hamarosan érkeznek az első modellek' : kindTab === 'plugin' ? 'Hamarosan érkeznek az első pluginok' : 'Hamarosan érkeznek az első termékek') : `Nincs a szűrésnek megfelelő ${noun}`}</h3>
-                <p className="muted">{all.length === 0 ? 'Nézz vissza később, vagy addig próbáld ki az Avenge SS toolt.' : 'Próbálj kevesebb szűrőt.'}</p>
+                <p className="muted">{all.length === 0 ? 'Nézz vissza később, vagy addig próbáld ki az Avenge PC Check előfizetést.' : 'Próbálj kevesebb szűrőt.'}</p>
               </div>
             )}
             <div className="product-grid">

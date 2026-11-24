@@ -103,10 +103,10 @@ function AuthForms() {
         <h2>Miért kell fiók?</h2>
         <ul className="check-list">
           <li><Icon name="download" size={16} /> A megvásárolt pluginjaid, modelljeid és minden frissítésük itt lesz letölthető.</li>
-          <li><Icon name="radar" size={16} /> Az SS tool előfizetésed is ehhez a fiókhoz kötődik.</li>
+          <li><Icon name="radar" size={16} /> A PC Check előfizetésed is ehhez a fiókhoz kötődik.</li>
           <li><Icon name="lock" size={16} /> Kártyaadatot nem tárolunk: a fizetést a Tebex intézi.</li>
         </ul>
-        <p className="muted small">Staff vagy? Az SS panelbe a <Link to="/login">staff belépésnél</Link> jutsz be.</p>
+        <p className="muted small">Staff vagy? A PC Check panelbe a <Link to="/login">staff belépésnél</Link> jutsz be.</p>
       </section>
     </div>
   );
@@ -282,7 +282,7 @@ function Dashboard() {
       replaceToken(token);
       setCurrentPassword('');
       setNewPassword('');
-      setNotice('Jelszó megváltoztatva. Ha van SS panel-fiókod, ott is ez az új jelszó.');
+      setNotice('Jelszó megváltoztatva. Ha van PC Check panel-fiókod, ott is ez az új jelszó.');
     });
   };
 
@@ -343,7 +343,7 @@ function Dashboard() {
           <Link to="/tamogatas" className="btn-secondary btn-block">Ticketjeim</Link>
         </section>
         <section className={`card sub-card stagger-in ${subLive ? 'sub-card-live' : ''}`} style={{ animationDelay: '40ms' }}>
-          <h2 className="card-title"><Icon name="radar" size={18} /> SS tool előfizetés</h2>
+          <h2 className="card-title"><Icon name="radar" size={18} /> PC Check előfizetés</h2>
           {sub ? (
             <>
               <p><span className={`status-pill status-${sub.status.toLowerCase()}`}>{SUBSCRIPTION_STATUS_LABELS[sub.status] ?? sub.status}</span></p>
@@ -354,7 +354,7 @@ function Dashboard() {
               {sub.note && <p className="muted small">{sub.note}</p>}
               {sub.hasPanelAccess && (
                 <button type="button" className={`btn-primary btn-block ${busy === 'panel' ? 'is-loading' : ''}`} onClick={openPanel} disabled={busy !== null}>
-                  <Icon name="radar" size={16} /> Belépés az SS panelbe
+                  <Icon name="radar" size={16} /> Belépés a PC Check panelbe
                 </button>
               )}
               {subLive && <SubscriptionCancel subscription={sub} onChanged={refresh} />}
@@ -362,7 +362,7 @@ function Dashboard() {
             </>
           ) : (
             <>
-              <p className="muted small">Saját SS panel, korlátlan vizsgálati kód, staff fiókok - havi díjért, bármikor lemondható.</p>
+              <p className="muted small">Saját PC Check panel, korlátlan vizsgálati kód, staff fiókok - havi díjért, bármikor lemondható.</p>
               <Link to="/elofizetes" className="btn-secondary btn-block">Részletek</Link>
             </>
           )}
@@ -407,7 +407,7 @@ export function StoreAccountPage() {
       <header className="page-head stagger-in">
         <span className="eyebrow">Vásárlói fiók</span>
         <h1>{isLoggedIn ? `Szia${me?.minecraftUsername || me?.displayName ? `, ${me?.minecraftUsername || me?.displayName}` : ''}!` : 'Belépés az áruházba'}</h1>
-        <p className="muted">{isLoggedIn ? 'Itt éred el a pluginjaidat, a modelljeidet, a rendeléseidet és az SS tool előfizetésedet.' : 'Vásárláshoz és letöltéshez fiók szükséges.'}</p>
+        <p className="muted">{isLoggedIn ? 'Itt éred el a pluginjaidat, a modelljeidet, a rendeléseidet és a PC Check előfizetésedet.' : 'Vásárláshoz és letöltéshez fiók szükséges.'}</p>
       </header>
       {isLoggedIn ? <Dashboard /> : <AuthForms />}
     </main>

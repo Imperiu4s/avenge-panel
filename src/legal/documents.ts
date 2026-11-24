@@ -11,9 +11,9 @@ export const LEGAL_DOCUMENTS: LegalDocument[] = [
     slug: 'aszf',
     title: 'Általános Szerződési Feltételek',
     short: 'ÁSZF',
-    updated: '2026. november 13.',
+    updated: '2026. november 24.',
     body: `
-Ez az Általános Szerződési Feltételek (ÁSZF) a(z) {{weboldal}} weboldalon elérhető, {{szolgaltatas.nev}} néven nyújtott szolgáltatások igénybevételének feltételeit tartalmazza: az **Avenge SS tool** (Minecraft screenshare vizsgálóeszköz) és az **Avenge Foundry** áruház (Minecraft pluginok és modellek értékesítése). A regisztrációval, a vásárlással vagy az előfizetéssel elfogadod ezt az ÁSZF-et.
+Ez az Általános Szerződési Feltételek (ÁSZF) a(z) {{weboldal}} weboldalon elérhető, {{szolgaltatas.nev}} néven nyújtott szolgáltatások igénybevételének feltételeit tartalmazza: az **Avenge PC Check** (Minecraft szerverekhez készült PC Check vizsgálóeszköz) és az **Avenge Foundry** áruház (Minecraft pluginok és modellek értékesítése). A regisztrációval, a vásárlással vagy az előfizetéssel elfogadod ezt az ÁSZF-et.
 
 ## 1. A szolgáltató
 {{szolgaltato.tabla}}
@@ -25,8 +25,8 @@ A fizetéseket és a számlázást viszonteladóként (merchant of record) a {{v
 - **Plugin**: a Szolgáltató által fejlesztett, letölthető Minecraft szerverkiegészítő (digitális tartalom).
 - **Modell**: a Szolgáltató által készített, letölthető Minecraft 3D modell, textúra vagy erőforráscsomag (pl. Blockbench, ModelEngine, ItemsAdder, Oraxen vagy Nexo formátumban; digitális tartalom).
 - **Termék**: a pluginok és a modellek együttes megnevezése.
-- **SS tool**: az Avenge screenshare vizsgálóeszköz (Windows kliensprogram és webes panel).
-- **Előfizetés**: az SS tool havidíjas, automatikusan megújuló használati joga.
+- **PC Check**: az Avenge PC Check vizsgálóeszköze (Windows kliensprogram és webes panel).
+- **Előfizetés**: a PC Check havidíjas, automatikusan megújuló használati joga.
 - **Szolgáltató**: {{szolgaltato.nev}} ({{szolgaltato.jogallas}}), a {{szolgaltatas.nev}} üzemeltetője.
 - **Tebex**: a {{viszontelado.nev}}, amely a fizetéseket viszonteladóként (merchant of record) bonyolítja.
 
@@ -44,13 +44,13 @@ A fizetéseket és a számlázást viszonteladóként (merchant of record) a {{v
 4. A vásárlással a Felhasználó **nem a Termék tulajdonjogát**, hanem a [Licencfeltételek](/jogi/licenc) szerinti, nem kizárólagos használati jogot szerzi meg.
 5. A kompatibilitási adatok (Minecraft-verzió, szerverszoftver, modellkezelő plugin vagy formátum) tájékoztató jellegűek; a Felhasználó vásárlás előtt ellenőrizze, hogy a Termék megfelel-e a szerverének. A modellek használatához a leírásban megjelölt külső plugin (pl. ModelEngine, ItemsAdder) szükséges lehet, amelyet a Felhasználó maga szerez be.
 
-## 5. Az SS tool előfizetés
+## 5. A PC Check előfizetés
 1. Az előfizetés havidíjas, és a Felhasználó lemondásáig **havonta automatikusan megújul**; a díjat a Tebex terheli a megadott fizetési módra.
-2. Az első sikeres fizetés után a Felhasználó saját szervezetet és Tulajdonos rangú hozzáférést kap az SS panelhez, ahol a csapata Admin és Staff rangjainak jogait maga állíthatja be.
+2. Az első sikeres fizetés után a Felhasználó saját szervezetet és Tulajdonos rangú hozzáférést kap a PC Check panelhez, ahol a csapata Admin és Staff rangjainak jogait maga állíthatja be.
 3. Az előfizetés bármikor, egy gombbal lemondható az Előfizetés vagy a Fiókom oldalon; a már kifizetett időszak végéig a hozzáférés megmarad, utána újabb terhelés nem történik. Ha a lemondás után a Tebex mégis terhelne, a terhelést visszatérítjük.
 4. Lejárt előfizetéssel új vizsgálati kód nem generálható; a korábbi eredmények a szervezet megőrzési beállításai szerint maradnak meg.
-5. Az SS tool csak olyan személy vizsgálatára használható, aki a vizsgálatot maga indítja el a kapott kóddal. A Felhasználó (szerver) felel azért, hogy a vizsgálatot jogszerűen, a játékos megfelelő tájékoztatása mellett végezze, és az eredményeket csak a csalás kiszűrésére használja.
-6. Az SS tool eredménye szakmai segítség a döntéshez, nem tévedhetetlen: a végső döntés (pl. kitiltás) a szerver staffjáé.
+5. A PC Check csak olyan személy vizsgálatára használható, aki a vizsgálatot maga indítja el a kapott kóddal. A Felhasználó (szerver) felel azért, hogy a vizsgálatot jogszerűen, a játékos megfelelő tájékoztatása mellett végezze, és az eredményeket csak a csalás kiszűrésére használja.
+6. A PC Check eredménye szakmai segítség a döntéshez, nem tévedhetetlen: a végső döntés (pl. kitiltás) a szerver staffjáé.
 
 ## 6. Elállási jog
 A fogyasztót a 45/2014. (II. 26.) Korm. rendelet alapján főszabályként 14 napos elállási jog illeti meg. **Nem tárgyi adathordozón nyújtott digitális tartalom** (plugin, modell) esetén azonban az elállási jog megszűnik, ha a teljesítés a fogyasztó kifejezett előzetes beleegyezésével kezdődött meg, és a fogyasztó tudomásul vette, hogy ezzel elveszíti az elállási jogát (29. § (1) m) pont). Ezt a hozzájárulást a vásárlás előtt külön jelölőnégyzettel kérjük. Részletek: [Visszatérítési szabályzat](/jogi/visszaterites).
@@ -73,7 +73,7 @@ A Szolgáltató az ÁSZF-et módosíthatja; a módosítást a weboldalon közzé
     slug: 'adatkezeles',
     title: 'Adatkezelési tájékoztató',
     short: 'Adatkezelés',
-    updated: '2026. november 22.',
+    updated: '2026. november 24.',
     body: `
 Ez a tájékoztató az Európai Parlament és a Tanács (EU) 2016/679 rendelete (GDPR) és az Infotv. (2011. évi CXII. törvény) alapján mutatja be, milyen személyes adatokat kezelünk, miért és meddig.
 
@@ -96,7 +96,7 @@ Ez a tájékoztató az Európai Parlament és a Tanács (EU) 2016/679 rendelete 
 
 **Bankkártya-adatot nem kezelünk**: a fizetést a {{viszontelado.nev}} (Egyesült Királyság) végzi saját adatkezelőként; a fizetéshez megadott adatokra a Tebex adatvédelmi tájékoztatója vonatkozik (https://www.tebex.io/privacy). Mi a Tebextől csak a fizetés tényét, összegét, azonosítóját és a vásárló e-mail címét kapjuk meg; a Tebexnek a fizetéshez a regisztrációkor megadott Minecraft-nevet adjuk át.
 
-## 3. Az SS tool vizsgálatai
+## 3. A PC Check vizsgálatai
 A vizsgálatot a játékos maga indítja el a staff tagtól kapott kóddal; a program jelzi, hogy a csatlakozással a vizsgálat elindul, és az eredményt a staff látja.
 
 A vizsgálat során a program a számítógépen ismert csalóprogramok és autoclickerek nyomait keresi. Ehhez elemzi a **számítógépen tárolt fájlokat** (nevüket, méretüket, ujjlenyomatukat és - jar fájloknál - a tartalmukat), a **futtatási előzményeket és rendszernaplókat** (pl. Prefetch, Windows-naplók, törölt fájlok nyomai), a **futó folyamatokat** (a Minecraft memóriájával együtt), a **telepített programokat és beállításaikat** (pl. egérszoftverek makrói), valamint a böngésző- és DNS-előzmények csalással kapcsolatos bejegyzéseit.
@@ -107,14 +107,15 @@ A szerverre a vizsgálat **eredménye** kerül: a találatok (fájlnév, eléré
 - **Jogalap**: a szerver jogos érdeke a tisztességes játék biztosításához (GDPR 6. cikk (1) f)), amelyet a játékos a vizsgálat önkéntes elindításával tudomásul vesz.
 - **Adatkezelő**: az a szerver (szervezet), amelynek staff tagja a vizsgálatot kérte; a Szolgáltató ilyenkor a szerver megbízásából, adatfeldolgozóként tárolja az eredményt. A Szolgáltató saját szerverein végzett vizsgálatoknál a Szolgáltató az adatkezelő.
 - **Megőrzés**: a szervezet beállítása szerint (alapértelmezés szerint a szervezet törléséig, vagy a beállított napok után automatikusan törlődik). A megosztó link legfeljebb 3 napig érvényes.
-- **Minecraft-plugin**: ha a szerver az Avenge Velocity-pluginját használja, a vizsgálati kód kérésekor a játékos nevét és UUID-ját, a vizsgálatot kérő staff nevét és a szerver nevét a szervezet tevékenységnaplója rögzíti. Az SS eseményeiről (indulás, a vizsgálat elkezdése, eredménye és legfontosabb találatai, megtagadása, automatikus kitiltás, kilépés, az SS vége) naplóüzenet kerül a Szolgáltató Discord szerverére, és ha a szerver beállította, a szerver saját Discord szerverére is. Az üzenet tartalmazza a játékos és a staff nevét, a szerver és a szervezet nevét, a vizsgálati kódot, az eredményt és az eredmény linkjét. Cél: a vizsgálatok és a visszaélések nyomon követése; jogalap: a Szolgáltató és a szerver jogos érdeke (GDPR 6. cikk (1) f)).
+- **A Szolgáltató hozzáférése**: a szolgáltatás üzemeltetése, a hibaelhárítás és a visszaélések kivizsgálása érdekében a Szolgáltató megtekintheti a szervezetek adatait (tagok, vizsgálatok és eredmények, előfizetés, plugin-kulcsok). Minden ilyen megtekintést naplózunk.
+- **Minecraft-plugin**: ha a szerver az Avenge Velocity-pluginját használja, a vizsgálati kód kérésekor a játékos nevét és UUID-ját, a vizsgálatot kérő staff nevét és a szerver nevét a szervezet tevékenységnaplója rögzíti. A PC Check eseményeiről (indulás, a vizsgálat elkezdése, eredménye és legfontosabb találatai, megtagadása, automatikus kitiltás, kilépés, a PC Check vége) naplóüzenet kerül a Szolgáltató Discord szerverére, és ha a szerver beállította, a szerver saját Discord szerverére is. Az üzenet tartalmazza a játékos és a staff nevét, a szerver és a szervezet nevét, a vizsgálati kódot, az eredményt és az eredmény linkjét. Cél: a vizsgálatok és a visszaélések nyomon követése; jogalap: a Szolgáltató és a szerver jogos érdeke (GDPR 6. cikk (1) f)).
 
 ## 4. Technikai adatok
 A weboldal a bejelentkezéshez a böngésző helyi tárolójában (localStorage) tárol egy belépési tokent, és megjegyzi az oldal aktuális témáját. Követő (marketing vagy analitikai) sütit nem használunk. A szerver a biztonság érdekében naplózza a kérések IP-címét és idejét, a staff műveleteit pedig a szervezet tevékenységnaplójában rögzíti. {{naplo.megorzes}} Részletek: [Süti tájékoztató](/jogi/cookie).
 
 ## 5. Adatfeldolgozók, címzettek
 - **{{viszontelado.nev}}** (Egyesült Királyság) - fizetés, számlázás (önálló adatkezelő).
-- **Discord Inc.** (USA) - ha a Discord szerverünkön ({{kapcsolat.discord}}) keresel minket, az üzeneteidet a Discord a saját adatvédelmi tájékoztatója szerint kezeli. A Minecraft-plugin SS-naplójának üzeneteit is a Discord tárolja.
+- **Discord Inc.** (USA) - ha a Discord szerverünkön ({{kapcsolat.discord}}) keresel minket, az üzeneteidet a Discord a saját adatvédelmi tájékoztatója szerint kezeli. A Minecraft-plugin PC Check naplójának üzeneteit is a Discord tárolja.
 - **Tárhelyszolgáltatók** (adatfeldolgozók):
 {{tarhely.lista}}
 
@@ -130,7 +131,7 @@ Panasszal a Nemzeti Adatvédelmi és Információszabadság Hatósághoz (NAIH, 
     slug: 'visszaterites',
     title: 'Visszatérítési szabályzat',
     short: 'Visszatérítés',
-    updated: '2026. november 13.',
+    updated: '2026. november 24.',
     body: `
 ## 1. Pluginok és modellek (digitális tartalom)
 A pluginok és a modellek nem tárgyi adathordozón nyújtott digitális tartalmak: a fizetés után azonnal letölthetők. A vásárlás előtt kifejezetten hozzájárulsz a teljesítés azonnali megkezdéséhez, és tudomásul veszed, hogy ezzel **elveszíted a 14 napos elállási jogodat** (45/2014. (II. 26.) Korm. rendelet 29. § (1) m) pont).
@@ -142,7 +143,7 @@ Ettől függetlenül visszatérítést adunk, ha:
 
 Nem adunk visszatérítést, ha a Termék a szervered beállítása, egy nem támogatott verzió, egy hiányzó modellkezelő plugin vagy egy másik plugin miatt nem működik, illetve ha egyszerűen meggondoltad magad a letöltés után.
 
-## 2. SS tool előfizetés
+## 2. PC Check előfizetés
 - Az előfizetést bármikor lemondhatod; a következő hónapra már nem terhelünk.
 - A megkezdett hónap díját nem térítjük vissza, de a hónap végéig használhatod a szolgáltatást.
 - Ha a fizetést követő 14 napon belül a szolgáltatás a mi hibánkból nem volt használható, kérésre a havi díjat visszatérítjük; ilyenkor az előfizetés azonnal megszűnik.
@@ -219,7 +220,7 @@ A Minecraft a Mojang AB védjegye. A(z) {{szolgaltatas.nev}} nem áll kapcsolatb
     slug: 'cookie',
     title: 'Süti (cookie) tájékoztató',
     short: 'Sütik',
-    updated: '2026. november 13.',
+    updated: '2026. november 24.',
     body: `
 ## Mit tárolunk a böngésződben?
 Az avenge.hu **nem használ követő, reklám- vagy analitikai sütit**, ezért nem kérünk hozzájárulást süti-sávval.
@@ -229,7 +230,7 @@ A működéshez szükséges, a böngésző helyi tárolójában (localStorage) t
 | Kulcs | Cél | Élettartam |
 |---|---|---|
 | \`avenge_customer_token\` | vásárlói bejelentkezés | legfeljebb 7 nap, vagy kijelentkezésig |
-| \`avenge_staff_token\` | staff (SS panel) bejelentkezés | legfeljebb 8 óra, vagy kijelentkezésig |
+| \`avenge_staff_token\` | staff (PC Check panel) bejelentkezés | legfeljebb 8 óra, vagy kijelentkezésig |
 | \`avenge.siteTheme\` | az oldal aktuális (ünnepi) témájának megjegyzése, hogy betöltéskor ne villanjon | amíg nem törlöd |
 
 Ezek a bejelentkezéshez, illetve a kért megjelenéshez feltétlenül szükségesek (az ePrivacy irányelv 5. cikk (3) bekezdése szerinti kivétel), és csak a te böngésződben vannak.

@@ -11,7 +11,7 @@ import { SubscriptionCancel } from '../../store/SubscriptionCancel';
 import { formatDate, formatPrice, SUBSCRIPTION_STATUS_LABELS } from '../../store/format';
 
 const FEATURES: { icon: IconName; title: string; text: string }[] = [
-  { icon: 'radar', title: 'Saját SS panel', text: 'Külön szervezet a szerverednek: a vizsgálatokat élőben követed, az eredmények csak nálatok látszanak.' },
+  { icon: 'radar', title: 'Saját PC Check panel', text: 'Külön szervezet a szerverednek: a vizsgálatokat élőben követed, az eredmények csak nálatok látszanak.' },
   { icon: 'key', title: 'Korlátlan vizsgálati kód', text: 'Annyi játékost vizsgálsz, amennyit akarsz - nincs darabszám-korlát.' },
   { icon: 'users', title: 'Staff fiókok', text: 'Tulajdonosként Admin és Staff rangú csapattagokat hozhatsz létre, és jogonként beállíthatod, mit tehetnek.' },
   { icon: 'share', title: 'Megosztható eredmény', text: '3 napig érvényes link az eredményhez, hogy a játékos vagy a vezetőség is lássa.' },
@@ -67,8 +67,8 @@ export function SubscriptionPage() {
     <main className="page store-page">
       <section className="sub-hero stagger-in">
         <div className="sub-hero-copy">
-          <span className="eyebrow">Avenge SS tool</span>
-          <h1>A saját screenshare panel<br /><em>a szerverednek</em>.</h1>
+          <span className="eyebrow">Avenge PC Check</span>
+          <h1>A saját PC Check panel<br /><em>a szerverednek</em>.</h1>
           <p className="muted">Ugyanaz az eszköz, amit mi is használunk: a játékos egy kóddal elindítja a vizsgálatot, te élőben látod, mit talál a gépén. Havi díjért, hűségidő nélkül.</p>
         </div>
         <aside className={`card price-card ${live ? 'price-card-live' : ''}`}>
@@ -86,7 +86,7 @@ export function SubscriptionPage() {
               {sub.hasPanelAccess && (
                 <button type="button" className={`btn-primary btn-block btn-large ${busy ? 'is-loading' : ''}`} onClick={openPanel} disabled={busy}>
                   {busy && <span className="btn-spinner" aria-hidden="true" />}
-                  <Icon name="radar" size={18} /> SS panel megnyitása
+                  <Icon name="radar" size={18} /> PC Check panel megnyitása
                 </button>
               )}
               <SubscriptionCancel subscription={sub} onChanged={refresh} />

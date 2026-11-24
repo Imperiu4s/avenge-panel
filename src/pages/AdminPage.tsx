@@ -12,6 +12,7 @@ import { RolesAdminTab } from '../components/admin/RolesAdminTab';
 import { ThemesAdminTab } from '../components/admin/ThemesAdminTab';
 import { TicketsAdminTab } from '../components/admin/TicketsAdminTab';
 import { PluginAdminTab } from '../components/admin/PluginAdminTab';
+import { OrganizationsAdminTab } from '../components/admin/OrganizationsAdminTab';
 import { supportAdminApi } from '../api/support';
 import { useAuth } from '../auth/AuthContext';
 import { canAny, ROLE_LABELS } from '../auth/permissions';
@@ -36,6 +37,7 @@ const ALL_TABS: { key: string; label: string; icon: IconName; perms: string[] }[
   { key: 'settings', label: 'Beállítások', icon: 'settings', perms: ['settings.view', 'settings.edit', 'sharelinks.manage'] },
   { key: 'audit', label: 'Napló', icon: 'clock', perms: ['audit.view'] },
   { key: 'signatures', label: 'Csalásjelek', icon: 'bug', perms: ['signatures.view', 'platform.signatures'] },
+  { key: 'organizations', label: 'Szervezetek', icon: 'layers', perms: ['platform.organizations'] },
   { key: 'store', label: 'Áruház', icon: 'cart', perms: ['platform.store'] },
   { key: 'discord', label: 'Discord', icon: 'message', perms: ['platform.discord'] },
   { key: 'legal', label: 'Jogi', icon: 'scale', perms: ['platform.legal'] },
@@ -258,6 +260,7 @@ export function AdminPage() {
       {tab === 'themes' && <ThemesAdminTab />}
       {tab === 'tickets' && <TicketsAdminTab />}
       {tab === 'plugin' && <PluginAdminTab />}
+      {tab === 'organizations' && <OrganizationsAdminTab />}
 
       {tab === 'users' && (
         <div className="panel-grid">

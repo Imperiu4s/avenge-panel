@@ -2,32 +2,12 @@ import { useCallback, useEffect, useState } from 'react';
 import { api } from '../../api/client';
 import type { AuditEntryView, AuditPage } from '../../api/types';
 import { Icon } from '../Icon';
+import { AUDIT_ACTION_LABELS } from './auditLabels';
 import { Skeleton } from '../motion';
 import { formatSecond } from '../timeline';
 
 const PAGE_SIZE = 50;
 
-const ACTION_LABELS: Record<string, string> = {
-  'session.create': 'Kódot generált',
-  'session.claim': 'A játékos csatlakozott',
-  'result.submit': 'Eredmény beérkezett',
-  'result.view': 'Megnyitotta az eredményt',
-  'result.share': 'Megosztó linket készített',
-  'result.share_view': 'Megosztó linken megnyitották',
-  'result.share_revoke': 'Megosztó linket visszavont',
-  'share.revoke_all': 'Minden megosztó linket visszavont',
-  'session.delete': 'Vizsgálatot törölt',
-  'session.delete_many': 'Több vizsgálatot törölt',
-  'history.purge': 'Előzményeket törölt',
-  'history.retention': 'Automatikus törlés (megőrzési idő)',
-  'settings.update': 'Beállításokat módosított',
-  'user.create': 'Felhasználót hozott létre',
-  'user.update': 'Felhasználót módosított',
-  'user.delete': 'Felhasználót törölt',
-  'user.reset_password': 'Új jelszót állított be',
-  'user.sign_out': 'Kijelentkeztetett mindenhonnan',
-  'hwid.ban': 'Gépet tiltott ki'
-};
 
 const FILTERS: { value: string; label: string }[] = [
   { value: '', label: 'Mind' },
@@ -37,7 +17,9 @@ const FILTERS: { value: string; label: string }[] = [
   { value: 'history.', label: 'Törlések' },
   { value: 'user.', label: 'Felhasználók' },
   { value: 'settings.', label: 'Beállítások' },
-  { value: 'hwid.', label: 'Tiltások' }
+  { value: 'hwid.', label: 'Tiltások' },
+  { value: 'plugin.', label: 'Plugin' },
+  { value: 'platform.', label: 'Platform' }
 ];
 
 const SETTING_LABELS: Record<string, string> = {
@@ -70,6 +52,8 @@ function summary(entry: AuditEntryView): string | null {
     if (data.onlyUnfinished === true) parts.push('csak befejezetlenek');
     if (data.all === true) parts.push('az összes');
     if (typeof data.clientVersion === 'string') parts.push(`kliens ${data.clientVersion}`);
+    if (typeof data.organization === 'string') parts.push(data.organization);
+    if (typeof data.code === 'string') parts.push(`#${data.code}`);
     if (typeof data.expiresAt === 'string') parts.push(`lejár ${formatSecond(data.expiresAt)}`);
     if (entry.action === 'settings.update') {
       const show = (value: unknown) => (typeof value === 'boolean' ? (value ? 'be' : 'ki') : String(value));
@@ -143,7 +127,7 @@ export function AdminAuditTab() {
                 <td className="mono small">{formatSecond(entry.createdAt)}</td>
                 <td className="mono small">{actor(entry)}</td>
                 <td>
-                  {ACTION_LABELS[entry.action] ?? entry.action}
+                  {AUDIT_ACTION_LABELS[entry.action] ?? entry.action}
                   {summary(entry) && <small className="muted audit-summary">{summary(entry)}</small>}
                 </td>
                 <td className="mono small">{entry.target ?? '-'}</td>

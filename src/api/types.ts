@@ -113,6 +113,7 @@ export interface ScanResultView {
   findings: FindingDto[];
   minecraftUsername: string | null;
   sessionCode?: string | null;
+  foreignOrganization?: string | null;
 }
 
 export type UserRole = 'Owner' | 'Admin' | 'Staff';
