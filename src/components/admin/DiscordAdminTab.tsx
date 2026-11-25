@@ -4,6 +4,7 @@ import { discordAdminApi, type DiscordJob, type DiscordSettings } from '../../ap
 import { formatDateTime } from '../../store/format';
 import { Icon } from '../Icon';
 import { DiscordComposer } from './DiscordComposer';
+import { DiscordIntegrations } from './DiscordIntegrations';
 
 const KIND_LABELS: Record<string, string> = { apply: 'Szerver berendezése', post: 'Info-üzenetek' };
 
@@ -215,6 +216,8 @@ export function DiscordAdminTab() {
           )}
         </section>
       )}
+
+      {connected && selected && <DiscordIntegrations settings={settings} onChanged={load} />}
 
       {connected && selected && <DiscordComposer />}
 

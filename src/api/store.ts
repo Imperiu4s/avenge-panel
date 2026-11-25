@@ -212,6 +212,7 @@ export interface AdminCustomer {
   subscriptionStatus: SubscriptionStatus | null;
   subscriptionEnd: string | null;
   minecraftUsername?: string | null;
+  discordUsername?: string | null;
 }
 
 export interface AdminOrderItem {
@@ -399,6 +400,28 @@ export interface DiscordSettings {
   lastRunLog: string;
   job: DiscordJob;
   gateway?: { state: string; botName: string | null; guilds: number; latencyMs: number | null; connectedAt: string | null; lastError: string | null; lastErrorAt: string | null } | null;
+  link?: { hasClientSecret: boolean; applicationId: string | null; redirectUri: string; linkedAccounts: number } | null;
+  minecraft?: MinecraftNotifier | null;
+}
+
+export interface MinecraftNotifier {
+  channelId: string | null;
+  includeSnapshots: boolean;
+  lastRelease: string | null;
+  lastSnapshot: string | null;
+  paperSupported: boolean;
+  lastCheckAt: string | null;
+  lastError: string | null;
+}
+
+export interface DiscordLink {
+  available: boolean;
+  linked: boolean;
+  username: string | null;
+  userId: string | null;
+  linkedAt: string | null;
+  inGuild: boolean | null;
+  inviteUrl: string | null;
 }
 
 export interface WebhookLog {
@@ -513,6 +536,11 @@ export const storeApi = {
     send<CustomerToken>('/api/store/auth/login', { method: 'POST', body: { email, password } }),
 
   me: () => send<CustomerMe>('/api/store/me', { auth: 'customer' }),
+  discord: () => send<DiscordLink>('/api/store/me/discord', { auth: 'customer' }),
+  discordStart: () => send<{ url: string }>('/api/store/me/discord/start', { method: 'POST', auth: 'customer' }),
+  discordCallback: (code: string, state: string) =>
+    send<DiscordLink>('/api/store/me/discord/callback', { method: 'POST', body: { code, state }, auth: 'customer' }),
+  discordUnlink: () => send<void>('/api/store/me/discord', { method: 'DELETE', auth: 'customer' }),
   changePassword: (currentPassword: string, newPassword: string) =>
     send<CustomerToken>('/api/store/me/password', { method: 'POST', body: { currentPassword, newPassword }, auth: 'customer' }),
   deleteAccount: (password: string) =>
@@ -643,7 +671,10 @@ export interface DiscordSendRequest {
 
 export const discordAdminApi = {
   get: () => send<DiscordSettings>(D, { auth: 'staff' }),
-  update: (body: { botToken?: string | null; guildId?: string | null }) => send<void>(D, { method: 'PUT', body, auth: 'staff' }),
+  update: (body: { botToken?: string | null; guildId?: string | null; clientSecret?: string | null; mcChannelId?: string | null; mcIncludeSnapshots?: boolean | null }) =>
+    send<void>(D, { method: 'PUT', body, auth: 'staff' }),
+  minecraftTest: () => send<void>(`${D}/minecraft/test`, { method: 'POST', auth: 'staff' }),
+  minecraftCheck: () => send<void>(`${D}/minecraft/check`, { method: 'POST', auth: 'staff' }),
   job: () => send<DiscordJob>(`${D}/job`, { auth: 'staff' }),
   structure: () => send<{ lines: string[] }>(`${D}/structure`, { auth: 'staff' }),
   apply: () => send<DiscordJob>(`${D}/apply`, { method: 'POST', auth: 'staff' }),

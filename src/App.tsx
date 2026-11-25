@@ -17,6 +17,7 @@ import { StorePage } from './pages/store/StorePage';
 import { StoreProductPage } from './pages/store/StoreProductPage';
 import { StoreAccountPage } from './pages/store/StoreAccountPage';
 import { StoreThanksPage } from './pages/store/StoreThanksPage';
+import { DiscordCallbackPage } from './pages/store/DiscordCallbackPage';
 import { StoreTebexContinuePage } from './pages/store/StoreTebexContinuePage';
 import { SubscriptionPage } from './pages/store/SubscriptionPage';
 import { SupportPage } from './pages/store/SupportPage';
@@ -44,6 +45,7 @@ export default function App() {
             <Route path="/store/fiok" element={<StoreAccountPage />} />
             <Route path="/store/koszonjuk" element={<StoreThanksPage />} />
             <Route path="/store/tebex" element={<StoreTebexContinuePage />} />
+            <Route path="/discord/callback" element={<DiscordCallbackPage />} />
             <Route path="/store/:slug" element={<StoreProductPage />} />
             <Route path="/elofizetes" element={<SubscriptionPage />} />
             <Route path="/tamogatas" element={<SupportPage />} />

@@ -11,6 +11,7 @@ import { ProfileCustomizer } from '../../components/ProfileCustomizer';
 import { MINECRAFT_NAME_PATTERN } from '../../store/MinecraftNamePrompt';
 import { SubscriptionCancel } from '../../store/SubscriptionCancel';
 import { useCustomer } from '../../store/CustomerAuth';
+import { DiscordLinkCard } from '../../store/DiscordLinkCard';
 import { InvoiceTable } from '../../store/InvoiceTable';
 import { ProductIcon } from '../../store/ProductCard';
 import { formatBytes, formatDate, formatDateTime, formatPrice, ORDER_STATUS_LABELS, SUBSCRIPTION_STATUS_LABELS } from '../../store/format';
@@ -336,6 +337,7 @@ function Dashboard() {
 
       <aside className="side-stack">
         <ProfileSection me={me} refresh={refresh} />
+        <DiscordLinkCard />
         <section className="card stagger-in support-mini" style={{ animationDelay: '30ms' }}>
           <h2 className="card-title"><Icon name="message" size={18} /> Támogatás</h2>
           {(me.unreadTickets ?? 0) > 0

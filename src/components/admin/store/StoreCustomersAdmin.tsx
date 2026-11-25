@@ -64,6 +64,7 @@ function CustomerDetail({ id, currency, products, onChanged, onClose }: {
 
       <dl className="detail-facts">
         <div><dt>Minecraft-név</dt><dd className="mono">{c.minecraftUsername ?? c.displayName ?? '-'}</dd></div>
+        <div><dt>Discord</dt><dd>{c.discordUsername ?? '-'}</dd></div>
         <div><dt>Regisztrált</dt><dd>{formatDateTime(c.createdAt)}</dd></div>
         <div><dt>Utolsó belépés</dt><dd>{formatDateTime(c.lastLoginAt)}</dd></div>
         <div><dt>ÁSZF elfogadva</dt><dd>{detail.acceptedTermsVersion ? `${detail.acceptedTermsVersion} (${formatDate(detail.acceptedTermsAt)})` : '-'}</dd></div>

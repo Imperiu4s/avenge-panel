@@ -2,6 +2,7 @@ import type { ReactElement } from 'react';
 
 export type IconName =
   | 'bolt'
+  | 'discord'
   | 'layers'
   | 'shield'
   | 'key'
@@ -318,7 +319,14 @@ const PATHS: Record<IconName, ReactElement> = {
   ),
   refresh: <path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3M19.5 4v4.2h-4.2" />,
   message: <path d="M4 5.5h16v10.5H9.5L5 19.5V16H4zM8.5 10.5h.01M12 10.5h.01M15.5 10.5h.01" />,
-  external: <path d="M14 4h6v6M20 4l-9 9M18 13.5V20H4V6h6.5" />
+  external: <path d="M14 4h6v6M20 4l-9 9M18 13.5V20H4V6h6.5" />,
+  discord: (
+    <>
+      <path d="M8.5 5.5c-1.6.3-3 .8-4.2 1.6C2.6 10 2 13.2 2.3 16.6c1.4 1.1 3 1.8 4.6 2.2l1.1-1.8M15.5 5.5c1.6.3 3 .8 4.2 1.6 1.7 2.9 2.3 6.1 2 9.5-1.4 1.1-3 1.8-4.6 2.2l-1.1-1.8" />
+      <path d="M7 16.2c3.2 1.4 6.8 1.4 10 0M8.6 5.5l.6 1.4c1.9-.4 3.7-.4 5.6 0l.6-1.4" />
+      <path d="M9.2 12.3h.01M14.8 12.3h.01" strokeWidth={2.6} />
+    </>
+  )
 };
 
 export function Icon({ name, size = 22, className }: { name: IconName; size?: number; className?: string }) {

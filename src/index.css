@@ -2649,3 +2649,26 @@ a.dc-embed-title { color: #00a8fc; }
 .tl-action-game { color: #7dd3fc; border-color: rgba(125, 211, 252, 0.45); background: rgba(125, 211, 252, 0.1); }
 .scan-timeline-game { box-shadow: inset 3px 0 0 #7dd3fc; }
 .ticket-delete { margin-left: auto; }
+
+.mc-notifier-grid { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: end; margin: 6px 0 12px; }
+.mc-channel { display: grid; gap: 6px; flex: 1; min-width: 240px; }
+.mc-channel select { width: 100%; }
+.mc-snap { grid-column: auto; padding-bottom: 8px; }
+.btn-discord {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 10px 16px; border-radius: 10px; border: 1px solid transparent;
+  background: #5865f2; color: #fff; font-weight: 600; cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.btn-discord:hover:not(:disabled) { background: #4752c4; }
+.btn-discord:active:not(:disabled) { transform: translateY(1px); }
+.btn-discord:disabled { opacity: 0.6; cursor: default; }
+.discord-link-who { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.discord-link-who > div { display: grid; gap: 2px; min-width: 0; }
+.discord-link-who strong { overflow-wrap: anywhere; }
+.discord-link-badge {
+  display: inline-grid; place-items: center; width: 36px; height: 36px; flex: none;
+  border-radius: 50%; background: rgba(88, 101, 242, 0.16); color: #8b95ff;
+}
+.discord-link-card .btn-ghost { margin-top: 4px; }
+.discord-callback { max-width: 560px; margin: 40px auto; display: grid; gap: 14px; justify-items: start; }
