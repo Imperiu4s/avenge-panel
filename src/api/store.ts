@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { API_BASE } from './config';
 import { ApiError, clearStoredToken, getStoredToken, SESSION_EXPIRED_EVENT } from './client';
 
@@ -477,19 +478,19 @@ export async function send<T>(path: string, options: { method?: string; body?: u
     if (response.status === 401 && token && mode === 'customer') {
       clearCustomerToken();
       window.dispatchEvent(new Event(CUSTOMER_EXPIRED_EVENT));
-      throw new ApiError(401, 'A bejelentkezésed lejárt, lépj be újra.');
+      throw new ApiError(401, t('A bejelentkezésed lejárt, lépj be újra.'));
     }
     if (response.status === 401 && token && mode === 'staff') {
       clearStoredToken();
       window.dispatchEvent(new Event(SESSION_EXPIRED_EVENT));
-      throw new ApiError(401, 'A munkameneted lejárt, jelentkezz be újra.');
+      throw new ApiError(401, t('A munkameneted lejárt, jelentkezz be újra.'));
     }
     if (response.status === 401 && token && mode === 'customer-optional') {
       clearCustomerToken();
       window.dispatchEvent(new Event(CUSTOMER_EXPIRED_EVENT));
       return send<T>(path, { ...options, auth: 'none' });
     }
-    let message = `Hiba (${response.status})`;
+    let message = t('Hiba ({0})', response.status);
     let code: string | null = null;
     try {
       const errorBody = await response.json();
@@ -508,8 +509,8 @@ async function downloadFile(path: string, auth: AuthMode, fileName: string): Pro
   const token = auth === 'staff' ? getStoredToken() : getCustomerToken();
   const response = await fetch(`${API_BASE}${path}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
   if (!response.ok) {
-    if (response.status === 401) throw new ApiError(401, 'A bejelentkezésed lejárt, lépj be újra.');
-    throw new ApiError(response.status, response.status === 404 ? 'A bizonylat nem található.' : `Hiba (${response.status})`);
+    if (response.status === 401) throw new ApiError(401, t('A bejelentkezésed lejárt, lépj be újra.'));
+    throw new ApiError(response.status, response.status === 404 ? t('A bizonylat nem található.') : t('Hiba ({0})', response.status));
   }
   const url = URL.createObjectURL(await response.blob());
   const link = document.createElement('a');
@@ -701,5 +702,5 @@ export async function tebexContinue(target: { order?: string | null; subscriptio
   }
   if (response.ok && body.checkoutUrl) return { checkoutUrl: body.checkoutUrl };
   if (response.status === 409 && body.loginUrl) return { loginUrl: body.loginUrl, message: body.message ?? '' };
-  throw new ApiError(response.status, body.message ?? `Hiba (${response.status})`);
+  throw new ApiError(response.status, body.message ?? t('Hiba ({0})', response.status));
 }

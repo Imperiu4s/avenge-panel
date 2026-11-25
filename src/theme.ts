@@ -1,3 +1,4 @@
+import { t as tr } from './i18n';
 import { useSyncExternalStore } from 'react';
 import { API_BASE } from './api/config';
 
@@ -20,8 +21,8 @@ export interface SiteTheme {
 export const SITE_THEMES: SiteTheme[] = [
   {
     key: 'default',
-    label: 'Alap',
-    tagline: 'Az Avenge megszokott, vörös arculata, díszek nélkül.',
+    label: tr('Alap'),
+    tagline: tr('Az Avenge megszokott, vörös arculata, díszek nélkül.'),
     greeting: null,
     signal: '#ff2d37',
     hot: '#ff6a4d',
@@ -33,9 +34,9 @@ export const SITE_THEMES: SiteTheme[] = [
   },
   {
     key: 'christmas',
-    label: 'Karácsonyi',
-    tagline: 'Hóesés, fényfüzér, mikulássapka, havas kártyák, fenyők és ajándékok.',
-    greeting: 'Kellemes ünnepeket kíván az Avenge csapata!',
+    label: tr('Karácsonyi'),
+    tagline: tr('Hóesés, fényfüzér, mikulássapka, havas kártyák, fenyők és ajándékok.'),
+    greeting: tr('Kellemes ünnepeket kíván az Avenge csapata!'),
     signal: '#e3263a',
     hot: '#ffcf5a',
     deep: '#0f6b3a',
@@ -46,9 +47,9 @@ export const SITE_THEMES: SiteTheme[] = [
   },
   {
     key: 'easter',
-    label: 'Húsvéti',
-    tagline: 'Pasztell színek, hulló szirmok, pillangók, festett tojások, nyuszifül és virágos rét.',
-    greeting: 'Kellemes húsvéti ünnepeket kíván az Avenge csapata!',
+    label: tr('Húsvéti'),
+    tagline: tr('Pasztell színek, hulló szirmok, pillangók, festett tojások, nyuszifül és virágos rét.'),
+    greeting: tr('Kellemes húsvéti ünnepeket kíván az Avenge csapata!'),
     signal: '#ff7eb6',
     hot: '#ffd84d',
     deep: '#7c5cff',
@@ -60,8 +61,8 @@ export const SITE_THEMES: SiteTheme[] = [
   {
     key: 'halloween',
     label: 'Halloween',
-    tagline: 'Narancs és lila, denevérek, pókhálók, lógó pókok, telihold, köd és világító tökök.',
-    greeting: 'Boldog Halloweent kíván az Avenge csapata!',
+    tagline: tr('Narancs és lila, denevérek, pókhálók, lógó pókok, telihold, köd és világító tökök.'),
+    greeting: tr('Boldog Halloweent kíván az Avenge csapata!'),
     signal: '#ff7a1a',
     hot: '#ffb347',
     deep: '#7b2fd6',

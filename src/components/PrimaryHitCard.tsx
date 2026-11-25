@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import type { FindingDto, ScanResultView } from '../api/types';
 import { Icon } from './Icon';
 import { HIT_KIND_LABELS, isSignal, rankHits, type PrimaryHit } from './primaryHit';
@@ -5,10 +6,10 @@ import { relationToGame } from './minecraftSessions';
 import { beforeScan, formatSecond } from './timeline';
 
 const SEVERITY_LABELS: Record<string, string> = {
-  Critical: 'Kritikus',
-  High: 'Magas',
-  Medium: 'Közepes',
-  Low: 'Alacsony',
+  Critical: t('Kritikus'),
+  High: t('Magas'),
+  Medium: t('Közepes'),
+  Low: t('Alacsony'),
   Info: 'Info'
 };
 
@@ -33,14 +34,12 @@ export function PrimaryHitCard({ result, onReveal }: Props) {
     return (
       <section className="card primary-hit primary-hit-clean stagger-in" style={{ animationDelay: '120ms' }}>
         <div className="primary-hit-head">
-          <h2 className="card-title"><Icon name="target" size={18} /> Mire jelzett</h2>
+          <h2 className="card-title"><Icon name="target" size={18} />{' '}{t('Mire jelzett')}</h2>
         </div>
         <p className="primary-hit-none">
-          <Icon name="check" size={18} /> Nem talált csalást vagy autoclickert ezen a gépen.
-        </p>
+          <Icon name="check" size={18} />{' '}{t('Nem talált csalást vagy autoclickert ezen a gépen.')}</p>
         {faint && (
-          <p className="muted small primary-hit-faint">
-            Leggyengébb nyom, ami nem számít jelzésnek: {faint.name}
+          <p className="muted small primary-hit-faint">{t('Leggyengébb nyom, ami nem számít jelzésnek:')}{' '}{faint.name}
             {' '}({SEVERITY_LABELS[faint.finding.severity]?.toLowerCase()}).
           </p>
         )}
@@ -51,10 +50,10 @@ export function PrimaryHitCard({ result, onReveal }: Props) {
   return (
     <section className={`card primary-hit primary-hit-${primary.kind} stagger-in`} style={{ animationDelay: '120ms' }}>
       <div className="primary-hit-head">
-        <h2 className="card-title"><Icon name="target" size={18} /> Mire jelzett</h2>
+        <h2 className="card-title"><Icon name="target" size={18} />{' '}{t('Mire jelzett')}</h2>
         <div className="primary-hit-counts">
-          <span className={cheatCount > 0 ? 'hit-count hit-count-cheat' : 'hit-count'}>{cheatCount} csalás</span>
-          <span className={clickerCount > 0 ? 'hit-count hit-count-autoclicker' : 'hit-count'}>{clickerCount} autoclicker</span>
+          <span className={cheatCount > 0 ? 'hit-count hit-count-cheat' : 'hit-count'}>{cheatCount}{' '}{t('csalás')}</span>
+          <span className={clickerCount > 0 ? 'hit-count hit-count-autoclicker' : 'hit-count'}>{clickerCount}{' '}{t('autoclicker')}</span>
         </div>
       </div>
 
@@ -65,7 +64,7 @@ export function PrimaryHitCard({ result, onReveal }: Props) {
           <p className="primary-hit-label">{primary.finding.label}</p>
           <dl className="primary-hit-facts">
             <div>
-              <dt>Súly</dt>
+              <dt>{t('Súly')}</dt>
               <dd>
                 <span className={`severity-badge severity-${primary.finding.severity.toLowerCase()}`}>
                   {SEVERITY_LABELS[primary.finding.severity]}
@@ -74,19 +73,19 @@ export function PrimaryHitCard({ result, onReveal }: Props) {
             </div>
             {primary.reason && (
               <div className="primary-hit-wide">
-                <dt>Miért</dt>
+                <dt>{t('Miért')}</dt>
                 <dd>{primary.reason}</dd>
               </div>
             )}
             {primary.finding.filePath && (
               <div className="primary-hit-wide">
-                <dt>Hol</dt>
+                <dt>{t('Hol')}</dt>
                 <dd className="mono">{primary.finding.filePath}</dd>
               </div>
             )}
             {primary.downloadedFrom && (
               <div className="primary-hit-wide">
-                <dt>Letöltve innen</dt>
+                <dt>{t('Letöltve innen')}</dt>
                 <dd className="mono">{primary.downloadedFrom}</dd>
               </div>
             )}
@@ -101,33 +100,32 @@ export function PrimaryHitCard({ result, onReveal }: Props) {
             )}
             {relation && (
               <div className="primary-hit-wide">
-                <dt>A Minecrafthez képest</dt>
+                <dt>{t('A Minecrafthez képest')}</dt>
                 <dd className={relation.during ? 'mc-relation mc-during' : 'mc-relation'}>
                   {relation.during && <Icon name="alert" size={14} />} {relation.text}
                 </dd>
               </div>
             )}
             <div>
-              <dt>Forrás</dt>
+              <dt>{t('Forrás')}</dt>
               <dd>{primary.finding.source}</dd>
             </div>
           </dl>
-          <button type="button" className="btn-ghost btn-tiny primary-hit-reveal" onClick={() => onReveal(primary.finding)}>
-            Részletek és idővonal <Icon name="arrow-right" size={13} />
+          <button type="button" className="btn-ghost btn-tiny primary-hit-reveal" onClick={() => onReveal(primary.finding)}>{t('Részletek és idővonal')}{' '}<Icon name="arrow-right" size={13} />
           </button>
         </div>
       </div>
 
       {others.length > 0 && (
         <div className="primary-hit-others">
-          <span className="primary-hit-others-title">Ezen kívül még</span>
+          <span className="primary-hit-others-title">{t('Ezen kívül még')}</span>
           <ul>
             {others.slice(0, MAX_OTHERS).map((hit, index) => (
               <OtherHit key={`${hit.finding.label}-${index}`} hit={hit} sessions={result.minecraftSessions} onReveal={onReveal} />
             ))}
           </ul>
           {others.length > MAX_OTHERS && (
-            <p className="muted small">és további {others.length - MAX_OTHERS} jelzés a találatok között.</p>
+            <p className="muted small">{t('és további')}{' '}{others.length - MAX_OTHERS}{' '}{t('jelzés a találatok között.')}</p>
           )}
         </div>
       )}
@@ -145,7 +143,7 @@ function OtherHit({ hit, sessions, onReveal }: { hit: PrimaryHit; sessions: Scan
         <span className={`severity-badge severity-${hit.finding.severity.toLowerCase()}`}>
           {SEVERITY_LABELS[hit.finding.severity]}
         </span>
-        {relation?.during && <span className="mc-chip">a játék mellett</span>}
+        {relation?.during && <span className="mc-chip">{t('a játék mellett')}</span>}
       </button>
     </li>
   );

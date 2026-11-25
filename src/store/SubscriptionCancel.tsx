@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useState } from 'react';
 import { ApiError } from '../api/client';
 import { storeApi, type CustomerSubscription } from '../api/store';
@@ -13,7 +14,7 @@ export function SubscriptionCancel({ subscription, onChanged }: { subscription: 
   const [manageUrl, setManageUrl] = useState<string | null>(null);
 
   async function cancel() {
-    if (!window.confirm(`Lemondod az előfizetést? ${formatDate(subscription.currentPeriodEnd)}-ig még használhatod, utána nem terhelünk többet. A lejárat után (3 nap türelmi idővel) a szervezeted minden vizsgálatával együtt törlődik.`)) return;
+    if (!window.confirm(t('Lemondod az előfizetést? {0}-ig még használhatod, utána nem terhelünk többet. A lejárat után (3 nap türelmi idővel) a szervezeted minden vizsgálatával együtt törlődik.', formatDate(subscription.currentPeriodEnd)))) return;
     setBusy(true);
     setError(null);
     try {
@@ -22,7 +23,7 @@ export function SubscriptionCancel({ subscription, onChanged }: { subscription: 
       setManageUrl(result.manageUrl);
       await onChanged();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Nem sikerült lemondani. Próbáld újra.');
+      setError(err instanceof ApiError ? err.message : t('Nem sikerült lemondani. Próbáld újra.'));
     } finally {
       setBusy(false);
     }
@@ -35,19 +36,17 @@ export function SubscriptionCancel({ subscription, onChanged }: { subscription: 
       {subscription.status === 'Active' && (
         <button type="button" className={`btn-ghost btn-block btn-danger ${busy ? 'is-loading' : ''}`} onClick={cancel} disabled={busy}>
           {busy && <span className="btn-spinner" aria-hidden="true" />}
-          <Icon name="x" size={15} /> Előfizetés lemondása
-        </button>
+          <Icon name="x" size={15} />{' '}{t('Előfizetés lemondása')}</button>
       )}
       {subscription.status === 'CancelPending' && !message && (
-        <p className="muted small"><Icon name="check" size={14} /> Lemondva. {formatDate(subscription.currentPeriodEnd)}-ig még használhatod, utána nem terhelünk többet.</p>
+        <p className="muted small"><Icon name="check" size={14} />{' '}{t('Lemondva.')}{' '}{formatDate(subscription.currentPeriodEnd)}{t('-ig még használhatod, utána nem terhelünk többet.')}</p>
       )}
       {message && <p className={tebexLink ? 'notice-text' : 'success-text'}><Icon name={tebexLink ? 'info' : 'check'} size={15} /> {message}</p>}
       {tebexLink && (
         <div className="sub-cancel-tebex">
-          {!message && <p className="muted small">A Tebexnél az automatikus megújítást még le kell állítani. Ha mégis terhelés érkezne, automatikusan visszatérítjük.</p>}
+          {!message && <p className="muted small">{t('A Tebexnél az automatikus megújítást még le kell állítani. Ha mégis terhelés érkezne, automatikusan visszatérítjük.')}</p>}
           <a href={tebexLink} target="_blank" rel="noopener noreferrer" className="btn-secondary btn-block">
-            <Icon name="external" size={14} /> Megújítás leállítása a Tebexnél
-          </a>
+            <Icon name="external" size={14} />{' '}{t('Megújítás leállítása a Tebexnél')}</a>
         </div>
       )}
       {error && <p className="error-text error-in">{error}</p>}

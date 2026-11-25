@@ -1,3 +1,4 @@
+import { t } from '../../../i18n';
 import { useEffect, useMemo, useState } from 'react';
 import { ApiError } from '../../../api/client';
 import { storeAdminApi, type StoreInvoice } from '../../../api/store';
@@ -16,7 +17,7 @@ export function StoreInvoicesAdmin() {
     const timer = window.setTimeout(() => {
       storeAdminApi.invoices(query.trim(), kind)
         .then((list) => { if (alive) { setInvoices(list); setError(null); } })
-        .catch((err) => { if (alive) setError(err instanceof ApiError ? err.message : 'Nem sikerült betölteni a bizonylatokat.'); });
+        .catch((err) => { if (alive) setError(err instanceof ApiError ? err.message : t('Nem sikerült betölteni a bizonylatokat.')); });
     }, 250);
     return () => { alive = false; window.clearTimeout(timer); };
   }, [query, kind]);
@@ -31,29 +32,29 @@ export function StoreInvoicesAdmin() {
     <section className="card stagger-in">
       <div className="scans-head">
         <h2 className="card-title">
-          <Icon name="file" size={18} /> Bizonylatok{' '}
+          <Icon name="file" size={18} />{' '}{t('Bizonylatok')}{' '}
           <span className="muted small">
-            ({invoices ? invoices.length : '…'}{totals.map(([currency, sum]) => ` · nettó ${formatPrice(sum, currency)}`).join('')})
+            ({invoices ? invoices.length : '…'}{totals.map(([currency, sum]) => t(' · nettó {0}', formatPrice(sum, currency))).join('')})
           </span>
         </h2>
         <div className="inline-form">
           <label className="filter-search filter-search-inline">
             <Icon name="search" size={15} />
-            <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Szám, e-mail vagy tranzakció" aria-label="Keresés" />
+            <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t('Szám, e-mail vagy tranzakció')} aria-label={t('Keresés')} />
           </label>
-          <select className="role-select" value={kind} onChange={(e) => setKind(e.target.value)} aria-label="Bizonylat típusa">
-            <option value="">Minden típus</option>
-            <option value="purchase">Plugin vásárlás</option>
-            <option value="subscription">Előfizetés</option>
-            <option value="refund">Visszatérítés</option>
+          <select className="role-select" value={kind} onChange={(e) => setKind(e.target.value)} aria-label={t('Bizonylat típusa')}>
+            <option value="">{t('Minden típus')}</option>
+            <option value="purchase">{t('Plugin vásárlás')}</option>
+            <option value="subscription">{t('Előfizetés')}</option>
+            <option value="refund">{t('Visszatérítés')}</option>
           </select>
         </div>
       </div>
-      {invoices && <InvoiceTable invoices={invoices} download={storeAdminApi.downloadInvoice} showBuyer empty="Nincs a szűrésnek megfelelő bizonylat." />}
+      {invoices && <InvoiceTable invoices={invoices} download={storeAdminApi.downloadInvoice} showBuyer empty={t('Nincs a szűrésnek megfelelő bizonylat.')} />}
       {error && <p className="error-text error-in">{error}</p>}
       <p className="invoice-note small muted">
         <Icon name="lock" size={15} />
-        <span>A bizonylatok kiállítás után nem módosíthatók és nem törölhetők, a vásárló fiókjának törlése után is megmaradnak. Visszatérítéskor új, negatív összegű bizonylat készül, ami az eredetire hivatkozik.</span>
+        <span>{t('A bizonylatok kiállítás után nem módosíthatók és nem törölhetők, a vásárló fiókjának törlése után is megmaradnak. Visszatérítéskor új, negatív összegű bizonylat készül, ami az eredetire hivatkozik.')}</span>
       </p>
     </section>
   );

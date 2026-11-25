@@ -1,3 +1,4 @@
+import { t, locale } from '../i18n';
 export interface TimelineEvent {
   time: string;
   action: string;
@@ -43,7 +44,7 @@ export function parseChanges(value: string | null | undefined): TimedChange[] {
 }
 
 export function formatSecond(iso: string): string {
-  return new Date(iso).toLocaleString('hu-HU', {
+  return new Date(iso).toLocaleString(locale, {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -55,13 +56,13 @@ export function formatSecond(iso: string): string {
 
 export function beforeScan(eventIso: string, scanIso: string): string {
   const seconds = Math.round((new Date(scanIso).getTime() - new Date(eventIso).getTime()) / 1000);
-  if (seconds < 0) return 'a vizsgálat közben';
-  if (seconds < 60) return `${seconds} másodperccel a vizsgálat előtt`;
+  if (seconds < 0) return t('a vizsgálat közben');
+  if (seconds < 60) return t('{0} másodperccel a vizsgálat előtt', seconds);
   const minutes = Math.round(seconds / 60);
-  if (minutes < 60) return `${minutes} perccel a vizsgálat előtt`;
+  if (minutes < 60) return t('{0} perccel a vizsgálat előtt', minutes);
   const hours = Math.round(minutes / 60);
-  if (hours < 48) return `${hours} órával a vizsgálat előtt`;
-  return `${Math.round(hours / 24)} nappal a vizsgálat előtt`;
+  if (hours < 48) return t('{0} órával a vizsgálat előtt', hours);
+  return t('{0} nappal a vizsgálat előtt', Math.round(hours / 24));
 }
 
 export interface TimingLabel {
@@ -75,20 +76,20 @@ export function changeTiming(change: TimedChange): TimingLabel {
     return { badge: 'pontos', tone: 'exact', text: formatSecond(change.exact) };
   }
   if (change.notBefore && change.notAfter) {
-    return { badge: 'időablak', tone: 'window', text: `${formatSecond(change.notBefore)} – ${formatSecond(change.notAfter)}` };
+    return { badge: t('időablak'), tone: 'window', text: `${formatSecond(change.notBefore)} – ${formatSecond(change.notAfter)}` };
   }
   if (change.notAfter) {
-    return { badge: 'legkésőbb', tone: 'window', text: formatSecond(change.notAfter) };
+    return { badge: t('legkésőbb'), tone: 'window', text: formatSecond(change.notAfter) };
   }
-  return { badge: 'ismeretlen', tone: 'unknown', text: 'az időpontot a program nem rögzíti' };
+  return { badge: 'ismeretlen', tone: 'unknown', text: t('az időpontot a program nem rögzíti') };
 }
 
 export function eventTiming(event: TimelineEvent): TimingLabel {
   if (event.precision === 'kozott' && event.notBefore) {
-    return { badge: 'időablak', tone: 'window', text: `${formatSecond(event.notBefore)} – ${formatSecond(event.time)}` };
+    return { badge: t('időablak'), tone: 'window', text: `${formatSecond(event.notBefore)} – ${formatSecond(event.time)}` };
   }
   if (event.precision === 'legkesobb') {
-    return { badge: 'legkésőbb', tone: 'window', text: formatSecond(event.time) };
+    return { badge: t('legkésőbb'), tone: 'window', text: formatSecond(event.time) };
   }
   return { badge: 'pontos', tone: 'exact', text: formatSecond(event.time) };
 }

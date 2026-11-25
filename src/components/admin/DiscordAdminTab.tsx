@@ -1,3 +1,4 @@
+import { t } from '../../i18n';
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { ApiError } from '../../api/client';
 import { discordAdminApi, type DiscordJob, type DiscordSettings } from '../../api/store';
@@ -6,7 +7,7 @@ import { Icon } from '../Icon';
 import { DiscordComposer } from './DiscordComposer';
 import { DiscordIntegrations } from './DiscordIntegrations';
 
-const KIND_LABELS: Record<string, string> = { apply: 'Szerver berendezése', post: 'Info-üzenetek' };
+const KIND_LABELS: Record<string, string> = { apply: t('Szerver berendezése'), post: t('Info-üzenetek') };
 
 export function DiscordAdminTab() {
   const [settings, setSettings] = useState<DiscordSettings | null>(null);
@@ -26,7 +27,7 @@ export function DiscordAdminTab() {
       setJob(s.job);
       setGuildId(s.guildId ?? '');
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Nem sikerült betölteni a Discord-beállításokat.');
+      setError(err instanceof ApiError ? err.message : t('Nem sikerült betölteni a Discord-beállításokat.'));
     }
   }, []);
 
@@ -60,7 +61,7 @@ export function DiscordAdminTab() {
     try {
       await action();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Nem sikerült.');
+      setError(err instanceof ApiError ? err.message : t('Nem sikerült.'));
     } finally {
       setBusy(null);
     }
@@ -71,7 +72,7 @@ export function DiscordAdminTab() {
     run('token', async () => {
       await discordAdminApi.update({ botToken: token.trim() });
       setToken('');
-      setNotice('Bot token elmentve a szerveren.');
+      setNotice(t('Bot token elmentve a szerveren.'));
       await load();
     });
   };
@@ -79,14 +80,14 @@ export function DiscordAdminTab() {
   const saveGuild = (id: string) => run('guild', async () => {
     setGuildId(id);
     await discordAdminApi.update({ guildId: id });
-    setNotice('Szerver kiválasztva.');
+    setNotice(t('Szerver kiválasztva.'));
     await load();
   });
 
   const start = (kind: 'apply' | 'post') => {
     const question = kind === 'apply'
-      ? 'Berendezed a Discord szervert a terv szerint? Létrehozza a hiányzó rangokat és csatornákat, bekapcsolja a Community funkciót, és beállítja az ikont. Meglévő csatornát nem töröl.'
-      : 'Kiküldöd (vagy frissíted) az info-üzeneteket az info-csatornákba?';
+      ? t('Berendezed a Discord szervert a terv szerint? Létrehozza a hiányzó rangokat és csatornákat, bekapcsolja a Community funkciót, és beállítja az ikont. Meglévő csatornát nem töröl.')
+      : t('Kiküldöd (vagy frissíted) az info-üzeneteket az info-csatornákba?');
     if (!window.confirm(question)) return;
     run(kind, async () => {
       setJob(kind === 'apply' ? await discordAdminApi.apply() : await discordAdminApi.post());
@@ -98,7 +99,7 @@ export function DiscordAdminTab() {
   });
 
   if (!settings) {
-    return <section className="card">{error ? <p className="error-text">{error}</p> : <p className="muted">Betöltés...</p>}</section>;
+    return <section className="card">{error ? <p className="error-text">{error}</p> : <p className="muted">{t('Betöltés...')}</p>}</section>;
   }
 
   const connected = settings.hasToken && !settings.botError && settings.botId;
@@ -109,18 +110,18 @@ export function DiscordAdminTab() {
     <>
       <section className="card stagger-in">
         <div className="scans-head">
-          <h2 className="card-title"><Icon name="message" size={18} /> Discord bot</h2>
+          <h2 className="card-title"><Icon name="message" size={18} />{' '}{t('Discord bot')}</h2>
           <span className="discord-bot-status">
             {connected
-              ? <span className="status-pill status-active">Kapcsolódva{settings.botName ? `: ${settings.botName}` : ''}</span>
-              : <span className="status-pill status-pending">{settings.hasToken ? 'Hibás kapcsolat' : 'Nincs beállítva'}</span>}
+              ? <span className="status-pill status-active">{t('Kapcsolódva')}{settings.botName ? `: ${settings.botName}` : ''}</span>
+              : <span className="status-pill status-pending">{settings.hasToken ? t('Hibás kapcsolat') : t('Nincs beállítva')}</span>}
             {settings.gateway && (
-              <span className={`status-pill ${settings.gateway.state === 'connected' ? 'status-active' : 'status-pending'}`} title="A bot folyamatos kapcsolata a Discorddal (online állapot)">
-                {settings.gateway.state === 'connected' ? `Online${settings.gateway.latencyMs !== null ? ` · ${settings.gateway.latencyMs} ms` : ''}` : settings.gateway.state === 'no-token' ? 'Offline' : 'Csatlakozik...'}
+              <span className={`status-pill ${settings.gateway.state === 'connected' ? 'status-active' : 'status-pending'}`} title={t('A bot folyamatos kapcsolata a Discorddal (online állapot)')}>
+                {settings.gateway.state === 'connected' ? t('Online{0}', settings.gateway.latencyMs !== null ? ` · ${settings.gateway.latencyMs} ms` : '') : settings.gateway.state === 'no-token' ? t('Offline') : 'Csatlakozik...'}
               </span>
             )}
             {settings.hasToken && (
-              <button type="button" className="btn-ghost btn-tiny" title="Bot újracsatlakoztatása" onClick={() => discordAdminApi.restartGateway().then(load).catch(() => undefined)}>
+              <button type="button" className="btn-ghost btn-tiny" title={t('Bot újracsatlakoztatása')} onClick={() => discordAdminApi.restartGateway().then(load).catch(() => undefined)}>
                 <Icon name="refresh" size={13} />
               </button>
             )}
@@ -130,9 +131,9 @@ export function DiscordAdminTab() {
         {settings.gateway?.lastError && settings.gateway.state !== 'connected' && <p className="error-text small">{settings.gateway.lastError}</p>}
 
         <ol className="setup-steps small muted">
-          <li>A <a className="text-link" href="https://discord.com/developers/applications" target="_blank" rel="noopener noreferrer">Discord Developer Portalon</a> hozz létre egy alkalmazást, a <b>Bot</b> fülön kérj új tokent (Reset Token), és másold be ide.</li>
-          <li>Hívd meg a botot a szerveredre a lenti gombbal (Administrator joggal).</li>
-          <li>Válaszd ki a szervert, majd indítsd a berendezést. A Szerverbeállítások → Szerepkörök alatt a bot szerepköre legyen a lista tetején.</li>
+          <li>{t('A')}{' '}<a className="text-link" href="https://discord.com/developers/applications" target="_blank" rel="noopener noreferrer">{t('Discord Developer Portalon')}</a>{' '}{t('hozz létre egy alkalmazást, a')}{' '}<b>{t('Bot')}</b>{' '}{t('fülön kérj új tokent (Reset Token), és másold be ide.')}</li>
+          <li>{t('Hívd meg a botot a szerveredre a lenti gombbal (Administrator joggal).')}</li>
+          <li>{t('Válaszd ki a szervert, majd indítsd a berendezést. A Szerverbeállítások → Szerepkörök alatt a bot szerepköre legyen a lista tetején.')}</li>
         </ol>
 
         <form className="inline-form discord-token-form" onSubmit={saveToken}>
@@ -141,33 +142,30 @@ export function DiscordAdminTab() {
             autoComplete="new-password"
             value={token}
             onChange={(e) => setToken(e.target.value)}
-            placeholder={settings.hasToken ? '•••••••• (beállítva, csak cseréhez írd be újra)' : 'Bot token'}
-            aria-label="Bot token"
+            placeholder={settings.hasToken ? t('•••••••• (beállítva, csak cseréhez írd be újra)') : t('Bot token')}
+            aria-label={t('Bot token')}
           />
-          <button type="submit" className={`btn-primary btn-tiny ${busy === 'token' ? 'is-loading' : ''}`} disabled={busy !== null || token.trim().length < 20}>
-            Mentés
-          </button>
+          <button type="submit" className={`btn-primary btn-tiny ${busy === 'token' ? 'is-loading' : ''}`} disabled={busy !== null || token.trim().length < 20}>{t('Mentés')}</button>
         </form>
-        <p className="muted small">A token csak a szerverre kerül, a panel soha nem mutatja meg újra.</p>
+        <p className="muted small">{t('A token csak a szerverre kerül, a panel soha nem mutatja meg újra.')}</p>
 
         {settings.inviteUrl && (
           <a className="btn-secondary btn-tiny" href={settings.inviteUrl} target="_blank" rel="noopener noreferrer">
-            <Icon name="external" size={13} /> Bot meghívása a szerverre
-          </a>
+            <Icon name="external" size={13} />{' '}{t('Bot meghívása a szerverre')}</a>
         )}
 
         {connected && (
           <div className="discord-guilds section-gap">
-            <span className="field-label">Szerver</span>
+            <span className="field-label">{t('Szerver')}</span>
             {settings.guilds.length === 0
-              ? <p className="muted small">A bot még egy szerveren sincs bent. Hívd meg a fenti gombbal, majd frissítsd az oldalt.</p>
+              ? <p className="muted small">{t('A bot még egy szerveren sincs bent. Hívd meg a fenti gombbal, majd frissítsd az oldalt.')}</p>
               : (
                 <div className="inline-form">
-                  <select value={guildId} onChange={(e) => saveGuild(e.target.value)} disabled={busy !== null || running} aria-label="Discord szerver">
-                    <option value="">Válassz szervert...</option>
+                  <select value={guildId} onChange={(e) => saveGuild(e.target.value)} disabled={busy !== null || running} aria-label={t('Discord szerver')}>
+                    <option value="">{t('Válassz szervert...')}</option>
                     {settings.guilds.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
                   </select>
-                  <button type="button" className="btn-ghost btn-tiny" onClick={() => load()} disabled={busy !== null}><Icon name="refresh" size={13} /> Frissítés</button>
+                  <button type="button" className="btn-ghost btn-tiny" onClick={() => load()} disabled={busy !== null}><Icon name="refresh" size={13} />{' '}{t('Frissítés')}</button>
                 </div>
               )}
           </div>
@@ -179,30 +177,25 @@ export function DiscordAdminTab() {
           <h2 className="card-title"><Icon name="settings" size={18} /> {selected.name}</h2>
           <div className="discord-actions">
             <button type="button" className={`btn-primary ${busy === 'apply' ? 'is-loading' : ''}`} onClick={() => start('apply')} disabled={busy !== null || running}>
-              <Icon name="layers" size={15} /> Szerver berendezése
-            </button>
+              <Icon name="layers" size={15} />{' '}{t('Szerver berendezése')}</button>
             <button type="button" className={`btn-secondary ${busy === 'post' ? 'is-loading' : ''}`} onClick={() => start('post')} disabled={busy !== null || running}>
-              <Icon name="message" size={15} /> Info-üzenetek {settings.postedMessages > 0 ? 'frissítése' : 'kiküldése'}
+              <Icon name="message" size={15} />{' '}{settings.postedMessages > 0 ? t('Info-üzenetek frissítése') : t('Info-üzenetek kiküldése')}
             </button>
             <button type="button" className="btn-ghost btn-tiny" onClick={showStructure} disabled={busy !== null || running}>
-              <Icon name="eye" size={13} /> Jelenlegi felépítés
-            </button>
+              <Icon name="eye" size={13} />{' '}{t('Jelenlegi felépítés')}</button>
           </div>
-          <p className="muted small">
-            A berendezés újrafuttatható: a meglévő elemeket frissíti, nem duplikál, és semmit nem töröl. Az info-üzenetek
-            (üdvözlés, szabályzat, hogyan működik, előfizetés, GYIK, Foundry, support) a már kint lévő üzeneteket szerkesztik át a mostani szövegekre és linkekre.
-            {settings.lastRunAt && ` Utolsó futás: ${KIND_LABELS[settings.lastRunKind] ?? settings.lastRunKind}, ${formatDateTime(settings.lastRunAt)}.`}
+          <p className="muted small">{t('A berendezés újrafuttatható: a meglévő elemeket frissíti, nem duplikál, és semmit nem töröl. Az info-üzenetek (üdvözlés, szabályzat, hogyan működik, előfizetés, GYIK, Foundry, support) a már kint lévő üzeneteket szerkesztik át a mostani szövegekre és linkekre.')}{settings.lastRunAt && t(' Utolsó futás: {0}, {1}.', KIND_LABELS[settings.lastRunKind] ?? settings.lastRunKind, formatDateTime(settings.lastRunAt))}
           </p>
 
           {job && (job.running || job.log.length > 0) && (
             <div className="discord-log-wrap">
               <div className="discord-log-head">
-                <span className="field-label">{KIND_LABELS[job.kind ?? ''] ?? 'Feladat'}</span>
+                <span className="field-label">{KIND_LABELS[job.kind ?? ''] ?? t('Feladat')}</span>
                 {job.running
-                  ? <span className="status-pill status-pending"><span className="btn-spinner" aria-hidden="true" /> Fut...</span>
+                  ? <span className="status-pill status-pending"><span className="btn-spinner" aria-hidden="true" />{' '}{t('Fut...')}</span>
                   : job.error
-                    ? <span className="status-pill status-failed">Hiba</span>
-                    : <span className="status-pill status-active">Kész</span>}
+                    ? <span className="status-pill status-failed">{t('Hiba')}</span>
+                    : <span className="status-pill status-active">{t('Kész')}</span>}
               </div>
               <pre ref={logRef} className="discord-log mono small">{job.log.join('\n')}</pre>
             </div>
@@ -210,7 +203,7 @@ export function DiscordAdminTab() {
 
           {structure && (
             <div className="discord-log-wrap">
-              <span className="field-label">Jelenlegi felépítés</span>
+              <span className="field-label">{t('Jelenlegi felépítés')}</span>
               <pre className="discord-log mono small">{structure.join('\n')}</pre>
             </div>
           )}

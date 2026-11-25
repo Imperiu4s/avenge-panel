@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 import {
   api,
@@ -97,8 +98,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSessionExpired(false);
       return true;
     } catch (e) {
-      let message = 'Nem sikerült bejelentkezni. Próbáld újra.';
-      if (e instanceof ApiError && e.status === 401) message = 'Hibás email vagy jelszó.';
+      let message = t('Nem sikerült bejelentkezni. Próbáld újra.');
+      if (e instanceof ApiError && e.status === 401) message = t('Hibás email vagy jelszó.');
       if (e instanceof ApiError && e.status === 429) message = e.message;
       setError(message);
       return false;
@@ -148,7 +149,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth(): AuthContextValue {
   const ctx = useContext(AuthContext);
   if (!ctx) {
-    throw new Error('useAuth csak AuthProvider-en belül használható.');
+    throw new Error(t('useAuth csak AuthProvider-en belül használható.'));
   }
   return ctx;
 }

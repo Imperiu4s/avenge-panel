@@ -1,3 +1,4 @@
+import { t as tr } from '../../i18n';
 import { useEffect, useState, type CSSProperties } from 'react';
 import { ApiError } from '../../api/client';
 import { siteApi } from '../../api/profile';
@@ -51,9 +52,9 @@ export function ThemesAdminTab() {
       const result = await siteApi.setTheme(key);
       applySiteTheme(result.theme);
       setSaved(result.theme as SiteThemeKey);
-      setNotice(`Kész: mostantól mindenki a(z) ${SITE_THEMES.find((t) => t.key === key)?.label ?? key} témát látja.`);
+      setNotice(tr('Kész: mostantól mindenki a(z) {0} témát látja.', SITE_THEMES.find((t) => t.key === key)?.label ?? key));
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Nem sikerült beállítani a témát.');
+      setError(err instanceof ApiError ? err.message : tr('Nem sikerült beállítani a témát.'));
     } finally {
       setBusy(null);
     }
@@ -63,18 +64,16 @@ export function ThemesAdminTab() {
     <>
       <section className="card stagger-in">
         <div className="scans-head">
-          <h2 className="card-title"><Icon name="star" size={18} /> Az oldal témája</h2>
-          <span className="muted small">Mindenkinek egyszerre vált: vásárlóknak, staffnak és látogatóknak</span>
+          <h2 className="card-title"><Icon name="star" size={18} />{' '}{tr('Az oldal témája')}</h2>
+          <span className="muted small">{tr('Mindenkinek egyszerre vált: vásárlóknak, staffnak és látogatóknak')}</span>
         </div>
-        <p className="muted small">
-          Az <strong>Előnézet</strong> csak nálad, ebben a böngészőben kapcsolja be a témát, így körülnézhetsz az oldalon. A <strong>Bekapcsolás mindenkinek</strong> azonnal átállítja az avenge.hu-t.
-        </p>
+        <p className="muted small">{tr('Az')}{' '}<strong>{tr('Előnézet')}</strong>{' '}{tr('csak nálad, ebben a böngészőben kapcsolja be a témát, így körülnézhetsz az oldalon. A')}{' '}<strong>{tr('Bekapcsolás mindenkinek')}</strong>{' '}{tr('azonnal átállítja az avenge.hu-t.')}</p>
         {previewing && (
           <div className="theme-preview-banner">
             <Icon name="eye" size={15} />
-            <span>Előnézet: <strong>{current.label}</strong>. Csak te látod.</span>
-            <button type="button" className="btn-primary btn-tiny" onClick={() => activate(current.key)} disabled={busy !== null}>Bekapcsolás mindenkinek</button>
-            <button type="button" className="btn-ghost btn-tiny" onClick={() => previewSiteTheme(null)}>Vissza</button>
+            <span>{tr('Előnézet:')}{' '}<strong>{current.label}</strong>{tr('. Csak te látod.')}</span>
+            <button type="button" className="btn-primary btn-tiny" onClick={() => activate(current.key)} disabled={busy !== null}>{tr('Bekapcsolás mindenkinek')}</button>
+            <button type="button" className="btn-ghost btn-tiny" onClick={() => previewSiteTheme(null)}>{tr('Vissza')}</button>
           </div>
         )}
       </section>
@@ -88,7 +87,7 @@ export function ThemesAdminTab() {
               <ThemePreview theme={theme} />
               <div className="theme-card-head">
                 <h3>{theme.label}</h3>
-                {isSaved ? <span className="status-pill status-active">Aktív</span> : isShown ? <span className="status-pill status-pending">Előnézet</span> : null}
+                {isSaved ? <span className="status-pill status-active">{tr('Aktív')}</span> : isShown ? <span className="status-pill status-pending">{tr('Előnézet')}</span> : null}
               </div>
               <p className="muted small">{theme.tagline}</p>
               <span className="theme-card-swatches">
@@ -96,15 +95,14 @@ export function ThemesAdminTab() {
               </span>
               <div className="theme-card-actions">
                 <button type="button" className="btn-ghost btn-tiny" onClick={() => previewSiteTheme(theme.key)} disabled={isShown}>
-                  <Icon name="eye" size={13} /> Előnézet
-                </button>
+                  <Icon name="eye" size={13} />{' '}{tr('Előnézet')}</button>
                 <button
                   type="button"
                   className={`btn-primary btn-tiny ${busy === theme.key ? 'is-loading' : ''}`}
                   onClick={() => activate(theme.key)}
                   disabled={busy !== null || isSaved}
                 >
-                  {isSaved ? 'Bekapcsolva' : 'Bekapcsolás mindenkinek'}
+                  {isSaved ? tr('Bekapcsolva') : tr('Bekapcsolás mindenkinek')}
                 </button>
               </div>
             </article>

@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { API_BASE } from './config';
 import { ApiError, getStoredToken } from './client';
 import { send } from './store';
@@ -31,7 +32,7 @@ export const pluginApi = {
   async download(): Promise<void> {
     const token = getStoredToken();
     const response = await fetch(`${API_BASE}${P}/download`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
-    if (!response.ok) throw new ApiError(response.status, response.status === 404 ? 'A plugin még nincs feltöltve a szerverre.' : `Hiba (${response.status})`);
+    if (!response.ok) throw new ApiError(response.status, response.status === 404 ? t('A plugin még nincs feltöltve a szerverre.') : t('Hiba ({0})', response.status));
     const url = URL.createObjectURL(await response.blob());
     const link = document.createElement('a');
     link.href = url;

@@ -2672,3 +2672,32 @@ a.dc-embed-title { color: #00a8fc; }
 }
 .discord-link-card .btn-ghost { margin-top: 4px; }
 .discord-callback { max-width: 560px; margin: 40px auto; display: grid; gap: 14px; justify-items: start; }
+
+.lang-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 2px;
+  gap: 2px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 233, 228, 0.18);
+}
+.lang-opt {
+  min-width: 30px;
+  padding: 4px 6px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: rgba(255, 233, 228, 0.7);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.lang-opt:hover { color: #fff; }
+.lang-opt.is-active { background: rgba(255, 233, 228, 0.92); color: var(--grip-bot); }
+.lang-opt:focus-visible { outline: 2px solid #fff; outline-offset: 1px; }
+.legal-translation-note { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 14px; }

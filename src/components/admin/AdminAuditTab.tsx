@@ -1,3 +1,4 @@
+import { t } from '../../i18n';
 import { useCallback, useEffect, useState } from 'react';
 import { api } from '../../api/client';
 import type { AuditEntryView, AuditPage } from '../../api/types';
@@ -10,32 +11,32 @@ const PAGE_SIZE = 50;
 
 
 const FILTERS: { value: string; label: string }[] = [
-  { value: '', label: 'Mind' },
-  { value: 'session.', label: 'Vizsgálatok' },
-  { value: 'result.', label: 'Eredmények' },
-  { value: 'result.share', label: 'Megosztás' },
-  { value: 'history.', label: 'Törlések' },
-  { value: 'user.', label: 'Felhasználók' },
-  { value: 'settings.', label: 'Beállítások' },
-  { value: 'hwid.', label: 'Tiltások' },
+  { value: '', label: t('Mind') },
+  { value: 'session.', label: t('Vizsgálatok') },
+  { value: 'result.', label: t('Eredmények') },
+  { value: 'result.share', label: t('Megosztás') },
+  { value: 'history.', label: t('Törlések') },
+  { value: 'user.', label: t('Felhasználók') },
+  { value: 'settings.', label: t('Beállítások') },
+  { value: 'hwid.', label: t('Tiltások') },
   { value: 'plugin.', label: 'Plugin' },
   { value: 'platform.', label: 'Platform' }
 ];
 
 const SETTING_LABELS: Record<string, string> = {
-  OrganizationName: 'név',
-  SessionCodeMinutes: 'kód érvényessége (perc)',
-  RetentionDays: 'automatikus törlés (nap)',
-  ShareLinksEnabled: 'megosztó linkek',
-  StaffCanShare: 'Staff megoszthat',
-  StaffCanDeleteOwnScans: 'Staff törölhet',
-  StaffSeesOnlyOwnScans: 'Staff csak a sajátját látja'
+  OrganizationName: t('név'),
+  SessionCodeMinutes: t('kód érvényessége (perc)'),
+  RetentionDays: t('automatikus törlés (nap)'),
+  ShareLinksEnabled: t('megosztó linkek'),
+  StaffCanShare: t('Staff megoszthat'),
+  StaffCanDeleteOwnScans: t('Staff törölhet'),
+  StaffSeesOnlyOwnScans: t('Staff csak a sajátját látja')
 };
 
 function actor(entry: AuditEntryView): string {
   if (entry.userEmail) return entry.userEmail;
-  if (entry.action === 'session.claim' || entry.action === 'result.submit') return 'játékos (kliens)';
-  if (entry.action === 'result.share_view') return 'megosztó linkkel';
+  if (entry.action === 'session.claim' || entry.action === 'result.submit') return t('játékos (kliens)');
+  if (entry.action === 'result.share_view') return t('megosztó linkkel');
   return 'rendszer';
 }
 
@@ -44,20 +45,20 @@ function summary(entry: AuditEntryView): string | null {
   try {
     const data = JSON.parse(entry.details) as Record<string, unknown>;
     const parts: string[] = [];
-    if (typeof data.deleted === 'number') parts.push(`${data.deleted} törölve`);
-    if (typeof data.revoked === 'number') parts.push(`${data.revoked} visszavonva`);
-    if (typeof data.days === 'number') parts.push(`${data.days} napnál régebbiek`);
-    if (typeof data.olderThanDays === 'number') parts.push(`${data.olderThanDays} napnál régebbiek`);
-    if (typeof data.verdict === 'string') parts.push(`csak ${data.verdict}`);
+    if (typeof data.deleted === 'number') parts.push(t('{0} törölve', data.deleted));
+    if (typeof data.revoked === 'number') parts.push(t('{0} visszavonva', data.revoked));
+    if (typeof data.days === 'number') parts.push(t('{0} napnál régebbiek', data.days));
+    if (typeof data.olderThanDays === 'number') parts.push(t('{0} napnál régebbiek', data.olderThanDays));
+    if (typeof data.verdict === 'string') parts.push(t('csak {0}', data.verdict));
     if (data.onlyUnfinished === true) parts.push('csak befejezetlenek');
-    if (data.all === true) parts.push('az összes');
-    if (typeof data.clientVersion === 'string') parts.push(`kliens ${data.clientVersion}`);
+    if (data.all === true) parts.push(t('az összes'));
+    if (typeof data.clientVersion === 'string') parts.push(t('kliens {0}', data.clientVersion));
     if (typeof data.organization === 'string') parts.push(data.organization);
-    if (typeof data.reason === 'string') parts.push(({ 'subscription-expired': 'lejárt előfizetés', 'account-deleted': 'törölt vásárlói fiók', admin: 'kézzel' } as Record<string, string>)[data.reason] ?? data.reason);
+    if (typeof data.reason === 'string') parts.push(({ 'subscription-expired': t('lejárt előfizetés'), 'account-deleted': t('törölt vásárlói fiók'), admin: t('kézzel') } as Record<string, string>)[data.reason] ?? data.reason);
     if (typeof data.channel === 'string') parts.push(`#${data.channel}`);
     if (typeof data.Subject === 'string') parts.push(data.Subject);
     if (typeof data.code === 'string') parts.push(`#${data.code}`);
-    if (typeof data.expiresAt === 'string') parts.push(`lejár ${formatSecond(data.expiresAt)}`);
+    if (typeof data.expiresAt === 'string') parts.push(t('lejár {0}', formatSecond(data.expiresAt)));
     if (entry.action === 'settings.update') {
       const show = (value: unknown) => (typeof value === 'boolean' ? (value ? 'be' : 'ki') : String(value));
       const changed = Object.entries(data)
@@ -97,8 +98,8 @@ export function AdminAuditTab() {
 
   return (
     <section className="card stagger-in">
-      <h2 className="card-title"><Icon name="clock" size={18} /> Tevékenységnapló</h2>
-      <p className="muted small">Ki, mikor, mit csinált a szervezetben, másodpercre. A naplót nem lehet törölni.</p>
+      <h2 className="card-title"><Icon name="clock" size={18} />{' '}{t('Tevékenységnapló')}</h2>
+      <p className="muted small">{t('Ki, mikor, mit csinált a szervezetben, másodpercre. A naplót nem lehet törölni.')}</p>
       <div className="timeline-filters">
         {FILTERS.map((f) => (
           <button
@@ -115,11 +116,11 @@ export function AdminAuditTab() {
         <table className="data-table audit-table">
           <thead>
             <tr>
-              <th>Időpont</th>
-              <th>Ki</th>
-              <th>Mit csinált</th>
-              <th>Mire</th>
-              <th>IP</th>
+              <th>{t('Időpont')}</th>
+              <th>{t('Ki')}</th>
+              <th>{t('Mit csinált')}</th>
+              <th>{t('Mire')}</th>
+              <th>{t('IP')}</th>
             </tr>
           </thead>
           <tbody>
@@ -138,15 +139,15 @@ export function AdminAuditTab() {
               </tr>
             ))}
             {!isLoading && data?.items.length === 0 && (
-              <tr><td colSpan={5} className="muted empty-row">Nincs bejegyzés.</td></tr>
+              <tr><td colSpan={5} className="muted empty-row">{t('Nincs bejegyzés.')}</td></tr>
             )}
           </tbody>
         </table>
       </div>
       <div className="pager">
-        <button className="btn-ghost btn-tiny" disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>Előző</button>
+        <button className="btn-ghost btn-tiny" disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>{t('Előző')}</button>
         <span className="mono small pager-page">{page} / {totalPages}</span>
-        <button className="btn-ghost btn-tiny" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>Következő</button>
+        <button className="btn-ghost btn-tiny" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>{t('Következő')}</button>
       </div>
     </section>
   );

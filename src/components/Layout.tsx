@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useEffect } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { BladeNav } from './BladeNav';
@@ -32,16 +33,16 @@ export function Layout() {
       <SeasonalGround />
 
       <footer className="site-footer">
-        <span>© {new Date().getFullYear()} Avenge · Avenge Foundry</span>
+        <span>© {new Date().getFullYear()}{' '}{t('Avenge · Avenge Foundry')}</span>
         <span className="site-footer-sep" aria-hidden="true" />
-        <nav className="site-footer-links" aria-label="Jogi információk">
-          <Link to="/jogi/aszf">ÁSZF</Link>
-          <Link to="/jogi/adatkezeles">Adatkezelés</Link>
-          <Link to="/jogi/visszaterites">Visszatérítés</Link>
-          <Link to="/jogi/licenc">Licenc</Link>
-          <Link to="/jogi/cookie">Sütik</Link>
-          <Link to="/jogi/impresszum">Impresszum</Link>
-          <Link to="/tamogatas">Támogatás</Link>
+        <nav className="site-footer-links" aria-label={t('Jogi információk')}>
+          <Link to="/jogi/aszf">{t('ÁSZF')}</Link>
+          <Link to="/jogi/adatkezeles">{t('Adatkezelés')}</Link>
+          <Link to="/jogi/visszaterites">{t('Visszatérítés')}</Link>
+          <Link to="/jogi/licenc">{t('Licenc')}</Link>
+          <Link to="/jogi/cookie">{t('Sütik')}</Link>
+          <Link to="/jogi/impresszum">{t('Impresszum')}</Link>
+          <Link to="/tamogatas">{t('Támogatás')}</Link>
         </nav>
       </footer>
     </div>

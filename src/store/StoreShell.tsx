@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { Link, NavLink, Outlet } from 'react-router-dom';
 import { storeApi, type StoreInfo } from '../api/store';
@@ -17,7 +18,7 @@ export function StoreShell() {
   const { isLoggedIn, me } = useCustomer();
 
   useEffect(() => {
-    storeApi.info().then(setInfo).catch(() => setError('Az áruház most nem érhető el. Próbáld újra pár perc múlva.'));
+    storeApi.info().then(setInfo).catch(() => setError(t('Az áruház most nem érhető el. Próbáld újra pár perc múlva.')));
   }, []);
 
   const brand = info?.brandName ?? 'Avenge Foundry';
@@ -27,25 +28,24 @@ export function StoreShell() {
     <StoreInfoContext.Provider value={{ info, error }}>
       <div className="foundry-shell">
         <div className="foundry-bar">
-          <Link to="/store" className="foundry-bar-brand" aria-label={`${brand} - áruház`}>
+          <Link to="/store" className="foundry-bar-brand" aria-label={t('{0} - áruház', brand)}>
             <span className="foundry-mark" aria-hidden="true"><Icon name="package" size={17} /></span>
             <span>{first} <em>{rest.join(' ')}</em></span>
           </Link>
-          <nav className="foundry-bar-links" aria-label="Áruház menü">
-            <NavLink to="/store" end className={({ isActive }) => `foundry-bar-link ${isActive ? 'is-active' : ''}`}>Termékek</NavLink>
+          <nav className="foundry-bar-links" aria-label={t('Áruház menü')}>
+            <NavLink to="/store" end className={({ isActive }) => `foundry-bar-link ${isActive ? 'is-active' : ''}`}>{t('Termékek')}</NavLink>
             {(info?.subscriptionEnabled ?? true) && (
-              <NavLink to="/elofizetes" className={({ isActive }) => `foundry-bar-link ${isActive ? 'is-active' : ''}`}>PC Check előfizetés</NavLink>
+              <NavLink to="/elofizetes" className={({ isActive }) => `foundry-bar-link ${isActive ? 'is-active' : ''}`}>{t('PC Check előfizetés')}</NavLink>
             )}
-            <NavLink to="/tamogatas" className={({ isActive }) => `foundry-bar-link ${isActive ? 'is-active' : ''}`}>
-              Támogatás{(me?.unreadTickets ?? 0) > 0 && <span className="foundry-bar-badge" title="Új válasz érkezett">{me?.unreadTickets}</span>}
+            <NavLink to="/tamogatas" className={({ isActive }) => `foundry-bar-link ${isActive ? 'is-active' : ''}`}>{t('Támogatás')}{(me?.unreadTickets ?? 0) > 0 && <span className="foundry-bar-badge" title={t('Új válasz érkezett')}>{me?.unreadTickets}</span>}
             </NavLink>
-            <NavLink to="/jogi/aszf" className={({ isActive }) => `foundry-bar-link ${isActive ? 'is-active' : ''}`}>Feltételek</NavLink>
+            <NavLink to="/jogi/aszf" className={({ isActive }) => `foundry-bar-link ${isActive ? 'is-active' : ''}`}>{t('Feltételek')}</NavLink>
           </nav>
           <NavLink to="/store/fiok" className={({ isActive }) => `foundry-bar-account ${isActive ? 'is-active' : ''}`}>
             {isLoggedIn && me?.avatarUrl
               ? <Avatar url={me.avatarUrl} name={me.minecraftUsername || me.email} className="foundry-bar-avatar" />
               : <Icon name="user" size={15} />}
-            <span>{isLoggedIn ? (me?.minecraftUsername || me?.displayName || me?.email || 'Fiókom') : 'Belépés / Regisztráció'}</span>
+            <span>{isLoggedIn ? (me?.minecraftUsername || me?.displayName || me?.email || t('Fiókom')) : t('Belépés / Regisztráció')}</span>
           </NavLink>
         </div>
         <Outlet />

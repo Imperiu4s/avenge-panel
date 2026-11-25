@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import type { FindingDto } from '../api/types';
 import { parseEvents } from './timeline';
 
@@ -16,9 +17,9 @@ export interface PrimaryHit {
 }
 
 export const HIT_KIND_LABELS: Record<HitKind, string> = {
-  cheat: 'Csalás',
+  cheat: t('Csalás'),
   autoclicker: 'Autoclicker',
-  other: 'Egyéb'
+  other: t('Egyéb')
 };
 
 const SEVERITY_RANK: Record<FindingDto['severity'], number> = {
@@ -107,9 +108,9 @@ function reasonOf(f: FindingDto): string | null {
   if (details['Indoklás']) return details['Indoklás'];
   if (details['Makró típusa']) {
     const parts = [details['Makró típusa']];
-    if (details['Kattintások']) parts.push(`${details['Kattintások']} kattintás`);
-    if (details['Legkisebb késleltetés']) parts.push(`legkisebb késleltetés ${details['Legkisebb késleltetés']}`);
-    if (details['Ismétlődik'] === 'igen') parts.push('ismétlődik');
+    if (details['Kattintások']) parts.push(t('{0} kattintás', details['Kattintások']));
+    if (details['Legkisebb késleltetés']) parts.push(t('legkisebb késleltetés {0}', details['Legkisebb késleltetés']));
+    if (details['Ismétlődik'] === 'igen') parts.push(t('ismétlődik'));
     return parts.join(', ');
   }
   if (details['Figyelmeztetések']) return details['Figyelmeztetések'].split('\n')[0];
@@ -147,12 +148,12 @@ function toHit(f: FindingDto, scanTime: string): PrimaryHit {
   const download = events.find((e) => e.action === 'Letöltve');
   const when = run ?? f.foundAt ?? latest?.time ?? null;
   const whenLabel = isRunning(f)
-    ? 'A vizsgálatkor is futott'
+    ? t('A vizsgálatkor is futott')
     : run
-      ? 'Utoljára elindítva'
+      ? t('Utoljára elindítva')
       : f.foundAt
-        ? 'Időpont'
-        : latest?.action ?? 'Időpont';
+        ? t('Időpont')
+        : latest?.action ?? t('Időpont');
   return {
     finding: f,
     kind: hitKind(f),

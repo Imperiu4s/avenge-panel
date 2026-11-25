@@ -1,6 +1,7 @@
+import { t } from '../i18n';
 import type { CurrentUserView } from '../api/types';
 
-export const ROLE_LABELS: Record<string, string> = { Owner: 'Tulajdonos', Admin: 'Admin', Staff: 'Staff' };
+export const ROLE_LABELS: Record<string, string> = { Owner: t('Tulajdonos'), Admin: 'Admin', Staff: 'Staff' };
 
 export const ADMIN_ENTRY_PERMISSIONS = [
   'admin.overview', 'admin.scans', 'users.view', 'users.create', 'settings.view', 'settings.edit', 'audit.view',

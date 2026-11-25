@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useCallback, useEffect, useState } from 'react';
 import { api, ApiError, shareLinkUrl } from '../api/client';
 import type { ShareLinkView } from '../api/types';
@@ -38,20 +39,20 @@ export function ShareLinkPanel({ resultId }: Props) {
       copy('share', url);
       load();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Nem sikerült linket készíteni.');
+      setError(err instanceof ApiError ? err.message : t('Nem sikerült linket készíteni.'));
     } finally {
       setIsCreating(false);
     }
   }
 
   async function handleRevoke(link: ShareLinkView) {
-    if (!window.confirm('Visszavonod ezt a linket? Aki megkapta, többé nem tudja megnyitni.')) return;
+    if (!window.confirm(t('Visszavonod ezt a linket? Aki megkapta, többé nem tudja megnyitni.'))) return;
     try {
       await api.revokeShareLink(resultId, link.id);
       if (issued?.id === link.id) setIssued(null);
       load();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Nem sikerült visszavonni a linket.');
+      setError(err instanceof ApiError ? err.message : t('Nem sikerült visszavonni a linket.'));
     }
   }
 
@@ -59,23 +60,23 @@ export function ShareLinkPanel({ resultId }: Props) {
     <section className="card share-card stagger-in" style={{ animationDelay: '140ms' }}>
       <div className="share-head">
         <div>
-          <h2 className="card-title"><Icon name="share" size={18} /> Megosztó link</h2>
-          <p className="muted small">Bárki megnyithatja bejelentkezés nélkül, akinek elküldöd. 3 napig érvényes, utána magától lejár.</p>
+          <h2 className="card-title"><Icon name="share" size={18} />{' '}{t('Megosztó link')}</h2>
+          <p className="muted small">{t('Bárki megnyithatja bejelentkezés nélkül, akinek elküldöd. 3 napig érvényes, utána magától lejár.')}</p>
         </div>
         <button type="button" className={`btn-primary ${isCreating ? 'is-loading' : ''}`} onClick={handleCreate} disabled={isCreating}>
           {isCreating && <span className="btn-spinner" aria-hidden="true" />}
-          <Icon name="link" size={16} /> {isCreating ? 'Készül...' : 'Új link'}
+          <Icon name="link" size={16} /> {isCreating ? t('Készül...') : t('Új link')}
         </button>
       </div>
 
       {issued && (
         <div className="share-issued">
-          <input className="mono share-url" value={issued.url} readOnly onFocus={(e) => e.currentTarget.select()} aria-label="Megosztó link" />
+          <input className="mono share-url" value={issued.url} readOnly onFocus={(e) => e.currentTarget.select()} aria-label={t('Megosztó link')} />
           <button type="button" className="btn-secondary" onClick={() => copy('share', issued.url)}>
             <Icon name={copiedKey === 'share' ? 'check' : 'copy'} size={16} />
-            {copiedKey === 'share' ? 'Másolva' : 'Másolás'}
+            {copiedKey === 'share' ? t('Másolva') : t('Másolás')}
           </button>
-          <p className="muted small share-expiry">Lejár: {formatSecond(issued.expiresAt)}. Ezt a címet most másold ki: később nem jeleníthető meg újra, de bármikor kérhetsz újat.</p>
+          <p className="muted small share-expiry">{t('Lejár:')}{' '}{formatSecond(issued.expiresAt)}{t('. Ezt a címet most másold ki: később nem jeleníthető meg újra, de bármikor kérhetsz újat.')}</p>
         </div>
       )}
 
@@ -86,13 +87,13 @@ export function ShareLinkPanel({ resultId }: Props) {
           {links.map((link) => (
             <li key={link.id}>
               <span className="share-list-main">
-                <strong>Aktív link</strong>
+                <strong>{t('Aktív link')}</strong>
                 <small>
-                  {link.createdByEmail ?? 'ismeretlen'} · készült {formatSecond(link.createdAt)} · lejár {formatSecond(link.expiresAt)}
+                  {link.createdByEmail ?? 'ismeretlen'}{' '}{t('· készült')}{' '}{formatSecond(link.createdAt)}{' '}{t('· lejár')}{' '}{formatSecond(link.expiresAt)}
                 </small>
               </span>
-              <span className="share-list-views">{link.viewCount} megnyitás</span>
-              <button type="button" className="btn-ghost btn-tiny btn-danger" onClick={() => handleRevoke(link)}>Visszavonás</button>
+              <span className="share-list-views">{link.viewCount}{' '}{t('megnyitás')}</span>
+              <button type="button" className="btn-ghost btn-tiny btn-danger" onClick={() => handleRevoke(link)}>{t('Visszavonás')}</button>
             </li>
           ))}
         </ul>

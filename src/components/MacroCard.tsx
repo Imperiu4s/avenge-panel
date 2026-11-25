@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useState } from 'react';
 import { formatCps, formatMs, isHotKind, type MacroDetailView } from './mouseDetails';
 
@@ -17,11 +18,11 @@ export function MacroCard({ macro }: { macro: MacroDetailView }) {
   const steps = showAll ? macro.steps : macro.steps.slice(0, VISIBLE_STEPS);
 
   const stats: [string, string][] = [];
-  if (macro.clicks > 0) stats.push(['Kattintás', `${macro.clicks}`]);
-  if (macro.minClickIntervalMs !== null) stats.push(['Két kattintás között legalább', formatMs(macro.minClickIntervalMs)]);
-  if (macro.minDelayMs !== null) stats.push(['Legrövidebb várakozás', formatMs(macro.minDelayMs)]);
-  if (macro.totalMs > 0) stats.push([macro.repeat ? 'Egy kör ideje' : 'Teljes idő', formatMs(macro.totalMs)]);
-  stats.push(['Lépések', `${macro.steps.length}`]);
+  if (macro.clicks > 0) stats.push([t('Kattintás'), `${macro.clicks}`]);
+  if (macro.minClickIntervalMs !== null) stats.push([t('Két kattintás között legalább'), formatMs(macro.minClickIntervalMs)]);
+  if (macro.minDelayMs !== null) stats.push([t('Legrövidebb várakozás'), formatMs(macro.minDelayMs)]);
+  if (macro.totalMs > 0) stats.push([macro.repeat ? t('Egy kör ideje') : t('Teljes idő'), formatMs(macro.totalMs)]);
+  stats.push([t('Lépések'), `${macro.steps.length}`]);
 
   return (
     <article className={`macro-card ${hot ? 'macro-card-hot' : ''}`}>
@@ -32,14 +33,13 @@ export function MacroCard({ macro }: { macro: MacroDetailView }) {
         </div>
         {macro.clicksPerSecond !== null && (
           <span className={`macro-cps ${hot ? 'macro-cps-hot' : ''}`}>
-            <b>{formatCps(macro.clicksPerSecond)}</b> kattintás/mp
-          </span>
+            <b>{formatCps(macro.clicksPerSecond)}</b>{' '}{t('kattintás/mp')}</span>
         )}
       </header>
 
       <dl className="macro-meta">
-        <div><dt>Gomb / indító</dt><dd>{macro.trigger ?? 'nincs gombhoz rendelve (vagy nem olvasható ki)'}</dd></div>
-        <div><dt>Ismétlés</dt><dd>{macro.repeat ?? 'egyszer fut le'}</dd></div>
+        <div><dt>{t('Gomb / indító')}</dt><dd>{macro.trigger ?? t('nincs gombhoz rendelve (vagy nem olvasható ki)')}</dd></div>
+        <div><dt>{t('Ismétlés')}</dt><dd>{macro.repeat ?? 'egyszer fut le'}</dd></div>
       </dl>
 
       <div className="macro-stats">
@@ -60,7 +60,7 @@ export function MacroCard({ macro }: { macro: MacroDetailView }) {
       )}
       {macro.steps.length > VISIBLE_STEPS && (
         <button className="text-action change-more" onClick={() => setShowAll((v) => !v)}>
-          {showAll ? 'Kevesebb lépés' : `Mind a ${macro.steps.length} lépés`}
+          {showAll ? t('Kevesebb lépés') : t('Mind a {0} lépés', macro.steps.length)}
         </button>
       )}
       {macro.source && <small className="macro-source mono">{macro.source}</small>}

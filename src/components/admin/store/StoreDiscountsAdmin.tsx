@@ -1,3 +1,4 @@
+import { t } from '../../../i18n';
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { ApiError } from '../../../api/client';
 import { storeAdminApi, type AdminDiscount, type AdminProduct, type DiscountUpsert } from '../../../api/store';
@@ -20,8 +21,8 @@ function defaults(): DiscountUpsert {
 const PRESETS: { name: string; percent: number; days: number }[] = [
   { name: 'Black Friday', percent: 30, days: 4 },
   { name: 'Cyber Monday', percent: 25, days: 1 },
-  { name: 'Karácsonyi akció', percent: 20, days: 10 },
-  { name: 'Nyári akció', percent: 15, days: 7 }
+  { name: t('Karácsonyi akció'), percent: 20, days: 10 },
+  { name: t('Nyári akció'), percent: 15, days: 7 }
 ];
 
 export function StoreDiscountsAdmin() {
@@ -33,7 +34,7 @@ export function StoreDiscountsAdmin() {
   const [busy, setBusy] = useState(false);
 
   const load = useCallback(() => {
-    storeAdminApi.discounts().then(setDiscounts).catch(() => setError('Nem sikerült betölteni az akciókat.'));
+    storeAdminApi.discounts().then(setDiscounts).catch(() => setError(t('Nem sikerült betölteni az akciókat.')));
   }, []);
 
   useEffect(() => {
@@ -60,7 +61,7 @@ export function StoreDiscountsAdmin() {
       setEditingId(null);
       load();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Nem sikerült menteni.');
+      setError(err instanceof ApiError ? err.message : t('Nem sikerült menteni.'));
     } finally {
       setBusy(false);
     }
@@ -72,7 +73,7 @@ export function StoreDiscountsAdmin() {
   }
 
   async function remove(d: AdminDiscount) {
-    if (!window.confirm(`Törlöd a(z) "${d.name}" akciót?`)) return;
+    if (!window.confirm(t('Törlöd a(z) "{0}" akciót?', d.name))) return;
     await storeAdminApi.deleteDiscount(d.id).catch(() => undefined);
     load();
   }
@@ -81,81 +82,81 @@ export function StoreDiscountsAdmin() {
     <>
       <form className="card stagger-in" onSubmit={submit}>
         <div className="scans-head">
-          <h2 className="card-title"><Icon name="tag" size={18} /> {editingId ? 'Akció szerkesztése' : 'Új akció'}</h2>
+          <h2 className="card-title"><Icon name="tag" size={18} /> {editingId ? t('Akció szerkesztése') : t('Új akció')}</h2>
           <div className="preset-row">
             {PRESETS.map((p) => <button type="button" key={p.name} className="chip-toggle" onClick={() => applyPreset(p)}>{p.name}</button>)}
           </div>
         </div>
         <div className="settings-grid">
           <label>
-            <span className="field-label">Név</span>
-            <input required maxLength={60} value={draft.name} onChange={(e) => set('name', e.target.value)} placeholder="pl. Black Friday" />
+            <span className="field-label">{t('Név')}</span>
+            <input required maxLength={60} value={draft.name} onChange={(e) => set('name', e.target.value)} placeholder={t('pl. Black Friday')} />
           </label>
           <label>
-            <span className="field-label">Kedvezmény (%)</span>
+            <span className="field-label">{t('Kedvezmény (%)')}</span>
             <input type="number" min={1} max={100} required value={draft.percent} onChange={(e) => set('percent', Number(e.target.value))} />
           </label>
           <label>
-            <span className="field-label">Termék</span>
+            <span className="field-label">{t('Termék')}</span>
             <select value={draft.productId ?? ''} onChange={(e) => set('productId', e.target.value || null)}>
-              <option value="">Minden plugin</option>
+              <option value="">{t('Minden plugin')}</option>
               {products.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
             </select>
           </label>
           <label>
-            <span className="field-label">Kezdete</span>
+            <span className="field-label">{t('Kezdete')}</span>
             <input type="datetime-local" required value={toLocalInput(draft.startsAt)} onChange={(e) => e.target.value && set('startsAt', new Date(e.target.value).toISOString())} />
           </label>
           <label>
-            <span className="field-label">Vége</span>
+            <span className="field-label">{t('Vége')}</span>
             <input type="datetime-local" required value={toLocalInput(draft.endsAt)} onChange={(e) => e.target.value && set('endsAt', new Date(e.target.value).toISOString())} />
           </label>
           <label>
-            <span className="field-label">Tebex kuponkód</span>
-            <input maxLength={60} value={draft.tebexCouponCode ?? ''} onChange={(e) => set('tebexCouponCode', e.target.value)} placeholder="pl. BLACKFRIDAY" />
-            <small className="muted">Tebex-csomagos pluginnál kötelező: hozz létre a Tebexben azonos kedvezményű kupont, és írd be a kódját. A kosárra automatikusan rákerül.</small>
+            <span className="field-label">{t('Tebex kuponkód')}</span>
+            <input maxLength={60} value={draft.tebexCouponCode ?? ''} onChange={(e) => set('tebexCouponCode', e.target.value)} placeholder={t('pl. BLACKFRIDAY')} />
+            <small className="muted">{t('Tebex-csomagos pluginnál kötelező: hozz létre a Tebexben azonos kedvezményű kupont, és írd be a kódját. A kosárra automatikusan rákerül.')}</small>
           </label>
           <label className="toggle-row toggle-inline">
-            <span className="toggle-text"><strong>Aktív</strong><small>Kikapcsolva nem érvényes, akkor sem, ha az időszak tart.</small></span>
+            <span className="toggle-text"><strong>{t('Aktív')}</strong><small>{t('Kikapcsolva nem érvényes, akkor sem, ha az időszak tart.')}</small></span>
             <input type="checkbox" className="switch" checked={draft.isActive} onChange={(e) => set('isActive', e.target.checked)} />
           </label>
         </div>
-        <p className="muted small">Ha egy pluginra több akció is érvényes, a legnagyobb kedvezmény számít. Az akció az időszak kezdetén magától indul és a végén magától leáll.</p>
+        <p className="muted small">{t('Ha egy pluginra több akció is érvényes, a legnagyobb kedvezmény számít. Az akció az időszak kezdetén magától indul és a végén magától leáll.')}</p>
         <div className="settings-actions">
-          {editingId ? <button type="button" className="btn-ghost btn-tiny" onClick={() => { setEditingId(null); setDraft(defaults()); }}>Mégse</button> : <span />}
+          {editingId ? <button type="button" className="btn-ghost btn-tiny" onClick={() => { setEditingId(null); setDraft(defaults()); }}>{t('Mégse')}</button> : <span />}
           <button type="submit" className={`btn-primary ${busy ? 'is-loading' : ''}`} disabled={busy}>
             {busy && <span className="btn-spinner" aria-hidden="true" />}
-            {editingId ? 'Mentés' : 'Akció indítása'}
+            {editingId ? t('Mentés') : t('Akció indítása')}
           </button>
         </div>
         {error && <p className="error-text error-in">{error}</p>}
       </form>
 
       <section className="card section-gap stagger-in" style={{ animationDelay: '60ms' }}>
-        <h2 className="card-title"><Icon name="clock" size={18} /> Akciók</h2>
+        <h2 className="card-title"><Icon name="clock" size={18} />{' '}{t('Akciók')}</h2>
         <div className="table-scroll">
           <table className="data-table">
-            <thead><tr><th>Név</th><th>Kedvezmény</th><th>Termék</th><th>Időszak</th><th>Állapot</th><th /></tr></thead>
+            <thead><tr><th>{t('Név')}</th><th>{t('Kedvezmény')}</th><th>{t('Termék')}</th><th>{t('Időszak')}</th><th>{t('Állapot')}</th><th /></tr></thead>
             <tbody>
               {discounts.map((d) => (
                 <tr key={d.id}>
                   <td><strong>{d.name}</strong></td>
                   <td className="mono">−{d.percent}%</td>
-                  <td className="small">{d.productName ?? 'Minden plugin'}</td>
+                  <td className="small">{d.productName ?? t('Minden plugin')}</td>
                   <td className="small muted">{formatDateTime(d.startsAt)} – {formatDateTime(d.endsAt)}</td>
                   <td>
                     <span className={`status-pill ${d.isRunning ? 'status-paid' : d.isActive && new Date(d.startsAt) > new Date() ? 'status-pending' : 'status-ended'}`}>
-                      {d.isRunning ? 'Fut' : !d.isActive ? 'Kikapcsolva' : new Date(d.startsAt) > new Date() ? 'Ütemezve' : 'Lejárt'}
+                      {d.isRunning ? t('Fut') : !d.isActive ? t('Kikapcsolva') : new Date(d.startsAt) > new Date() ? t('Ütemezve') : t('Lejárt')}
                     </span>
                   </td>
                   <td className="row-actions">
-                    <button type="button" className="btn-ghost btn-tiny" onClick={() => { setEditingId(d.id); setDraft({ name: d.name, percent: d.percent, productId: d.productId, startsAt: d.startsAt, endsAt: d.endsAt, isActive: d.isActive, tebexCouponCode: d.tebexCouponCode ?? '' }); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>Szerkesztés</button>
-                    <button type="button" className="btn-ghost btn-tiny" onClick={() => toggle(d)}>{d.isActive ? 'Kikapcsol' : 'Bekapcsol'}</button>
-                    <button type="button" className="btn-ghost btn-tiny btn-danger" onClick={() => remove(d)}>Törlés</button>
+                    <button type="button" className="btn-ghost btn-tiny" onClick={() => { setEditingId(d.id); setDraft({ name: d.name, percent: d.percent, productId: d.productId, startsAt: d.startsAt, endsAt: d.endsAt, isActive: d.isActive, tebexCouponCode: d.tebexCouponCode ?? '' }); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>{t('Szerkesztés')}</button>
+                    <button type="button" className="btn-ghost btn-tiny" onClick={() => toggle(d)}>{d.isActive ? t('Kikapcsol') : t('Bekapcsol')}</button>
+                    <button type="button" className="btn-ghost btn-tiny btn-danger" onClick={() => remove(d)}>{t('Törlés')}</button>
                   </td>
                 </tr>
               ))}
-              {discounts.length === 0 && <tr><td colSpan={6} className="muted empty-row">Nincs akció.</td></tr>}
+              {discounts.length === 0 && <tr><td colSpan={6} className="muted empty-row">{t('Nincs akció.')}</td></tr>}
             </tbody>
           </table>
         </div>

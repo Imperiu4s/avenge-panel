@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent, type ReactNode } from 'react';
 import { ApiError } from '../api/client';
 import { attachmentUrl, type SupportAttachment, type SupportMessage } from '../api/support';
@@ -47,7 +48,7 @@ export function TicketMessages({ messages, staff }: { messages: SupportMessage[]
     <div className="ticket-thread">
       {messages.map((m) => {
         if (m.authorType === 'system') {
-          return <p key={m.id} className="ticket-system small muted"><Icon name="info" size={13} /> {m.body} · {formatDateTime(m.createdAt)}</p>;
+          return <p key={m.id} className="ticket-system small muted"><Icon name="info" size={13} /> {t(m.body)} · {formatDateTime(m.createdAt)}</p>;
         }
         const mine = staff ? m.authorType === 'staff' : m.authorType === 'customer';
         return (
@@ -70,7 +71,7 @@ export function TicketMessages({ messages, staff }: { messages: SupportMessage[]
   );
 }
 
-export function TicketComposer({ onSend, placeholder, extra, busyLabel = 'Küldés' }: {
+export function TicketComposer({ onSend, placeholder, extra, busyLabel = t('Küldés') }: {
   onSend: (message: string, files: File[], closeAfter: boolean) => Promise<void>;
   placeholder: string;
   extra?: (send: (closeAfter: boolean) => void, busy: boolean) => ReactNode;
@@ -86,15 +87,15 @@ export function TicketComposer({ onSend, placeholder, extra, busyLabel = 'Küld�
     const chosen = Array.from(e.target.files ?? []);
     e.target.value = '';
     const images = chosen.filter((f) => f.type.startsWith('image/'));
-    if (images.length !== chosen.length) setError('Csak képet csatolhatsz.');
-    else if (images.some((f) => f.size > MAX_BYTES)) setError('Egy kép legfeljebb 4 MB lehet.');
+    if (images.length !== chosen.length) setError(t('Csak képet csatolhatsz.'));
+    else if (images.some((f) => f.size > MAX_BYTES)) setError(t('Egy kép legfeljebb 4 MB lehet.'));
     else setError(null);
     setFiles((prev) => [...prev, ...images.filter((f) => f.size <= MAX_BYTES)].slice(0, MAX_FILES));
   }
 
   async function submit(closeAfter = false) {
     if (!message.trim() && files.length === 0) {
-      setError('Írj üzenetet, vagy csatolj képet.');
+      setError(t('Írj üzenetet, vagy csatolj képet.'));
       return;
     }
     setBusy(true);
@@ -104,7 +105,7 @@ export function TicketComposer({ onSend, placeholder, extra, busyLabel = 'Küld�
       setMessage('');
       setFiles([]);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Nem sikerült elküldeni.');
+      setError(err instanceof ApiError ? err.message : t('Nem sikerült elküldeni.'));
     } finally {
       setBusy(false);
     }
@@ -130,7 +131,7 @@ export function TicketComposer({ onSend, placeholder, extra, busyLabel = 'Küld�
           {files.map((f, i) => (
             <span key={`${f.name}-${i}`} className="chip chip-dim">
               <Icon name="file" size={12} /> {f.name}
-              <button type="button" className="chip-remove" aria-label={`${f.name} eltávolítása`} onClick={() => setFiles((prev) => prev.filter((_, j) => j !== i))}>
+              <button type="button" className="chip-remove" aria-label={t('{0} eltávolítása', f.name)} onClick={() => setFiles((prev) => prev.filter((_, j) => j !== i))}>
                 <Icon name="x" size={11} />
               </button>
             </span>
@@ -139,9 +140,8 @@ export function TicketComposer({ onSend, placeholder, extra, busyLabel = 'Küld�
       )}
       <div className="ticket-composer-actions">
         <button type="button" className="btn-ghost btn-tiny" onClick={() => input.current?.click()} disabled={busy || files.length >= MAX_FILES}>
-          <Icon name="upload" size={13} /> Kép csatolása
-        </button>
-        <span className="muted small ticket-composer-hint">Ctrl+Enter: küldés · max. {MAX_FILES} kép, egyenként 4 MB</span>
+          <Icon name="upload" size={13} />{' '}{t('Kép csatolása')}</button>
+        <span className="muted small ticket-composer-hint">{t('Ctrl+Enter: küldés · max.')}{' '}{MAX_FILES}{' '}{t('kép, egyenként 4 MB')}</span>
         {extra?.((closeAfter) => submit(closeAfter), busy)}
         <button type="submit" className={`btn-primary btn-tiny ${busy ? 'is-loading' : ''}`} disabled={busy}>
           <Icon name="arrow-right" size={13} /> {busyLabel}

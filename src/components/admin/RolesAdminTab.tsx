@@ -1,3 +1,4 @@
+import { t } from '../../i18n';
 import { useEffect, useMemo, useState } from 'react';
 import { ApiError } from '../../api/client';
 import { rolesApi, type PermissionInfo, type RolePermissions } from '../../api/profile';
@@ -44,7 +45,7 @@ export function RolesAdminTab() {
   }
 
   useEffect(() => {
-    rolesApi.get().then(apply).catch((err) => setError(err instanceof ApiError ? err.message : 'Nem sikerült betölteni a rangokat.'));
+    rolesApi.get().then(apply).catch((err) => setError(err instanceof ApiError ? err.message : t('Nem sikerült betölteni a rangokat.')));
   }, []);
 
   const groups = useMemo(() => {
@@ -80,7 +81,7 @@ export function RolesAdminTab() {
       refreshUser();
       setNotice(message);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Nem sikerült menteni.');
+      setError(err instanceof ApiError ? err.message : t('Nem sikerült menteni.'));
     } finally {
       setBusy(false);
     }
@@ -90,25 +91,22 @@ export function RolesAdminTab() {
     <>
       <section className="card stagger-in">
         <div className="scans-head">
-          <h2 className="card-title"><Icon name="crown" size={18} /> Rangok és jogok</h2>
-          <span className="muted small">Csak a Tulajdonos látja és módosíthatja</span>
+          <h2 className="card-title"><Icon name="crown" size={18} />{' '}{t('Rangok és jogok')}</h2>
+          <span className="muted small">{t('Csak a Tulajdonos látja és módosíthatja')}</span>
         </div>
-        <p className="muted small">
-          A <strong>Tulajdonos</strong> mindenhez hozzáfér, és csak ő adhat Tulajdonos rangot. Az <strong>Admin</strong> és a <strong>Staff</strong> rang jogait itt állíthatod be;
-          a változás azonnal érvényes, újra belépni nem kell. Rangot a Felhasználók fülön adhatsz.
-        </p>
+        <p className="muted small">{t('A')}{' '}<strong>{t('Tulajdonos')}</strong>{' '}{t('mindenhez hozzáfér, és csak ő adhat Tulajdonos rangot. Az')}{' '}<strong>{t('Admin')}</strong>{' '}{t('és a')}{' '}<strong>{t('Staff')}</strong>{' '}{t('rang jogait itt állíthatod be; a változás azonnal érvényes, újra belépni nem kell. Rangot a Felhasználók fülön adhatsz.')}</p>
 
         <div className="table-scroll">
           <table className="data-table roles-table">
             <thead>
               <tr>
-                <th>Jog</th>
-                <th className="align-center"><Icon name="crown" size={13} /> Tulajdonos</th>
+                <th>{t('Jog')}</th>
+                <th className="align-center"><Icon name="crown" size={13} />{' '}{t('Tulajdonos')}</th>
                 {ROLE_COLUMNS.map((r) => (
                   <th key={r.key} className="align-center">
                     {r.label}
                     {(r.key === 'admin' ? data.adminCustomized : data.staffCustomized)
-                      ? <span className="role-custom-dot" title="Egyedi beállítás" />
+                      ? <span className="role-custom-dot" title={t('Egyedi beállítás')} />
                       : null}
                   </th>
                 ))}
@@ -117,14 +115,14 @@ export function RolesAdminTab() {
             {groups.map(([group, items]) => (
               <tbody key={group}>
                 <tr className="roles-group-row">
-                  <th scope="rowgroup">{group}</th>
+                  <th scope="rowgroup">{t(group)}</th>
                   <td className="align-center"><Icon name="check" size={14} /></td>
                   {ROLE_COLUMNS.map((r) => (
                     <td key={r.key} className="align-center">
                       <GroupToggle
                         items={items}
                         selected={draft[r.key]}
-                        label={`${group}: mind (${r.label})`}
+                        label={t('{0}: mind ({1})', group, r.label)}
                         onChange={(on) => toggle(r.key, items.map((p) => p.key), on)}
                       />
                     </td>
@@ -134,8 +132,8 @@ export function RolesAdminTab() {
                   <tr key={p.key}>
                     <td>
                       <span className="roles-perm">
-                        <strong>{p.label}</strong>
-                        <small className="muted">{p.description}</small>
+                        <strong>{t(p.label)}</strong>
+                        <small className="muted">{t(p.description)}</small>
                       </span>
                     </td>
                     <td className="align-center"><span className="role-locked"><Icon name="check" size={13} /></span></td>
@@ -144,7 +142,7 @@ export function RolesAdminTab() {
                         <input
                           type="checkbox"
                           className="role-check"
-                          aria-label={`${p.label} (${r.label})`}
+                          aria-label={`${t(p.label)} (${r.label})`}
                           checked={draft[r.key].has(p.key)}
                           onChange={(e) => toggle(r.key, [p.key], e.target.checked)}
                         />
@@ -160,22 +158,18 @@ export function RolesAdminTab() {
 
       <div className="settings-actions section-gap">
         <span className="roles-reset">
-          <button type="button" className="btn-ghost btn-tiny" disabled={busy || !data.adminCustomized} onClick={() => save({ resetAdmin: true }, 'Az Admin rang visszaállt az alapértelmezésre.')}>
-            <Icon name="refresh" size={13} /> Admin alapértelmezés
-          </button>
-          <button type="button" className="btn-ghost btn-tiny" disabled={busy || !data.staffCustomized} onClick={() => save({ resetStaff: true }, 'A Staff rang visszaállt az alapértelmezésre.')}>
-            <Icon name="refresh" size={13} /> Staff alapértelmezés
-          </button>
+          <button type="button" className="btn-ghost btn-tiny" disabled={busy || !data.adminCustomized} onClick={() => save({ resetAdmin: true }, t('Az Admin rang visszaállt az alapértelmezésre.'))}>
+            <Icon name="refresh" size={13} />{' '}{t('Admin alapértelmezés')}</button>
+          <button type="button" className="btn-ghost btn-tiny" disabled={busy || !data.staffCustomized} onClick={() => save({ resetStaff: true }, t('A Staff rang visszaállt az alapértelmezésre.'))}>
+            <Icon name="refresh" size={13} />{' '}{t('Staff alapértelmezés')}</button>
         </span>
         <button
           type="button"
           className={`btn-primary ${busy ? 'is-loading' : ''}`}
           disabled={busy || !dirty}
-          onClick={() => save({ admin: [...draft.admin], staff: [...draft.staff] }, 'Jogok mentve. Minden tag azonnal az új jogokkal dolgozik.')}
+          onClick={() => save({ admin: [...draft.admin], staff: [...draft.staff] }, t('Jogok mentve. Minden tag azonnal az új jogokkal dolgozik.'))}
         >
-          {busy && <span className="btn-spinner" aria-hidden="true" />}
-          Mentés
-        </button>
+          {busy && <span className="btn-spinner" aria-hidden="true" />}{t('Mentés')}</button>
       </div>
       {notice && <p className="success-text"><Icon name="check" size={15} /> {notice}</p>}
       {error && <p className="error-text error-in">{error}</p>}

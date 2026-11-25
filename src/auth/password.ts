@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 const LOWER = 'abcdefghijkmnpqrstuvwxyz';
 const UPPER = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
 const DIGITS = '23456789';
@@ -32,9 +33,9 @@ export interface PasswordStrength {
 
 export function ratePassword(password: string): PasswordStrength {
   if (password.length === 0) return { score: 0, label: '' };
-  if (password.length < 8) return { score: 1, label: 'Túl rövid' };
+  if (password.length < 8) return { score: 1, label: t('Túl rövid') };
   const classes = [/[a-z]/, /[A-Z]/, /\d/, /[^a-zA-Z0-9]/].filter((re) => re.test(password)).length;
-  if (password.length >= 14 && classes >= 3) return { score: 4, label: 'Erős' };
-  if (password.length >= 10 && classes >= 2) return { score: 3, label: 'Jó' };
-  return { score: 2, label: 'Gyenge' };
+  if (password.length >= 14 && classes >= 3) return { score: 4, label: t('Erős') };
+  if (password.length >= 10 && classes >= 2) return { score: 3, label: t('Jó') };
+  return { score: 2, label: t('Gyenge') };
 }

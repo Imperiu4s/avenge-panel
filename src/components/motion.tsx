@@ -1,3 +1,4 @@
+import { locale } from '../i18n';
 import { useEffect, useRef, useState, type CSSProperties, type ElementType, type ReactNode } from 'react';
 
 export function prefersReducedMotion(): boolean {
@@ -79,7 +80,7 @@ export function CountUp({ value, suffix = '', duration = 1600 }: { value: number
 
   return (
     <span ref={ref} className="count-up">
-      {display.toLocaleString('hu-HU')}
+      {display.toLocaleString(locale)}
       {suffix}
     </span>
   );

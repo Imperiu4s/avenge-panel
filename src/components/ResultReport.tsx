@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { Fragment, useState, type ReactNode } from 'react';
 import type { FindingDto, ScanResultView } from '../api/types';
 import { Icon, type IconName } from './Icon';
@@ -11,36 +12,36 @@ import { actionTone, beforeScan, eventTiming, formatSecond, parseEvents } from '
 const VERDICT_LABELS: Record<string, string> = {
   Legit: 'LEGIT',
   Unlegit: 'UNLEGIT',
-  Inconclusive: 'NEM EGYÉRTELMŰ'
+  Inconclusive: t('NEM EGYÉRTELMŰ')
 };
 
 const VERDICT_TEXT: Record<string, string> = {
-  Legit: 'Nem volt komoly találat ezen a gépen.',
-  Unlegit: 'Magas vagy kritikus súlyú találat, vagy kitiltott gép.',
-  Inconclusive: 'Közepes súlyú találat. Nézd át a részleteket, és döntsd el.'
+  Legit: t('Nem volt komoly találat ezen a gépen.'),
+  Unlegit: t('Magas vagy kritikus súlyú találat, vagy kitiltott gép.'),
+  Inconclusive: t('Közepes súlyú találat. Nézd át a részleteket, és döntsd el.')
 };
 
 const ACCORDION_CATEGORIES: { category: FindingDto['category']; label: string; icon: IconName }[] = [
-  { category: 'AltAccount', label: 'Másodfiókok', icon: 'users' },
-  { category: 'RecordingSoftware', label: 'Felvevő szoftverek', icon: 'video' },
-  { category: 'XrayTexturePack', label: 'X-ray textúracsomagok', icon: 'gamepad' },
+  { category: 'AltAccount', label: t('Másodfiókok'), icon: 'users' },
+  { category: 'RecordingSoftware', label: t('Felvevő szoftverek'), icon: 'video' },
+  { category: 'XrayTexturePack', label: t('X-ray textúracsomagok'), icon: 'gamepad' },
   { category: 'VpnOrProxy', label: 'VPN / proxy', icon: 'globe' }
 ];
 
 const TYPE_LABELS: Record<string, string> = {
-  CheatSignature: 'Csalás',
-  SuspiciousSavedFile: 'Gyanús fájl',
-  SuspiciousDeletedFile: 'Törölt fájl',
-  Injector: 'Injektor',
+  CheatSignature: t('Csalás'),
+  SuspiciousSavedFile: t('Gyanús fájl'),
+  SuspiciousDeletedFile: t('Törölt fájl'),
+  Injector: t('Injektor'),
   VmSandbox: 'VM / sandbox',
-  TamperAttempt: 'Nyomeltüntetés'
+  TamperAttempt: t('Nyomeltüntetés')
 };
 
 const SEVERITY_LABELS: Record<string, string> = {
-  Critical: 'Kritikus',
-  High: 'Magas',
-  Medium: 'Közepes',
-  Low: 'Alacsony',
+  Critical: t('Kritikus'),
+  High: t('Magas'),
+  Medium: t('Közepes'),
+  Low: t('Alacsony'),
   Info: 'Info'
 };
 
@@ -54,15 +55,15 @@ function groupByCategory(findings: FindingDto[]): Record<string, FindingDto[]> {
 }
 
 function formatRelativeToNow(iso: string | null): string {
-  if (!iso) return 'nincs adat';
+  if (!iso) return t('nincs adat');
   const diffMs = Date.now() - new Date(iso).getTime();
-  if (diffMs < 0) return 'nincs adat';
+  if (diffMs < 0) return t('nincs adat');
   const minutes = Math.floor(diffMs / 60000);
   if (minutes < 1) return 'most';
-  if (minutes < 60) return `${minutes} perce`;
+  if (minutes < 60) return t('{0} perce', minutes);
   const hours = Math.floor(minutes / 60);
-  if (hours < 48) return `${hours} órája`;
-  return `${Math.floor(hours / 24)} napja`;
+  if (hours < 48) return t('{0} órája', hours);
+  return t('{0} napja', Math.floor(hours / 24));
 }
 
 function formatDuration(ms: number): string {
@@ -122,30 +123,30 @@ export function ResultReport({ result, aside }: Props) {
             <span className="verdict-print-scan" />
           </span>
           <div>
-            <span className="eyebrow">Verdikt</span>
+            <span className="eyebrow">{t('Verdikt')}</span>
             <div className="verdict-stamp">{VERDICT_LABELS[result.verdict] ?? result.verdict}</div>
             <p className="muted">{VERDICT_TEXT[result.verdict]}</p>
           </div>
         </section>
 
         <section className="card stagger-in" style={{ animationDelay: '90ms' }}>
-          <h2 className="card-title"><Icon name="cpu" size={18} /> A gép adatai</h2>
+          <h2 className="card-title"><Icon name="cpu" size={18} />{' '}{t('A gép adatai')}</h2>
           <dl className="fact-grid">
             {result.minecraftUsername && (
-              <div><dt>Minecraft név</dt><dd>{result.minecraftUsername}</dd></div>
+              <div><dt>{t('Minecraft név')}</dt><dd>{result.minecraftUsername}</dd></div>
             )}
-            <div><dt>Gépnév</dt><dd>{result.system.hostname}</dd></div>
-            <div><dt>Operációs rendszer</dt><dd>{result.system.osVersion}</dd></div>
-            <div><dt>Lomtár utoljára ürítve</dt><dd>{formatRelativeToNow(result.system.recycleBinLastEmptiedAt)}</dd></div>
-            <div><dt>Vizsgálat ideje</dt><dd>{formatSecond(result.createdAt)}</dd></div>
-            <div><dt>Időtartam</dt><dd>{formatDuration(result.scanDurationMs)}</dd></div>
-            <div><dt>Kliens verzió</dt><dd className="mono">{result.clientVersion}</dd></div>
+            <div><dt>{t('Gépnév')}</dt><dd>{result.system.hostname}</dd></div>
+            <div><dt>{t('Operációs rendszer')}</dt><dd>{result.system.osVersion}</dd></div>
+            <div><dt>{t('Lomtár utoljára ürítve')}</dt><dd>{formatRelativeToNow(result.system.recycleBinLastEmptiedAt)}</dd></div>
+            <div><dt>{t('Vizsgálat ideje')}</dt><dd>{formatSecond(result.createdAt)}</dd></div>
+            <div><dt>{t('Időtartam')}</dt><dd>{formatDuration(result.scanDurationMs)}</dd></div>
+            <div><dt>{t('Kliens verzió')}</dt><dd className="mono">{result.clientVersion}</dd></div>
             {result.minecraftSessions && (
               <div className="fact-wide">
-                <dt>Minecraft elindítva</dt>
+                <dt>{t('Minecraft elindítva')}</dt>
                 <dd>
                   {result.minecraftSessions.length === 0
-                    ? <span className="muted">A vizsgálatkor nem futott Minecraft.</span>
+                    ? <span className="muted">{t('A vizsgálatkor nem futott Minecraft.')}</span>
                     : result.minecraftSessions.map((s) => (
                       <span key={`${s.processId}-${s.startedAt}`} className="mc-session">
                         <span className="mono">{formatSecond(s.startedAt)}</span> · {sessionLabel(s)}
@@ -167,34 +168,34 @@ export function ResultReport({ result, aside }: Props) {
         <div className={`tally ${cheatCount > 0 ? 'tally-hot' : ''}`}>
           <Icon name="bug" size={20} />
           <strong><CountUp value={cheatCount} duration={700} /></strong>
-          <span>Csalásnyom</span>
+          <span>{t('Csalásnyom')}</span>
         </div>
         <div className={`tally ${savedCount > 0 ? 'tally-warm' : ''}`}>
           <Icon name="file" size={20} />
           <strong><CountUp value={savedCount} duration={700} /></strong>
-          <span>Gyanús fájl</span>
+          <span>{t('Gyanús fájl')}</span>
         </div>
         <div className={`tally ${deletedCount > 0 ? 'tally-warm' : ''}`}>
           <Icon name="trash" size={20} />
           <strong><CountUp value={deletedCount} duration={700} /></strong>
-          <span>Törölt fájl nyoma</span>
+          <span>{t('Törölt fájl nyoma')}</span>
         </div>
         <div className={`tally ${mouseMacroCount > 0 ? 'tally-hot' : ''}`}>
           <Icon name="activity" size={20} />
           <strong><CountUp value={mouseProductCount} duration={700} /></strong>
-          <span>Egérprogram{mouseMacroCount > 0 ? `, ${mouseMacroCount} gyanús makró` : ''}</span>
+          <span>{t('Egérprogram')}{mouseMacroCount > 0 ? t(', {0} gyanús makró', mouseMacroCount) : ''}</span>
         </div>
       </div>
 
       <section className="card section-gap stagger-in" style={{ animationDelay: '210ms' }}>
-        <h2 className="card-title"><Icon name="search" size={18} /> Találatok</h2>
+        <h2 className="card-title"><Icon name="search" size={18} />{' '}{t('Találatok')}</h2>
         <div className="table-scroll">
           <table className="data-table findings-table">
             <thead>
               <tr>
-                <th>Típus</th>
-                <th>Súly</th>
-                <th>Részlet</th>
+                <th>{t('Típus')}</th>
+                <th>{t('Súly')}</th>
+                <th>{t('Részlet')}</th>
               </tr>
             </thead>
             <tbody>
@@ -207,7 +208,7 @@ export function ResultReport({ result, aside }: Props) {
                       className={`row-in finding-row ${isExpanded ? 'finding-row-open' : ''}`}
                       style={{ animationDelay: `${Math.min(i, 20) * 30}ms` }}
                       onClick={() => setExpandedFinding(isExpanded ? null : i)}
-                      title="Kattints a részletekért"
+                      title={t('Kattints a részletekért')}
                     >
                       <td><span className="type-pill">{TYPE_LABELS[f.category] ?? f.category}</span></td>
                       <td><span className={`severity-badge severity-${f.severity.toLowerCase()}`}>{SEVERITY_LABELS[f.severity] ?? f.severity}</span></td>
@@ -224,17 +225,17 @@ export function ResultReport({ result, aside }: Props) {
                           <div className="finding-detail">
                             <p className="finding-detail-label">{f.label}</p>
                             <dl className="finding-detail-grid">
-                              <dt>Forrás</dt>
+                              <dt>{t('Forrás')}</dt>
                               <dd>{f.source}</dd>
                               {f.foundAt && (
                                 <>
-                                  <dt>Időpont</dt>
+                                  <dt>{t('Időpont')}</dt>
                                   <dd>{formatSecond(f.foundAt)}</dd>
                                 </>
                               )}
                               {f.filePath && (
                                 <>
-                                  <dt>Elérési út</dt>
+                                  <dt>{t('Elérési út')}</dt>
                                   <dd className="mono">{f.filePath}</dd>
                                 </>
                               )}
@@ -249,7 +250,7 @@ export function ResultReport({ result, aside }: Props) {
                                   ))}
                               {f.fileHashSha256 && (
                                 <>
-                                  <dt>SHA-256</dt>
+                                  <dt>{t('SHA-256')}</dt>
                                   <dd className="mono finding-detail-hash">{f.fileHashSha256}</dd>
                                 </>
                               )}
@@ -277,7 +278,7 @@ export function ResultReport({ result, aside }: Props) {
               })}
               {mainFindings.length === 0 && (
                 <tr>
-                  <td colSpan={3} className="muted empty-row">Nincs találat ezekben a kategóriákban.</td>
+                  <td colSpan={3} className="muted empty-row">{t('Nincs találat ezekben a kategóriákban.')}</td>
                 </tr>
               )}
             </tbody>
@@ -311,7 +312,7 @@ export function ResultReport({ result, aside }: Props) {
               <div className="accordion-panel-wrapper">
                 <div className="accordion-panel-inner">
                   <div className="accordion-panel">
-                    {items.length === 0 && <p className="muted small">Nincs találat ebben a kategóriában.</p>}
+                    {items.length === 0 && <p className="muted small">{t('Nincs találat ebben a kategóriában.')}</p>}
                     {items.map((f, i) => (
                       <div className="accordion-finding" key={i}>
                         <span className="mono small">{f.filePath ?? f.label}</span>

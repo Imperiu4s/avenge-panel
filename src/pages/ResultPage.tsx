@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api, ApiError } from '../api/client';
@@ -25,11 +26,11 @@ export function ResultPage() {
       .then(setResult)
       .catch((e) => {
         if (e instanceof ApiError && e.status === 403) {
-          setError('Ezt a vizsgálatot nem nézheted meg.');
+          setError(t('Ezt a vizsgálatot nem nézheted meg.'));
         } else if (e instanceof ApiError && e.status === 404) {
-          setError('Nincs ilyen vizsgálat.');
+          setError(t('Nincs ilyen vizsgálat.'));
         } else {
-          setError('Nem sikerült betölteni az eredményt.');
+          setError(t('Nem sikerült betölteni az eredményt.'));
         }
       })
       .finally(() => setIsLoading(false));
@@ -39,8 +40,8 @@ export function ResultPage() {
     return (
       <main className="page">
         <header className="page-head">
-          <span className="eyebrow">Eredmény</span>
-          <h1>Vizsgálat</h1>
+          <span className="eyebrow">{t('Eredmény')}</span>
+          <h1>{t('Vizsgálat')}</h1>
         </header>
         <div className="result-top">
           <div className="card"><Skeleton width="60%" height={40} style={{ marginBottom: 16 }} /><Skeleton width="80%" /></div>
@@ -53,8 +54,8 @@ export function ResultPage() {
   if (error || !result || !resultId) {
     return (
       <main className="page">
-        <Link to="/panel" className="back-link"><Icon name="arrow-right" size={15} className="flip-x" /> Vissza a Panelre</Link>
-        <p className="error-text">{error ?? 'Ismeretlen hiba.'}</p>
+        <Link to="/panel" className="back-link"><Icon name="arrow-right" size={15} className="flip-x" />{' '}{t('Vissza a Panelre')}</Link>
+        <p className="error-text">{error ?? t('Ismeretlen hiba.')}</p>
       </main>
     );
   }
@@ -65,29 +66,28 @@ export function ResultPage() {
 
   async function handleDelete() {
     if (!result?.sessionCode) return;
-    if (!window.confirm(`Törlöd a #${result.sessionCode} vizsgálatot az összes találatával és megosztó linkjével? Ez nem vonható vissza.`)) return;
+    if (!window.confirm(t('Törlöd a #{0} vizsgálatot az összes találatával és megosztó linkjével? Ez nem vonható vissza.', result.sessionCode))) return;
     setDeleteError(null);
     try {
       await api.deleteSession(result.sessionCode);
       navigate('/panel', { replace: true });
     } catch (err) {
-      setDeleteError(err instanceof ApiError ? err.message : 'Nem sikerült törölni a vizsgálatot.');
+      setDeleteError(err instanceof ApiError ? err.message : t('Nem sikerült törölni a vizsgálatot.'));
     }
   }
 
   return (
     <main className="page">
       <div className="result-toolbar">
-        <Link to="/panel" className="back-link"><Icon name="arrow-right" size={15} className="flip-x" /> Vissza a Panelre</Link>
+        <Link to="/panel" className="back-link"><Icon name="arrow-right" size={15} className="flip-x" />{' '}{t('Vissza a Panelre')}</Link>
         {canDelete && (
           <button type="button" className="btn-ghost btn-tiny btn-danger" onClick={handleDelete}>
-            <Icon name="trash" size={14} /> Vizsgálat törlése
-          </button>
+            <Icon name="trash" size={14} />{' '}{t('Vizsgálat törlése')}</button>
         )}
       </div>
       {deleteError && <p className="error-text">{deleteError}</p>}
       {foreign && (
-        <p className="foreign-org-banner"><Icon name="layers" size={15} /> Ez a(z) <strong>{foreign}</strong> szervezet vizsgálata. Csak megtekintheted; a megnyitás bekerült a tevékenységnaplódba.</p>
+        <p className="foreign-org-banner"><Icon name="layers" size={15} />{' '}{t('Ez a(z)')}{' '}<strong>{foreign}</strong>{' '}{t('szervezet vizsgálata. Csak megtekintheted; a megnyitás bekerült a tevékenységnaplódba.')}</p>
       )}
 
       <ResultReport result={result} aside={canShare ? <ShareLinkPanel resultId={resultId} /> : null} />

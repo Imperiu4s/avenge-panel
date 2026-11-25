@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { api, ApiError } from '../api/client';
@@ -20,8 +21,8 @@ export function SharedResultPage() {
       .then(setShared)
       .catch((e) => {
         setError(e instanceof ApiError && e.status === 404
-          ? 'Ez a link lejárt, vagy visszavonták. Kérj újat attól, aki küldte.'
-          : 'Nem sikerült betölteni az eredményt.');
+          ? t('Ez a link lejárt, vagy visszavonták. Kérj újat attól, aki küldte.')
+          : t('Nem sikerült betölteni az eredményt.'));
       })
       .finally(() => setIsLoading(false));
   }, [token]);
@@ -42,8 +43,8 @@ export function SharedResultPage() {
       <main className="page">
         <section className="card shared-gone">
           <Icon name="clock" size={28} />
-          <h1>A link nem érhető el</h1>
-          <p className="muted">{error ?? 'Ismeretlen hiba.'}</p>
+          <h1>{t('A link nem érhető el')}</h1>
+          <p className="muted">{error ?? t('Ismeretlen hiba.')}</p>
         </section>
       </main>
     );
@@ -53,9 +54,8 @@ export function SharedResultPage() {
     <main className="page">
       <div className="shared-banner stagger-in">
         <Icon name="share" size={17} />
-        <span>
-          Megosztott eredmény{shared.organizationName ? ` · ${shared.organizationName}` : ''}
-          <small>A link eddig érvényes: {formatSecond(shared.expiresAt)}</small>
+        <span>{t('Megosztott eredmény')}{shared.organizationName ? ` · ${shared.organizationName}` : ''}
+          <small>{t('A link eddig érvényes:')}{' '}{formatSecond(shared.expiresAt)}</small>
         </span>
       </div>
       <ResultReport result={shared.result} />

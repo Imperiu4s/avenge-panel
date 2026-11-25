@@ -1,3 +1,4 @@
+import { t as tr } from '../i18n';
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { SignatureCatalogSection } from '../components/SignatureCatalogSection';
@@ -30,19 +31,19 @@ interface IssuedCredentials {
 }
 
 const ALL_TABS: { key: string; label: string; icon: IconName; perms: string[] }[] = [
-  { key: 'overview', label: 'Áttekintés', icon: 'activity', perms: ['admin.overview'] },
-  { key: 'users', label: 'Felhasználók', icon: 'users', perms: ['users.view', 'users.create'] },
-  { key: 'roles', label: 'Rangok', icon: 'crown', perms: ['roles.manage'] },
-  { key: 'scans', label: 'Vizsgálatok', icon: 'history', perms: ['admin.scans'] },
-  { key: 'settings', label: 'Beállítások', icon: 'settings', perms: ['settings.view', 'settings.edit', 'sharelinks.manage'] },
-  { key: 'audit', label: 'Napló', icon: 'clock', perms: ['audit.view'] },
-  { key: 'signatures', label: 'Csalásjelek', icon: 'bug', perms: ['signatures.view', 'platform.signatures'] },
-  { key: 'organizations', label: 'Szervezetek', icon: 'layers', perms: ['platform.organizations'] },
-  { key: 'store', label: 'Áruház', icon: 'cart', perms: ['platform.store'] },
+  { key: 'overview', label: tr('Áttekintés'), icon: 'activity', perms: ['admin.overview'] },
+  { key: 'users', label: tr('Felhasználók'), icon: 'users', perms: ['users.view', 'users.create'] },
+  { key: 'roles', label: tr('Rangok'), icon: 'crown', perms: ['roles.manage'] },
+  { key: 'scans', label: tr('Vizsgálatok'), icon: 'history', perms: ['admin.scans'] },
+  { key: 'settings', label: tr('Beállítások'), icon: 'settings', perms: ['settings.view', 'settings.edit', 'sharelinks.manage'] },
+  { key: 'audit', label: tr('Napló'), icon: 'clock', perms: ['audit.view'] },
+  { key: 'signatures', label: tr('Csalásjelek'), icon: 'bug', perms: ['signatures.view', 'platform.signatures'] },
+  { key: 'organizations', label: tr('Szervezetek'), icon: 'layers', perms: ['platform.organizations'] },
+  { key: 'store', label: tr('Áruház'), icon: 'cart', perms: ['platform.store'] },
   { key: 'discord', label: 'Discord', icon: 'message', perms: ['platform.discord'] },
-  { key: 'legal', label: 'Jogi', icon: 'scale', perms: ['platform.legal'] },
-  { key: 'themes', label: 'Témák', icon: 'star', perms: ['platform.theme'] },
-  { key: 'tickets', label: 'Ticketek', icon: 'message', perms: ['platform.tickets'] },
+  { key: 'legal', label: tr('Jogi'), icon: 'scale', perms: ['platform.legal'] },
+  { key: 'themes', label: tr('Témák'), icon: 'star', perms: ['platform.theme'] },
+  { key: 'tickets', label: tr('Ticketek'), icon: 'message', perms: ['platform.tickets'] },
   { key: 'plugin', label: 'Plugin', icon: 'package', perms: ['pluginkeys.manage'] }
 ];
 
@@ -104,7 +105,7 @@ export function AdminPage() {
       setUsers(await api.listAdminUsers());
     } catch (err) {
       if (!(err instanceof ApiError && err.status === 401)) {
-        setListError('Nem sikerült betölteni a felhasználókat.');
+        setListError(tr('Nem sikerült betölteni a felhasználókat.'));
       }
     } finally {
       setIsLoading(false);
@@ -131,7 +132,7 @@ export function AdminPage() {
     setIsCreating(true);
     try {
       const created = await api.createAdminUser({ email, password, role });
-      setIssued({ title: 'Fiók létrehozva', email: created.email, password });
+      setIssued({ title: tr('Fiók létrehozva'), email: created.email, password });
       setEmail('');
       setPassword('');
       setShowPassword(false);
@@ -141,10 +142,10 @@ export function AdminPage() {
       if (err instanceof ApiError && err.status === 401) return;
       const message =
         err instanceof ApiError && err.status === 409
-          ? 'Ez az email cím már foglalt.'
+          ? tr('Ez az email cím már foglalt.')
           : err instanceof ApiError
             ? err.message
-            : 'Nem sikerült létrehozni a felhasználót.';
+            : tr('Nem sikerült létrehozni a felhasználót.');
       setCreateError(message);
     } finally {
       setIsCreating(false);
@@ -156,7 +157,7 @@ export function AdminPage() {
       const updated = await api.updateAdminUser(user.id, { role: newRole });
       setUsers((prev) => prev.map((u) => (u.id === updated.id ? updated : u)));
     } catch (err) {
-      setListError(err instanceof ApiError ? err.message : 'Nem sikerült módosítani a rangot.');
+      setListError(err instanceof ApiError ? err.message : tr('Nem sikerült módosítani a rangot.'));
     }
   }
 
@@ -165,68 +166,68 @@ export function AdminPage() {
       const updated = await api.updateAdminUser(user.id, { isActive: !user.isActive });
       setUsers((prev) => prev.map((u) => (u.id === updated.id ? updated : u)));
     } catch (err) {
-      setListError(err instanceof ApiError ? err.message : 'Nem sikerült módosítani az állapotot.');
+      setListError(err instanceof ApiError ? err.message : tr('Nem sikerült módosítani az állapotot.'));
     }
   }
 
   async function handleResetPassword(user: AdminUserView) {
-    if (!window.confirm(`Új, véletlen jelszót kap a(z) ${user.email} fiók, és minden eszközön kijelentkezik. Folytatod?`)) {
+    if (!window.confirm(tr('Új, véletlen jelszót kap a(z) {0} fiók, és minden eszközön kijelentkezik. Folytatod?', user.email))) {
       return;
     }
     const newPassword = generatePassword();
     try {
       await api.resetAdminUserPassword(user.id, newPassword);
-      setIssued({ title: 'Új jelszó beállítva', email: user.email, password: newPassword });
+      setIssued({ title: tr('Új jelszó beállítva'), email: user.email, password: newPassword });
     } catch (err) {
-      setListError(err instanceof ApiError ? err.message : 'Nem sikerült új jelszót beállítani.');
+      setListError(err instanceof ApiError ? err.message : tr('Nem sikerült új jelszót beállítani.'));
     }
   }
 
   async function handleSignOut(user: AdminUserView) {
-    if (!window.confirm(`${user.email} minden eszközön kijelentkezik. A jelszava nem változik. Folytatod?`)) return;
+    if (!window.confirm(tr('{0} minden eszközön kijelentkezik. A jelszava nem változik. Folytatod?', user.email))) return;
     try {
       await api.signOutAdminUser(user.id);
       setListNotice(`${user.email} kijelentkeztetve.`);
     } catch (err) {
-      setListError(err instanceof ApiError ? err.message : 'Nem sikerült kijelentkeztetni.');
+      setListError(err instanceof ApiError ? err.message : tr('Nem sikerült kijelentkeztetni.'));
     }
   }
 
   async function handlePurgeUser(user: AdminUserView) {
-    if (!window.confirm(`Törlöd ${user.email} ÖSSZES vizsgálatát az eredményekkel együtt? Ez nem vonható vissza.`)) return;
+    if (!window.confirm(tr('Törlöd {0} ÖSSZES vizsgálatát az eredményekkel együtt? Ez nem vonható vissza.', user.email))) return;
     try {
       const { deleted } = await api.purgeAdminHistory({ userId: user.id });
-      setListNotice(`${user.email}: ${deleted} vizsgálat törölve.`);
+      setListNotice(tr('{0}: {1} vizsgálat törölve.', user.email, deleted));
     } catch (err) {
-      setListError(err instanceof ApiError ? err.message : 'Nem sikerült törölni az előzményeket.');
+      setListError(err instanceof ApiError ? err.message : tr('Nem sikerült törölni az előzményeket.'));
     }
   }
 
   async function handleDelete(user: AdminUserView) {
     const confirmed = window.confirm(
-      `Biztosan törlöd a(z) ${user.email} felhasználót? Ez nem vonható vissza.\n\n` +
-      'A vizsgálatai megmaradnak a szervezet előzményeiben; ha azokat is törölnéd, előbb az "Előzmények törlése" gombot használd.'
+      tr('Biztosan törlöd a(z) {0} felhasználót? Ez nem vonható vissza.\n\n', user.email) +
+      tr('A vizsgálatai megmaradnak a szervezet előzményeiben; ha azokat is törölnéd, előbb az "Előzmények törlése" gombot használd.')
     );
     if (!confirmed) return;
     try {
       await api.deleteAdminUser(user.id);
       setUsers((prev) => prev.filter((u) => u.id !== user.id));
     } catch (err) {
-      setListError(err instanceof ApiError ? err.message : 'Nem sikerült törölni a felhasználót.');
+      setListError(err instanceof ApiError ? err.message : tr('Nem sikerült törölni a felhasználót.'));
     }
   }
 
   return (
     <main className="page">
       <header className="page-head stagger-in">
-        <span className="eyebrow">Adminisztráció</span>
-        <h1>Admin Panel</h1>
+        <span className="eyebrow">{tr('Adminisztráció')}</span>
+        <h1>{tr('Admin Panel')}</h1>
         <p className="muted">
-          {user ? `${ROLE_LABELS[user.role] ?? user.role} rangod szerint ${TABS.length} terület érhető el.` : 'Betöltés...'}
+          {user ? tr('{0} rangod szerint {1} terület érhető el.', ROLE_LABELS[user.role] ?? user.role, TABS.length) : tr('Betöltés...')}
         </p>
       </header>
 
-      <nav className="admin-tabs stagger-in" aria-label="Admin fülek" style={{ animationDelay: '40ms' }}>
+      <nav className="admin-tabs stagger-in" aria-label={tr('Admin fülek')} style={{ animationDelay: '40ms' }}>
         {TABS.map((t) => (
           <button
             key={t.key}
@@ -265,16 +266,16 @@ export function AdminPage() {
       {tab === 'users' && (
         <div className="panel-grid">
           <section className="card stagger-in" style={{ animationDelay: '60ms' }}>
-            <h2 className="card-title"><Icon name="users" size={18} /> Felhasználók</h2>
+            <h2 className="card-title"><Icon name="users" size={18} />{' '}{tr('Felhasználók')}</h2>
             <div className="table-scroll">
               <table className="data-table">
                 <thead>
                   <tr>
-                    <th>Email</th>
-                    <th>Rang</th>
-                    <th>Állapot</th>
-                    <th>Utolsó belépés</th>
-                    <th>Műveletek</th>
+                    <th>{tr('Email')}</th>
+                    <th>{tr('Rang')}</th>
+                    <th>{tr('Állapot')}</th>
+                    <th>{tr('Utolsó belépés')}</th>
+                    <th>{tr('Műveletek')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -284,14 +285,14 @@ export function AdminPage() {
                     const canChangeRole = can('users.role') && !isSelf && !locked;
                     return (
                       <tr key={u.id} className="row-in" style={{ animationDelay: `${i * 40}ms` }}>
-                        <td className="mono small">{u.email}{isSelf && <span className="muted"> (te)</span>}</td>
+                        <td className="mono small">{u.email}{isSelf && <span className="muted">{' '}{tr('(te)')}</span>}</td>
                         <td>
                           {canChangeRole ? (
                             <select
                               value={u.role}
                               onChange={(e) => handleRoleChange(u, e.target.value as UserRole)}
                               className="role-select"
-                              aria-label={`${u.email} rangja`}
+                              aria-label={tr('{0} rangja', u.email)}
                             >
                               {[...new Set([...assignable, u.role])].map((r) => <option key={r} value={r}>{ROLE_LABELS[r] ?? r}</option>)}
                             </select>
@@ -303,28 +304,28 @@ export function AdminPage() {
                         </td>
                         <td>
                           <span className={`status-badge ${u.isActive ? 'status-completed' : 'status-interrupted'}`}>
-                            {u.isActive ? 'Aktív' : 'Inaktív'}
+                            {u.isActive ? tr('Aktív') : tr('Inaktív')}
                           </span>
                         </td>
                         <td className="muted small">{u.lastLoginAt ? formatSecond(u.lastLoginAt) : '-'}</td>
                         <td className="admin-actions">
-                          {can('admin.scans') && <button className="btn-ghost btn-tiny" onClick={() => openTab('scans', { user: u.id })}>Vizsgálatai</button>}
-                          {can('scans.purge') && <button className="btn-ghost btn-tiny btn-danger" onClick={() => handlePurgeUser(u)}>Előzmények törlése</button>}
-                          {!isSelf && !locked && can('users.password') && <button className="btn-ghost btn-tiny" onClick={() => handleResetPassword(u)}>Új jelszó</button>}
-                          {!isSelf && !locked && can('users.signout') && <button className="btn-ghost btn-tiny" onClick={() => handleSignOut(u)}>Kijelentkeztetés</button>}
+                          {can('admin.scans') && <button className="btn-ghost btn-tiny" onClick={() => openTab('scans', { user: u.id })}>{tr('Vizsgálatai')}</button>}
+                          {can('scans.purge') && <button className="btn-ghost btn-tiny btn-danger" onClick={() => handlePurgeUser(u)}>{tr('Előzmények törlése')}</button>}
+                          {!isSelf && !locked && can('users.password') && <button className="btn-ghost btn-tiny" onClick={() => handleResetPassword(u)}>{tr('Új jelszó')}</button>}
+                          {!isSelf && !locked && can('users.signout') && <button className="btn-ghost btn-tiny" onClick={() => handleSignOut(u)}>{tr('Kijelentkeztetés')}</button>}
                           {!isSelf && !locked && can('users.deactivate') && (
                             <button className="btn-ghost btn-tiny" onClick={() => handleToggleActive(u)}>
-                              {u.isActive ? 'Deaktiválás' : 'Aktiválás'}
+                              {u.isActive ? tr('Deaktiválás') : tr('Aktiválás')}
                             </button>
                           )}
-                          {!isSelf && !locked && can('users.delete') && <button className="btn-ghost btn-tiny btn-danger" onClick={() => handleDelete(u)}>Fiók törlése</button>}
+                          {!isSelf && !locked && can('users.delete') && <button className="btn-ghost btn-tiny btn-danger" onClick={() => handleDelete(u)}>{tr('Fiók törlése')}</button>}
                         </td>
                       </tr>
                     );
                   })}
                   {!isLoading && users.length === 0 && (
                     <tr>
-                      <td colSpan={5} className="muted empty-row">Nincs felhasználó.</td>
+                      <td colSpan={5} className="muted empty-row">{tr('Nincs felhasználó.')}</td>
                     </tr>
                   )}
                 </tbody>
@@ -337,9 +338,9 @@ export function AdminPage() {
           <div className="side-stack">
             {can('users.create') && (
               <section className="card generate-card stagger-in" style={{ animationDelay: '120ms' }}>
-                <h2 className="card-title"><Icon name="plus" size={18} /> Új felhasználó</h2>
+                <h2 className="card-title"><Icon name="plus" size={18} />{' '}{tr('Új felhasználó')}</h2>
                 <form onSubmit={handleCreate}>
-                  <label className="field-label" htmlFor="new-user-email">Email</label>
+                  <label className="field-label" htmlFor="new-user-email">{tr('Email')}</label>
                   <input
                     id="new-user-email"
                     type="email"
@@ -350,10 +351,9 @@ export function AdminPage() {
                   />
 
                   <div className="field-label-row">
-                    <label className="field-label" htmlFor="new-user-password">Jelszó</label>
+                    <label className="field-label" htmlFor="new-user-password">{tr('Jelszó')}</label>
                     <button type="button" className="text-action" onClick={handleGeneratePassword}>
-                      <Icon name="dice" size={15} /> Véletlen jelszó
-                    </button>
+                      <Icon name="dice" size={15} />{' '}{tr('Véletlen jelszó')}</button>
                   </div>
                   <div className="input-with-action">
                     <input
@@ -369,7 +369,7 @@ export function AdminPage() {
                       type="button"
                       className="input-action"
                       onClick={() => setShowPassword((v) => !v)}
-                      aria-label={showPassword ? 'Jelszó elrejtése' : 'Jelszó megjelenítése'}
+                      aria-label={showPassword ? tr('Jelszó elrejtése') : tr('Jelszó megjelenítése')}
                     >
                       <Icon name={showPassword ? 'eye-off' : 'eye'} size={18} />
                     </button>
@@ -379,7 +379,7 @@ export function AdminPage() {
                     <span className="small">{strength.label}</span>
                   </div>
 
-                  <label className="field-label" htmlFor="new-user-role">Rang</label>
+                  <label className="field-label" htmlFor="new-user-role">{tr('Rang')}</label>
                   <select
                     id="new-user-role"
                     value={role}
@@ -391,7 +391,7 @@ export function AdminPage() {
 
                   <button className={`btn-primary btn-block ${isCreating ? 'is-loading' : ''}`} type="submit" disabled={isCreating}>
                     {isCreating && <span className="btn-spinner" aria-hidden="true" />}
-                    {isCreating ? 'Létrehozás...' : 'Fiók létrehozása'}
+                    {isCreating ? tr('Létrehozás...') : tr('Fiók létrehozása')}
                   </button>
                   {createError && <p className="error-text error-in">{createError}</p>}
                 </form>
@@ -402,35 +402,35 @@ export function AdminPage() {
               <section className="card credentials-card" key={`${issued.email}-${issued.password}`}>
                 <div className="credentials-head">
                   <h2 className="card-title"><Icon name="check" size={18} /> {issued.title}</h2>
-                  <button className="icon-button" onClick={() => setIssued(null)} aria-label="Bezárás">
+                  <button className="icon-button" onClick={() => setIssued(null)} aria-label={tr('Bezárás')}>
                     <Icon name="x" size={16} />
                   </button>
                 </div>
-                <p className="muted small">Add át ezeket az adatokat. A jelszó többé nem jeleníthető meg.</p>
+                <p className="muted small">{tr('Add át ezeket az adatokat. A jelszó többé nem jeleníthető meg.')}</p>
                 <dl className="credentials-list">
-                  <div><dt>Email</dt><dd className="mono">{issued.email}</dd></div>
-                  <div><dt>Jelszó</dt><dd className="mono">{issued.password}</dd></div>
+                  <div><dt>{tr('Email')}</dt><dd className="mono">{issued.email}</dd></div>
+                  <div><dt>{tr('Jelszó')}</dt><dd className="mono">{issued.password}</dd></div>
                 </dl>
                 <button
                   className="btn-secondary btn-block"
-                  onClick={() => copy('credentials', `Email: ${issued.email}\nJelszó: ${issued.password}\nBelépés: ${window.location.origin}/login`)}
+                  onClick={() => copy('credentials', tr('Email: {0}\nJelszó: {1}\nBelépés: {2}/login', issued.email, issued.password, window.location.origin))}
                 >
                   <Icon name={copiedKey === 'credentials' ? 'check' : 'copy'} size={16} />
-                  {copiedKey === 'credentials' ? 'Másolva' : 'Belépési adatok másolása'}
+                  {copiedKey === 'credentials' ? tr('Másolva') : tr('Belépési adatok másolása')}
                 </button>
               </section>
             )}
 
             <section className="card release-card stagger-in" style={{ animationDelay: '180ms' }}>
-              <h2 className="card-title"><Icon name="download" size={18} /> Kliens kiadás</h2>
+              <h2 className="card-title"><Icon name="download" size={18} />{' '}{tr('Kliens kiadás')}</h2>
               {release ? (
                 <dl className="credentials-list">
-                  <div><dt>Verzió</dt><dd className="mono">v{release.version}</dd></div>
-                  <div><dt>Méret</dt><dd className="mono">{formatSize(release.sizeBytes)}</dd></div>
-                  <div><dt>Kiadva</dt><dd>{formatSecond(release.publishedAt)}</dd></div>
+                  <div><dt>{tr('Verzió')}</dt><dd className="mono">{tr('v')}{release.version}</dd></div>
+                  <div><dt>{tr('Méret')}</dt><dd className="mono">{formatSize(release.sizeBytes)}</dd></div>
+                  <div><dt>{tr('Kiadva')}</dt><dd>{formatSecond(release.publishedAt)}</dd></div>
                 </dl>
               ) : (
-                <p className="muted small">{isReleaseLoaded ? 'Még nincs kiadott kliens a szerveren.' : 'Betöltés...'}</p>
+                <p className="muted small">{isReleaseLoaded ? tr('Még nincs kiadott kliens a szerveren.') : tr('Betöltés...')}</p>
               )}
             </section>
           </div>

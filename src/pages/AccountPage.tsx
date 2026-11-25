@@ -1,3 +1,4 @@
+import { t, locale } from '../i18n';
 import { useState, type FormEvent } from 'react';
 import { api, ApiError } from '../api/client';
 import { useAuth } from '../auth/AuthContext';
@@ -9,7 +10,7 @@ import { Skeleton } from '../components/motion';
 import { Avatar, ProfileCustomizer } from '../components/ProfileCustomizer';
 
 function formatDate(iso: string | null | undefined): string {
-  return iso ? new Date(iso).toLocaleString('hu-HU') : '-';
+  return iso ? new Date(iso).toLocaleString(locale) : '-';
 }
 
 export function AccountPage() {
@@ -31,7 +32,7 @@ export function AccountPage() {
     setError(null);
     setSaved(false);
     if (newPassword !== confirmPassword) {
-      setError('A két új jelszó nem egyezik.');
+      setError(t('A két új jelszó nem egyezik.'));
       return;
     }
     setIsSaving(true);
@@ -45,7 +46,7 @@ export function AccountPage() {
       setSaved(true);
     } catch (err) {
       if (!(err instanceof ApiError && err.status === 401)) {
-        setError(err instanceof ApiError ? err.message : 'Nem sikerült módosítani a jelszót.');
+        setError(err instanceof ApiError ? err.message : t('Nem sikerült módosítani a jelszót.'));
       }
     } finally {
       setIsSaving(false);
@@ -63,9 +64,9 @@ export function AccountPage() {
   return (
     <main className="page page-narrow">
       <header className="page-head stagger-in">
-        <span className="eyebrow">Beállítások</span>
-        <h1>Fiók</h1>
-        <p className="muted">A fiókod adatai, a profilképed és a jelszavad.</p>
+        <span className="eyebrow">{t('Beállítások')}</span>
+        <h1>{t('Fiók')}</h1>
+        <p className="muted">{t('A fiókod adatai, a profilképed és a jelszavad.')}</p>
       </header>
 
       <section className="card profile-card stagger-in" style={{ animationDelay: '80ms' }}>
@@ -77,14 +78,14 @@ export function AccountPage() {
           </span>
         </div>
         <dl className="profile-facts">
-          <div><dt>Szervezet</dt><dd>{user?.organizationName || '-'}</dd></div>
-          <div><dt>Fiók létrehozva</dt><dd>{formatDate(user?.createdAt)}</dd></div>
-          <div><dt>Utolsó belépés</dt><dd>{formatDate(user?.lastLoginAt)}</dd></div>
+          <div><dt>{t('Szervezet')}</dt><dd>{user?.organizationName || '-'}</dd></div>
+          <div><dt>{t('Fiók létrehozva')}</dt><dd>{formatDate(user?.createdAt)}</dd></div>
+          <div><dt>{t('Utolsó belépés')}</dt><dd>{formatDate(user?.lastLoginAt)}</dd></div>
         </dl>
       </section>
 
       <section className="card stagger-in section-gap-bottom" style={{ animationDelay: '120ms' }}>
-        <h2 className="card-title"><Icon name="user" size={18} /> Profilkép</h2>
+        <h2 className="card-title"><Icon name="user" size={18} />{' '}{t('Profilkép')}</h2>
         <ProfileCustomizer
           avatarUrl={user?.avatarUrl}
           name={user?.email ?? ''}
@@ -94,13 +95,11 @@ export function AccountPage() {
       </section>
 
       <section className="card stagger-in" style={{ animationDelay: '150ms' }}>
-        <h2 className="card-title"><Icon name="lock" size={18} /> Jelszó módosítása</h2>
-        <p className="muted small">
-          A módosítás után minden más eszközön automatikusan kijelentkezel, itt bent maradsz.
-        </p>
+        <h2 className="card-title"><Icon name="lock" size={18} />{' '}{t('Jelszó módosítása')}</h2>
+        <p className="muted small">{t('A módosítás után minden más eszközön automatikusan kijelentkezel, itt bent maradsz.')}</p>
 
         <form onSubmit={handleSubmit} className="password-form">
-          <label className="field-label" htmlFor="current-password">Jelenlegi jelszó</label>
+          <label className="field-label" htmlFor="current-password">{t('Jelenlegi jelszó')}</label>
           <div className="input-with-action">
             <input
               id="current-password"
@@ -114,17 +113,16 @@ export function AccountPage() {
               type="button"
               className="input-action"
               onClick={() => setShowPasswords((v) => !v)}
-              aria-label={showPasswords ? 'Jelszavak elrejtése' : 'Jelszavak megjelenítése'}
+              aria-label={showPasswords ? t('Jelszavak elrejtése') : t('Jelszavak megjelenítése')}
             >
               <Icon name={showPasswords ? 'eye-off' : 'eye'} size={18} />
             </button>
           </div>
 
           <div className="field-label-row">
-            <label className="field-label" htmlFor="new-password">Új jelszó</label>
+            <label className="field-label" htmlFor="new-password">{t('Új jelszó')}</label>
             <button type="button" className="text-action" onClick={handleGenerate}>
-              <Icon name="dice" size={15} /> Véletlen jelszó
-            </button>
+              <Icon name="dice" size={15} />{' '}{t('Véletlen jelszó')}</button>
           </div>
           <input
             id="new-password"
@@ -140,7 +138,7 @@ export function AccountPage() {
             <span className="small">{strength.label}</span>
           </div>
 
-          <label className="field-label" htmlFor="confirm-password">Új jelszó még egyszer</label>
+          <label className="field-label" htmlFor="confirm-password">{t('Új jelszó még egyszer')}</label>
           <input
             id="confirm-password"
             type={inputType}
@@ -149,14 +147,14 @@ export function AccountPage() {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
-          {mismatch && <p className="error-text">A két új jelszó nem egyezik.</p>}
+          {mismatch && <p className="error-text">{t('A két új jelszó nem egyezik.')}</p>}
 
           {error && <p className="error-text error-in">{error}</p>}
-          {saved && <p className="success-text"><Icon name="check" size={16} /> A jelszavad megváltozott.</p>}
+          {saved && <p className="success-text"><Icon name="check" size={16} />{' '}{t('A jelszavad megváltozott.')}</p>}
 
           <button type="submit" className={`btn-primary btn-large ${isSaving ? 'is-loading' : ''}`} disabled={isSaving || mismatch}>
             {isSaving && <span className="btn-spinner" aria-hidden="true" />}
-            {isSaving ? 'Mentés...' : 'Jelszó mentése'}
+            {isSaving ? t('Mentés...') : t('Jelszó mentése')}
           </button>
         </form>
       </section>

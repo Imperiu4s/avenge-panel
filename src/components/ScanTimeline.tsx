@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useMemo, useState } from 'react';
 import type { FindingDto, MinecraftSession } from '../api/types';
 import { sessionLabel } from './minecraftSessions';
@@ -10,12 +11,12 @@ interface Entry extends TimelineEvent {
 }
 
 const FILTERS: { key: string; label: string; match: (e: Entry) => boolean }[] = [
-  { key: 'all', label: 'Mind', match: () => true },
-  { key: 'run', label: 'Indítások', match: (e) => /elindítva|elindult/i.test(e.action) },
+  { key: 'all', label: t('Mind'), match: () => true },
+  { key: 'run', label: t('Indítások'), match: (e) => /elindítva|elindult/i.test(e.action) },
   { key: 'minecraft', label: 'Minecraft', match: (e) => e.action === 'Minecraft elindult' },
-  { key: 'file', label: 'Fájlműveletek', match: (e) => /létrehozva|módosít|átnevezve|letöltve|tartalom/i.test(e.action) },
-  { key: 'delete', label: 'Törlések', match: (e) => /törölve|lomtárba|eltávolította/i.test(e.action) },
-  { key: 'mouse', label: 'Egér: gomb, makró, profil', match: (e) => /gomb|makró|profil|beállítás/i.test(e.action) },
+  { key: 'file', label: t('Fájlműveletek'), match: (e) => /létrehozva|módosít|átnevezve|letöltve|tartalom/i.test(e.action) },
+  { key: 'delete', label: t('Törlések'), match: (e) => /törölve|lomtárba|eltávolította/i.test(e.action) },
+  { key: 'mouse', label: t('Egér: gomb, makró, profil'), match: (e) => /gomb|makró|profil|beállítás/i.test(e.action) },
   { key: 'defender', label: 'Defender', match: (e) => /defender/i.test(e.action) }
 ];
 
@@ -37,8 +38,8 @@ export function ScanTimeline({ findings, scanTime, minecraftSessions }: { findin
       all.push({
         time: s.startedAt,
         action: 'Minecraft elindult',
-        source: 'Futó folyamat',
-        text: `${sessionLabel(s)}${s.processName ? ` (${s.processName}${s.processId ? `, PID ${s.processId}` : ''})` : ''} - a vizsgálatkor is futott`,
+        source: t('Futó folyamat'),
+        text: t('{0}{1} - a vizsgálatkor is futott', sessionLabel(s), s.processName ? ` (${s.processName}${s.processId ? `, PID ${s.processId}` : ''})` : ''),
         precision: 'pontos',
         notBefore: null,
         finding: 'Minecraft',
@@ -65,11 +66,8 @@ export function ScanTimeline({ findings, scanTime, minecraftSessions }: { findin
 
   return (
     <section className="card section-gap stagger-in" style={{ animationDelay: '200ms' }}>
-      <h2 className="card-title"><Icon name="clock" size={18} /> Idővonal</h2>
-      <p className="muted small">
-        Minden esemény másodpercre, a legfrissebbel kezdve. A „pontos” jelzésűeket a Windows rögzítette (NTFS-napló,
-        Prefetch, Lomtár, Defender); a fájlok saját dátuma utólag átírható, az NTFS-napló nem.
-      </p>
+      <h2 className="card-title"><Icon name="clock" size={18} />{' '}{t('Idővonal')}</h2>
+      <p className="muted small">{t('Minden esemény másodpercre, a legfrissebbel kezdve. A „pontos” jelzésűeket a Windows rögzítette (NTFS-napló, Prefetch, Lomtár, Defender); a fájlok saját dátuma utólag átírható, az NTFS-napló nem.')}</p>
 
       <div className="timeline-filters">
         {FILTERS.map((f) => {
@@ -105,9 +103,7 @@ export function ScanTimeline({ findings, scanTime, minecraftSessions }: { findin
         })}
       </ol>
       {filtered.length > visible && (
-        <button className="btn-ghost btn-tiny timeline-more" onClick={() => setVisible((v) => v + PAGE)}>
-          Még {Math.min(PAGE, filtered.length - visible)} esemény ({filtered.length - visible} van hátra)
-        </button>
+        <button className="btn-ghost btn-tiny timeline-more" onClick={() => setVisible((v) => v + PAGE)}>{t('Még')}{' '}{Math.min(PAGE, filtered.length - visible)}{' '}{t('esemény (')}{filtered.length - visible}{' '}{t('van hátra)')}</button>
       )}
     </section>
   );

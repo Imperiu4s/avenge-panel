@@ -1,3 +1,4 @@
+import { t } from '../../i18n';
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { api, ApiError } from '../../api/client';
@@ -10,28 +11,28 @@ import { formatSecond } from '../timeline';
 const PAGE_SIZE = 25;
 
 const STATUS_LABELS: Record<string, string> = {
-  Pending: 'Várakozik',
-  ClientConnected: 'Kliens csatlakozott',
-  Scanning: 'Folyamatban',
-  Completed: 'Sikeres',
-  Interrupted: 'Megszakadt',
-  Expired: 'Lejárt'
+  Pending: t('Várakozik'),
+  ClientConnected: t('Kliens csatlakozott'),
+  Scanning: t('Folyamatban'),
+  Completed: t('Sikeres'),
+  Interrupted: t('Megszakadt'),
+  Expired: t('Lejárt')
 };
 
 const VERDICT_LABELS: Record<string, string> = {
   Legit: 'LEGIT',
   Unlegit: 'UNLEGIT',
-  Inconclusive: 'Nem egyértelmű'
+  Inconclusive: t('Nem egyértelmű')
 };
 
 const AGE_OPTIONS = [
-  { value: 0, label: 'bármikor' },
-  { value: 7, label: '7 napnál régebbi' },
-  { value: 14, label: '14 napnál régebbi' },
-  { value: 30, label: '30 napnál régebbi' },
-  { value: 90, label: '90 napnál régebbi' },
-  { value: 180, label: '180 napnál régebbi' },
-  { value: 365, label: '1 évnél régebbi' }
+  { value: 0, label: t('bármikor') },
+  { value: 7, label: t('7 napnál régebbi') },
+  { value: 14, label: t('14 napnál régebbi') },
+  { value: 30, label: t('30 napnál régebbi') },
+  { value: 90, label: t('90 napnál régebbi') },
+  { value: 180, label: t('180 napnál régebbi') },
+  { value: 365, label: t('1 évnél régebbi') }
 ];
 
 interface Props {
@@ -69,7 +70,7 @@ export function AdminScansTab({ users, initialUserId = '', onChanged }: Props) {
     try {
       setData(await api.listAdminSessions({ page, pageSize: PAGE_SIZE, userId, verdict, status, q: query }));
     } catch (err) {
-      if (!(err instanceof ApiError && err.status === 401)) setError('Nem sikerült betölteni a vizsgálatokat.');
+      if (!(err instanceof ApiError && err.status === 401)) setError(t('Nem sikerült betölteni a vizsgálatokat.'));
     } finally {
       setIsLoading(false);
     }
@@ -101,27 +102,27 @@ export function AdminScansTab({ users, initialUserId = '', onChanged }: Props) {
 
   async function deleteCodes(codes: string[]) {
     if (codes.length === 0) return;
-    const text = codes.length === 1 ? `a #${codes[0]} vizsgálatot` : `${codes.length} vizsgálatot`;
-    if (!window.confirm(`Törlöd ${text} az eredményekkel és a megosztó linkekkel együtt? Ez nem vonható vissza.`)) return;
+    const text = codes.length === 1 ? t('a #{0} vizsgálatot', codes[0]) : t('{0} vizsgálatot', codes.length);
+    if (!window.confirm(t('Törlöd {0} az eredményekkel és a megosztó linkekkel együtt? Ez nem vonható vissza.', text))) return;
     try {
       const { deleted } = await api.deleteAdminSessions(codes);
-      setNotice(`${deleted} vizsgálat törölve.`);
+      setNotice(t('{0} vizsgálat törölve.', deleted));
       setSelected(new Set());
       onChanged?.();
       await load();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Nem sikerült törölni.');
+      setError(err instanceof ApiError ? err.message : t('Nem sikerült törölni.'));
     }
   }
 
   function describePurge(): string {
     const parts: string[] = [];
     const who = users.find((u) => u.id === purgeUser);
-    parts.push(who ? `${who.email} vizsgálatai` : 'mindenki vizsgálatai');
+    parts.push(who ? t('{0} vizsgálatai', who.email) : t('mindenki vizsgálatai'));
     const age = AGE_OPTIONS.find((o) => o.value === purgeAge);
     if (purgeAge > 0 && age) parts.push(age.label);
-    if (purgeVerdict) parts.push(`csak ${VERDICT_LABELS[purgeVerdict]}`);
-    if (purgeUnfinished) parts.push('csak a befejezetlenek (lejárt / megszakadt kódok)');
+    if (purgeVerdict) parts.push(t('csak {0}', VERDICT_LABELS[purgeVerdict]));
+    if (purgeUnfinished) parts.push(t('csak a befejezetlenek (lejárt / megszakadt kódok)'));
     return parts.join(', ');
   }
 
@@ -129,10 +130,10 @@ export function AdminScansTab({ users, initialUserId = '', onChanged }: Props) {
     e.preventDefault();
     const hasFilter = Boolean(purgeUser) || purgeAge > 0 || Boolean(purgeVerdict) || purgeUnfinished;
     if (!hasFilter) {
-      setError('Adj meg legalább egy feltételt, vagy használd az összes előzmény törlését lent.');
+      setError(t('Adj meg legalább egy feltételt, vagy használd az összes előzmény törlését lent.'));
       return;
     }
-    if (!window.confirm(`Törlés: ${describePurge()}. Ez nem vonható vissza. Folytatod?`)) return;
+    if (!window.confirm(t('Törlés: {0}. Ez nem vonható vissza. Folytatod?', describePurge()))) return;
     await runPurge({
       userId: purgeUser || undefined,
       olderThanDays: purgeAge > 0 ? purgeAge : undefined,
@@ -142,7 +143,7 @@ export function AdminScansTab({ users, initialUserId = '', onChanged }: Props) {
   }
 
   async function handlePurgeAll() {
-    const answer = window.prompt('A szervezet ÖSSZES vizsgálata törlődik, minden staffé. A megerősítéshez írd be: TÖRLÉS');
+    const answer = window.prompt(t('A szervezet ÖSSZES vizsgálata törlődik, minden staffé. A megerősítéshez írd be: TÖRLÉS'));
     if (answer?.trim().toUpperCase() !== 'TÖRLÉS') return;
     await runPurge({ all: true });
   }
@@ -152,12 +153,12 @@ export function AdminScansTab({ users, initialUserId = '', onChanged }: Props) {
     setError(null);
     try {
       const { deleted } = await api.purgeAdminHistory(body);
-      setNotice(`${deleted} vizsgálat törölve.`);
+      setNotice(t('{0} vizsgálat törölve.', deleted));
       onChanged?.();
       setPage(1);
       await load();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Nem sikerült törölni.');
+      setError(err instanceof ApiError ? err.message : t('Nem sikerült törölni.'));
     } finally {
       setIsPurging(false);
     }
@@ -167,46 +168,45 @@ export function AdminScansTab({ users, initialUserId = '', onChanged }: Props) {
     <>
       <section className="card stagger-in">
         <div className="scans-head">
-          <h2 className="card-title"><Icon name="history" size={18} /> Összes vizsgálat</h2>
-          <span className="muted small">{data ? `${data.total} találat` : ''}</span>
+          <h2 className="card-title"><Icon name="history" size={18} />{' '}{t('Összes vizsgálat')}</h2>
+          <span className="muted small">{data ? t('{0} találat', data.total) : ''}</span>
         </div>
 
         <div className="admin-filters">
           <input
             type="search"
-            placeholder="Kód, eredmény, Minecraft név, gépnév vagy staff..."
+            placeholder={t('Kód, eredmény, Minecraft név, gépnév vagy staff...')}
             value={query}
             onChange={(e) => { setQuery(e.target.value); setPage(1); }}
-            aria-label="Keresés"
+            aria-label={t('Keresés')}
           />
-          <select value={userId} onChange={(e) => { setUserId(e.target.value); setPage(1); }} aria-label="Staff">
-            <option value="">Minden staff</option>
+          <select value={userId} onChange={(e) => { setUserId(e.target.value); setPage(1); }} aria-label={t('Staff')}>
+            <option value="">{t('Minden staff')}</option>
             {users.map((u) => <option key={u.id} value={u.id}>{u.email}</option>)}
           </select>
-          <select value={verdict} onChange={(e) => { setVerdict(e.target.value as ScanVerdict | ''); setPage(1); }} aria-label="Eredmény">
-            <option value="">Minden eredmény</option>
-            <option value="Unlegit">UNLEGIT</option>
-            <option value="Inconclusive">Nem egyértelmű</option>
-            <option value="Legit">LEGIT</option>
+          <select value={verdict} onChange={(e) => { setVerdict(e.target.value as ScanVerdict | ''); setPage(1); }} aria-label={t('Eredmény')}>
+            <option value="">{t('Minden eredmény')}</option>
+            <option value="Unlegit">{t('UNLEGIT')}</option>
+            <option value="Inconclusive">{t('Nem egyértelmű')}</option>
+            <option value="Legit">{t('LEGIT')}</option>
           </select>
-          <select value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }} aria-label="Állapot">
-            <option value="">Minden állapot</option>
-            <option value="Completed">Sikeres</option>
-            <option value="unfinished">Befejezetlen</option>
+          <select value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }} aria-label={t('Állapot')}>
+            <option value="">{t('Minden állapot')}</option>
+            <option value="Completed">{t('Sikeres')}</option>
+            <option value="unfinished">{t('Befejezetlen')}</option>
           </select>
         </div>
 
         {canDelete && (
           <div className="bulk-bar">
-            <span className="muted small">{selected.size > 0 ? `${selected.size} kijelölve` : 'Jelöld ki, amit törölni szeretnél.'}</span>
+            <span className="muted small">{selected.size > 0 ? t('{0} kijelölve', selected.size) : t('Jelöld ki, amit törölni szeretnél.')}</span>
             <button
               type="button"
               className="btn-ghost btn-tiny btn-danger"
               disabled={selected.size === 0}
               onClick={() => deleteCodes([...selected])}
             >
-              <Icon name="trash" size={14} /> Kijelöltek törlése
-            </button>
+              <Icon name="trash" size={14} />{' '}{t('Kijelöltek törlése')}</button>
           </div>
         )}
 
@@ -218,14 +218,14 @@ export function AdminScansTab({ users, initialUserId = '', onChanged }: Props) {
             <thead>
               <tr>
                 <th className="check-col">
-                  {canDelete && <input type="checkbox" checked={allSelected} onChange={toggleAll} aria-label="Összes kijelölése ezen az oldalon" />}
+                  {canDelete && <input type="checkbox" checked={allSelected} onChange={toggleAll} aria-label={t('Összes kijelölése ezen az oldalon')} />}
                 </th>
-                <th>Kód</th>
-                <th>Időpont</th>
-                <th>Staff</th>
-                <th>Játékos / gép</th>
-                <th className="align-right">Találat</th>
-                <th>Eredmény</th>
+                <th>{t('Kód')}</th>
+                <th>{t('Időpont')}</th>
+                <th>{t('Staff')}</th>
+                <th>{t('Játékos / gép')}</th>
+                <th className="align-right">{t('Találat')}</th>
+                <th>{t('Eredmény')}</th>
                 <th />
               </tr>
             </thead>
@@ -237,13 +237,13 @@ export function AdminScansTab({ users, initialUserId = '', onChanged }: Props) {
               {items.map((s, i) => (
                 <tr key={s.code} className={`row-in ${selected.has(s.code) ? 'row-selected' : ''}`} style={{ animationDelay: `${Math.min(i, 15) * 25}ms` }}>
                   <td className="check-col">
-                    {canDelete && <input type="checkbox" checked={selected.has(s.code)} onChange={() => toggle(s.code)} aria-label={`#${s.code} kijelölése`} />}
+                    {canDelete && <input type="checkbox" checked={selected.has(s.code)} onChange={() => toggle(s.code)} aria-label={t('#{0} kijelölése', s.code)} />}
                   </td>
                   <td className="mono">
                     {s.resultIdHash ? <Link to={`/results/${s.resultIdHash}`}>#{s.code}</Link> : <>#{s.code}</>}
                   </td>
                   <td className="muted small">{formatSecond(s.createdAt)}</td>
-                  <td className="mono small">{s.createdByEmail ?? 'törölt felhasználó'}</td>
+                  <td className="mono small">{s.createdByEmail ?? t('törölt felhasználó')}</td>
                   <td className="small">
                     {s.minecraftUsername ?? '-'}
                     {s.hostname && <span className="muted"> · {s.hostname}</span>}
@@ -258,7 +258,7 @@ export function AdminScansTab({ users, initialUserId = '', onChanged }: Props) {
                   </td>
                   <td>
                     {canDelete && (
-                      <button type="button" className="icon-button row-delete" onClick={() => deleteCodes([s.code])} aria-label={`#${s.code} törlése`} title="Törlés">
+                      <button type="button" className="icon-button row-delete" onClick={() => deleteCodes([s.code])} aria-label={t('#{0} törlése', s.code)} title={t('Törlés')}>
                         <Icon name="trash" size={14} />
                       </button>
                     )}
@@ -266,57 +266,53 @@ export function AdminScansTab({ users, initialUserId = '', onChanged }: Props) {
                 </tr>
               ))}
               {!isLoading && items.length === 0 && (
-                <tr><td colSpan={8} className="muted empty-row">Nincs ilyen vizsgálat.</td></tr>
+                <tr><td colSpan={8} className="muted empty-row">{t('Nincs ilyen vizsgálat.')}</td></tr>
               )}
             </tbody>
           </table>
         </div>
 
         <div className="pager">
-          <button className="btn-ghost btn-tiny" disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>Előző</button>
+          <button className="btn-ghost btn-tiny" disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>{t('Előző')}</button>
           <span className="mono small pager-page">{page} / {totalPages}</span>
-          <button className="btn-ghost btn-tiny" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>Következő</button>
+          <button className="btn-ghost btn-tiny" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>{t('Következő')}</button>
         </div>
       </section>
 
       {canPurge && (
         <section className="card section-gap stagger-in" style={{ animationDelay: '80ms' }}>
-          <h2 className="card-title"><Icon name="trash" size={18} /> Előzmények tömeges törlése</h2>
-          <p className="muted small">A feltételek együtt érvényesek. A törölt vizsgálatok az eredményükkel és a megosztó linkjeikkel együtt tűnnek el; a tevékenységnaplóban megmarad, ki és mikor törölte.</p>
+          <h2 className="card-title"><Icon name="trash" size={18} />{' '}{t('Előzmények tömeges törlése')}</h2>
+          <p className="muted small">{t('A feltételek együtt érvényesek. A törölt vizsgálatok az eredményükkel és a megosztó linkjeikkel együtt tűnnek el; a tevékenységnaplóban megmarad, ki és mikor törölte.')}</p>
           <form className="purge-form" onSubmit={handlePurge}>
             <label>
-              <span className="field-label">Kié</span>
+              <span className="field-label">{t('Kié')}</span>
               <select value={purgeUser} onChange={(e) => setPurgeUser(e.target.value)}>
-                <option value="">Mindenkié</option>
+                <option value="">{t('Mindenkié')}</option>
                 {users.map((u) => <option key={u.id} value={u.id}>{u.email}</option>)}
               </select>
             </label>
             <label>
-              <span className="field-label">Mikori</span>
+              <span className="field-label">{t('Mikori')}</span>
               <select value={purgeAge} onChange={(e) => setPurgeAge(Number(e.target.value))}>
                 {AGE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
               </select>
             </label>
             <label>
-              <span className="field-label">Eredmény</span>
+              <span className="field-label">{t('Eredmény')}</span>
               <select value={purgeVerdict} onChange={(e) => setPurgeVerdict(e.target.value as ScanVerdict | '')}>
-                <option value="">Bármilyen</option>
-                <option value="Legit">Csak LEGIT</option>
-                <option value="Inconclusive">Csak nem egyértelmű</option>
-                <option value="Unlegit">Csak UNLEGIT</option>
+                <option value="">{t('Bármilyen')}</option>
+                <option value="Legit">{t('Csak LEGIT')}</option>
+                <option value="Inconclusive">{t('Csak nem egyértelmű')}</option>
+                <option value="Unlegit">{t('Csak UNLEGIT')}</option>
               </select>
             </label>
             <label className="check-label">
-              <input type="checkbox" checked={purgeUnfinished} onChange={(e) => setPurgeUnfinished(e.target.checked)} />
-              Csak a befejezetlenek (lejárt, fel nem használt vagy megszakadt kódok)
-            </label>
+              <input type="checkbox" checked={purgeUnfinished} onChange={(e) => setPurgeUnfinished(e.target.checked)} />{t('Csak a befejezetlenek (lejárt, fel nem használt vagy megszakadt kódok)')}</label>
             <div className="purge-actions">
               <button type="submit" className="btn-secondary" disabled={isPurging}>
-                <Icon name="trash" size={15} /> {isPurging ? 'Törlés...' : 'Törlés a feltételek szerint'}
+                <Icon name="trash" size={15} /> {isPurging ? t('Törlés...') : t('Törlés a feltételek szerint')}
               </button>
-              <button type="button" className="btn-ghost btn-danger" onClick={handlePurgeAll} disabled={isPurging}>
-                Összes előzmény törlése
-              </button>
+              <button type="button" className="btn-ghost btn-danger" onClick={handlePurgeAll} disabled={isPurging}>{t('Összes előzmény törlése')}</button>
             </div>
           </form>
         </section>

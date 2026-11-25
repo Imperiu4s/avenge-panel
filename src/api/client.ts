@@ -1,3 +1,4 @@
+import { t, translateMessage } from '../i18n';
 import type {
   AdminOverviewView,
   AdminSessionPage,
@@ -37,7 +38,7 @@ export class ApiError extends Error {
   code: string | null;
 
   constructor(status: number, message: string, code: string | null = null) {
-    super(message);
+    super(translateMessage(message));
     this.status = status;
     this.code = code;
   }
@@ -76,9 +77,9 @@ async function request<T>(
     if (response.status === 401 && token) {
       clearStoredToken();
       window.dispatchEvent(new Event(SESSION_EXPIRED_EVENT));
-      throw new ApiError(401, 'A munkameneted lejárt, jelentkezz be újra.');
+      throw new ApiError(401, t('A munkameneted lejárt, jelentkezz be újra.'));
     }
-    let message = `Hiba (${response.status})`;
+    let message = t('Hiba ({0})', response.status);
     try {
       const errorBody = await response.json();
       message = errorBody?.message ?? errorBody?.title ?? message;

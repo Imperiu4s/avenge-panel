@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { Link } from 'react-router-dom';
 import { storeAssetUrl, type StoreProductCard } from '../api/store';
 import { Icon } from '../components/Icon';
@@ -34,14 +35,14 @@ export function ProductCard({ product, currency, index = 0 }: { product: StorePr
           <h3>{product.name}</h3>
           <span className="product-card-meta">
             <span className={`kind-pill ${product.kind === 'model' ? 'kind-pill-model' : ''}`}>
-              <Icon name={product.kind === 'model' ? 'cube' : 'package'} size={11} /> {product.kind === 'model' ? 'Modell' : 'Plugin'}
+              <Icon name={product.kind === 'model' ? 'cube' : 'package'} size={11} /> {product.kind === 'model' ? t('Modell') : 'Plugin'}
             </span>
             {product.category && <span>{product.category}</span>}
-            {product.latestVersion && <span className="mono">v{product.latestVersion}</span>}
+            {product.latestVersion && <span className="mono">{t('v')}{product.latestVersion}</span>}
           </span>
         </div>
       </div>
-      <p className="product-card-tagline">{product.tagline || (product.kind === 'model' ? 'Minecraft modell az Avenge csapatától.' : 'Minecraft plugin az Avenge csapatától.')}</p>
+      <p className="product-card-tagline">{product.tagline || (product.kind === 'model' ? t('Minecraft modell az Avenge csapatától.') : t('Minecraft plugin az Avenge csapatától.'))}</p>
       <div className="product-chips">
         {product.supportedVersions && <span className="chip"><Icon name="layers" size={12} /> {product.supportedVersions}</span>}
         {product.platforms.slice(0, 3).map((p) => <span className="chip chip-dim" key={p}>{p}</span>)}
@@ -49,12 +50,12 @@ export function ProductCard({ product, currency, index = 0 }: { product: StorePr
       </div>
       <div className="product-card-foot">
         <span className="product-card-stats">
-          <span title="Vásárlások"><Icon name="cart" size={13} /> {product.salesCount}</span>
-          <span title="Letöltések"><Icon name="download" size={13} /> {product.downloadCount}</span>
+          <span title={t('Vásárlások')}><Icon name="cart" size={13} /> {product.salesCount}</span>
+          <span title={t('Letöltések')}><Icon name="download" size={13} /> {product.downloadCount}</span>
         </span>
         <PriceTag price={product.price} listPrice={product.listPrice} currency={currency} discountPercent={product.discountPercent} />
       </div>
-      {product.isFeatured && <span className="product-featured"><Icon name="star" size={11} /> Kiemelt</span>}
+      {product.isFeatured && <span className="product-featured"><Icon name="star" size={11} />{' '}{t('Kiemelt')}</span>}
     </Link>
   );
 }

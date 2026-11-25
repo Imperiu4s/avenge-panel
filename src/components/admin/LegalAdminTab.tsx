@@ -1,3 +1,4 @@
+import { t } from '../../i18n';
 import { useEffect, useMemo, useState } from 'react';
 import { ApiError } from '../../api/client';
 import { LEGAL_DOCUMENTS } from '../../legal/documents';
@@ -45,7 +46,7 @@ export function LegalAdminTab() {
   }
 
   useEffect(() => {
-    legalAdminApi.get().then(apply).catch((err) => setError(err instanceof ApiError ? err.message : 'Nem sikerült betölteni a jogi adatokat.'));
+    legalAdminApi.get().then(apply).catch((err) => setError(err instanceof ApiError ? err.message : t('Nem sikerült betölteni a jogi adatokat.')));
   }, []);
 
   const draft: LegalContentData = useMemo(() => ({ fields, hosting, documents: docs, updatedAt: null }), [fields, hosting, docs]);
@@ -54,7 +55,7 @@ export function LegalAdminTab() {
   const customized = current && (current.body.trim() !== activeDoc.body.trim() || current.updated !== activeDoc.updated);
 
   if (!loaded || !current) {
-    return <section className="card">{error ? <p className="error-text">{error}</p> : <p className="muted">Betöltés...</p>}</section>;
+    return <section className="card">{error ? <p className="error-text">{error}</p> : <p className="muted">{t('Betöltés...')}</p>}</section>;
   }
 
   const setField = (key: string, value: string) => { setFields((f) => ({ ...f, [key]: value })); setNotice(null); };
@@ -77,9 +78,9 @@ export function LegalAdminTab() {
       const saved = await legalAdminApi.save({ fields, hosting: hosting.filter((h) => h.name.trim().length > 0), documents });
       apply(saved);
       await fetchLegalContent(true);
-      setNotice('Mentve. A jogi oldalak azonnal a frissített tartalmat mutatják.');
+      setNotice(t('Mentve. A jogi oldalak azonnal a frissített tartalmat mutatják.'));
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Nem sikerült menteni.');
+      setError(err instanceof ApiError ? err.message : t('Nem sikerült menteni.'));
     } finally {
       setBusy(false);
     }
@@ -89,10 +90,10 @@ export function LegalAdminTab() {
     <>
       <section className="card stagger-in">
         <div className="scans-head">
-          <h2 className="card-title"><Icon name="scale" size={18} /> Jogi adatok</h2>
-          <span className="muted small">{loaded.updatedAt ? `Módosítva: ${formatDateTime(loaded.updatedAt)}` : 'Még az alapértékek érvényesek'}</span>
+          <h2 className="card-title"><Icon name="scale" size={18} />{' '}{t('Jogi adatok')}</h2>
+          <span className="muted small">{loaded.updatedAt ? t('Módosítva: {0}', formatDateTime(loaded.updatedAt)) : t('Még az alapértékek érvényesek')}</span>
         </div>
-        <p className="muted small">Ezek az adatok kerülnek az ÁSZF-be, az adatkezelési tájékoztatóba, az impresszumba és a többi jogi oldalra. A szövegekben a <code>{'{{...}}'}</code> jelölők helyére kerülnek.</p>
+        <p className="muted small">{t('Ezek az adatok kerülnek az ÁSZF-be, az adatkezelési tájékoztatóba, az impresszumba és a többi jogi oldalra. A szövegekben a')}{' '}<code>{'{{...}}'}</code>{' '}{t('jelölők helyére kerülnek.')}</p>
         {GROUPS.map((group) => (
           <div key={group} className="legal-admin-group">
             <span className="field-label legal-admin-group-title">{group}</span>
@@ -111,33 +112,32 @@ export function LegalAdminTab() {
         ))}
 
         <div className="legal-admin-group">
-          <span className="field-label legal-admin-group-title">Tárhelyszolgáltatók</span>
-          <p className="muted small">Az Ekertv. szerint a tárhelyszolgáltató nevét, címét és elérhetőségét fel kell tüntetni.</p>
+          <span className="field-label legal-admin-group-title">{t('Tárhelyszolgáltatók')}</span>
+          <p className="muted small">{t('Az Ekertv. szerint a tárhelyszolgáltató nevét, címét és elérhetőségét fel kell tüntetni.')}</p>
           <div className="legal-hosting">
             {hosting.map((h, i) => (
               <div key={i} className="legal-hosting-row">
-                <input value={h.role} onChange={(e) => setHost(i, 'role', e.target.value)} placeholder="Feladat (pl. Szerver)" aria-label="Feladat" />
-                <input value={h.name} onChange={(e) => setHost(i, 'name', e.target.value)} placeholder="Szolgáltató neve" aria-label="Szolgáltató neve" />
-                <input value={h.address} onChange={(e) => setHost(i, 'address', e.target.value)} placeholder="Cím" aria-label="Cím" />
-                <input value={h.contact} onChange={(e) => setHost(i, 'contact', e.target.value)} placeholder="E-mail vagy weboldal" aria-label="Elérhetőség" />
-                <button type="button" className="btn-ghost btn-tiny btn-danger" onClick={() => setHosting((list) => list.filter((_, j) => j !== i))} aria-label="Sor törlése">
+                <input value={h.role} onChange={(e) => setHost(i, 'role', e.target.value)} placeholder={t('Feladat (pl. Szerver)')} aria-label={t('Feladat')} />
+                <input value={h.name} onChange={(e) => setHost(i, 'name', e.target.value)} placeholder={t('Szolgáltató neve')} aria-label={t('Szolgáltató neve')} />
+                <input value={h.address} onChange={(e) => setHost(i, 'address', e.target.value)} placeholder={t('Cím')} aria-label={t('Cím')} />
+                <input value={h.contact} onChange={(e) => setHost(i, 'contact', e.target.value)} placeholder={t('E-mail vagy weboldal')} aria-label={t('Elérhetőség')} />
+                <button type="button" className="btn-ghost btn-tiny btn-danger" onClick={() => setHosting((list) => list.filter((_, j) => j !== i))} aria-label={t('Sor törlése')}>
                   <Icon name="trash" size={13} />
                 </button>
               </div>
             ))}
           </div>
           <button type="button" className="btn-ghost btn-tiny" onClick={() => setHosting((list) => [...list, { role: '', name: '', address: '', contact: '' }])}>
-            <Icon name="plus" size={13} /> Új sor
-          </button>
+            <Icon name="plus" size={13} />{' '}{t('Új sor')}</button>
         </div>
       </section>
 
       <section className="card section-gap stagger-in" style={{ animationDelay: '60ms' }}>
         <div className="scans-head">
-          <h2 className="card-title"><Icon name="file" size={18} /> Dokumentumok</h2>
-          {customized ? <span className="status-pill status-pending">Egyedi szöveg</span> : <span className="status-pill status-active">Alapszöveg</span>}
+          <h2 className="card-title"><Icon name="file" size={18} />{' '}{t('Dokumentumok')}</h2>
+          {customized ? <span className="status-pill status-pending">{t('Egyedi szöveg')}</span> : <span className="status-pill status-active">{t('Alapszöveg')}</span>}
         </div>
-        <nav className="sub-tabs" aria-label="Jogi dokumentumok">
+        <nav className="sub-tabs" aria-label={t('Jogi dokumentumok')}>
           {LEGAL_DOCUMENTS.map((d) => (
             <button key={d.slug} type="button" className={`sub-tab ${active === d.slug ? 'is-active' : ''}`} onClick={() => setActive(d.slug)}>
               {d.short}
@@ -146,27 +146,26 @@ export function LegalAdminTab() {
         </nav>
         <div className="seller-grid">
           <label>
-            <span className="field-label">Hatályos</span>
+            <span className="field-label">{t('Hatályos')}</span>
             <input value={current.updated} onChange={(e) => setDoc({ updated: e.target.value })} />
           </label>
           <div className="legal-admin-actions">
             <button type="button" className="btn-ghost btn-tiny" onClick={() => setPreview(!preview)}>
-              <Icon name={preview ? 'file' : 'eye'} size={13} /> {preview ? 'Szerkesztés' : 'Előnézet'}
+              <Icon name={preview ? 'file' : 'eye'} size={13} /> {preview ? t('Szerkesztés') : t('Előnézet')}
             </button>
             <button type="button" className="btn-ghost btn-tiny" disabled={!customized} onClick={() => setDoc({ body: activeDoc.body.trim(), updated: activeDoc.updated })}>
-              <Icon name="refresh" size={13} /> Alapszöveg visszaállítása
-            </button>
+              <Icon name="refresh" size={13} />{' '}{t('Alapszöveg visszaállítása')}</button>
           </div>
         </div>
         {preview
           ? <div className="legal-body legal-admin-preview"><Markdown source={renderLegal(current.body, draft)} /></div>
           : <textarea className="legal-admin-editor mono" rows={22} value={current.body} onChange={(e) => setDoc({ body: e.target.value })} spellCheck={false} />}
         <details className="legal-placeholders">
-          <summary className="small">Beilleszthető jelölők</summary>
+          <summary className="small">{t('Beilleszthető jelölők')}</summary>
           <div className="legal-placeholder-list">
             {PLACEHOLDER_HELP.map((p) => (
-              <button key={p.token} type="button" className="chip chip-dim" onClick={() => copy(p.token, p.token)} title="Másolás">
-                <code>{p.token}</code> {copiedKey === p.token ? 'másolva' : p.text}
+              <button key={p.token} type="button" className="chip chip-dim" onClick={() => copy(p.token, p.token)} title={t('Másolás')}>
+                <code>{p.token}</code> {copiedKey === p.token ? t('másolva') : p.text}
               </button>
             ))}
           </div>
@@ -174,11 +173,9 @@ export function LegalAdminTab() {
       </section>
 
       <div className="settings-actions section-gap">
-        <span className="muted small">A mentés minden jogi oldalt egyszerre frissít.</span>
+        <span className="muted small">{t('A mentés minden jogi oldalt egyszerre frissít.')}</span>
         <button type="button" className={`btn-primary ${busy ? 'is-loading' : ''}`} onClick={save} disabled={busy}>
-          {busy && <span className="btn-spinner" aria-hidden="true" />}
-          Mentés
-        </button>
+          {busy && <span className="btn-spinner" aria-hidden="true" />}{t('Mentés')}</button>
       </div>
       {notice && <p className="success-text"><Icon name="check" size={15} /> {notice}</p>}
       {error && <p className="error-text error-in">{error}</p>}

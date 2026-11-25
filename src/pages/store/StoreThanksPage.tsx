@@ -1,3 +1,4 @@
+import { t } from '../../i18n';
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { storeApi } from '../../api/store';
@@ -61,43 +62,43 @@ export function StoreThanksPage() {
         {state === 'waiting' && (
           <>
             <span className="thanks-icon thanks-spin" aria-hidden="true"><Icon name="refresh" size={34} /></span>
-            <h1>Fizetés ellenőrzése...</h1>
-            <p className="muted">A Tebex visszaigazolása általában néhány másodperc. Ne zárd be az oldalt.</p>
+            <h1>{t('Fizetés ellenőrzése...')}</h1>
+            <p className="muted">{t('A Tebex visszaigazolása általában néhány másodperc. Ne zárd be az oldalt.')}</p>
           </>
         )}
         {state === 'done' && (
           <>
             <span className="thanks-icon" aria-hidden="true"><Icon name="check" size={34} /></span>
-            <h1>Köszönjük a vásárlást!</h1>
-            <p className="muted">{isSub ? 'Az előfizetésed aktív. A PC Check panelt a fiókodból egy kattintással megnyithatod; a staff belépésnél ugyanezzel az e-mail címmel és jelszóval is beléphetsz.' : 'A termék a tiéd: a fiókodban bármikor letöltheted, a frissítéseivel együtt. A számlát a Tebex e-mailben küldi.'}</p>
+            <h1>{t('Köszönjük a vásárlást!')}</h1>
+            <p className="muted">{isSub ? t('Az előfizetésed aktív. A PC Check panelt a fiókodból egy kattintással megnyithatod; a staff belépésnél ugyanezzel az e-mail címmel és jelszóval is beléphetsz.') : t('A termék a tiéd: a fiókodban bármikor letöltheted, a frissítéseivel együtt. A számlát a Tebex e-mailben küldi.')}</p>
             <div className="thanks-actions">
-              <Link to="/store/fiok" className="btn-primary">{isSub ? 'Fiókom és PC Check panel' : 'Pluginjaim'} <Icon name="arrow-right" size={16} /></Link>
-              <Link to="/store" className="btn-ghost">Vissza az áruházba</Link>
+              <Link to="/store/fiok" className="btn-primary">{isSub ? t('Fiókom és PC Check panel') : t('Pluginjaim')} <Icon name="arrow-right" size={16} /></Link>
+              <Link to="/store" className="btn-ghost">{t('Vissza az áruházba')}</Link>
             </div>
           </>
         )}
         {state === 'failed' && (
           <>
             <span className="thanks-icon" aria-hidden="true"><Icon name="x" size={34} /></span>
-            <h1>A fizetés nem sikerült</h1>
-            <p className="muted">Nem terheltünk meg semmit. Próbáld újra, vagy válassz másik fizetési módot.</p>
-            <div className="thanks-actions"><Link to={isSub ? '/elofizetes' : '/store'} className="btn-primary">Újrapróbálom</Link></div>
+            <h1>{t('A fizetés nem sikerült')}</h1>
+            <p className="muted">{t('Nem terheltünk meg semmit. Próbáld újra, vagy válassz másik fizetési módot.')}</p>
+            <div className="thanks-actions"><Link to={isSub ? '/elofizetes' : '/store'} className="btn-primary">{t('Újrapróbálom')}</Link></div>
           </>
         )}
         {state === 'slow' && (
           <>
             <span className="thanks-icon" aria-hidden="true"><Icon name="clock" size={34} /></span>
-            <h1>Még feldolgozás alatt</h1>
-            <p className="muted">A Tebex még nem igazolta vissza a fizetést. Ez néha pár percig is eltarthat; amint megérkezik, a fiókodban megjelenik a vásárlás. Ha egy órán belül sem jelenik meg, írj nekünk.</p>
-            <div className="thanks-actions"><Link to="/store/fiok" className="btn-primary">Fiókom</Link></div>
+            <h1>{t('Még feldolgozás alatt')}</h1>
+            <p className="muted">{t('A Tebex még nem igazolta vissza a fizetést. Ez néha pár percig is eltarthat; amint megérkezik, a fiókodban megjelenik a vásárlás. Ha egy órán belül sem jelenik meg, írj nekünk.')}</p>
+            <div className="thanks-actions"><Link to="/store/fiok" className="btn-primary">{t('Fiókom')}</Link></div>
           </>
         )}
         {state === 'login' && (
           <>
             <span className="thanks-icon" aria-hidden="true"><Icon name="user" size={34} /></span>
-            <h1>Lépj be a fiókodba</h1>
-            <p className="muted">A vásárlásod a fiókodhoz kötődik - belépés után ott találod.</p>
-            <div className="thanks-actions"><Link to="/store/fiok" className="btn-primary">Belépés</Link></div>
+            <h1>{t('Lépj be a fiókodba')}</h1>
+            <p className="muted">{t('A vásárlásod a fiókodhoz kötődik - belépés után ott találod.')}</p>
+            <div className="thanks-actions"><Link to="/store/fiok" className="btn-primary">{t('Belépés')}</Link></div>
           </>
         )}
       </section>

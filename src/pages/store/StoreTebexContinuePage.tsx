@@ -1,3 +1,4 @@
+import { t } from '../../i18n';
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ApiError } from '../../api/client';
@@ -24,11 +25,11 @@ export function StoreTebexContinuePage() {
           window.location.href = result.checkoutUrl;
         } else {
           setLoginUrl(result.loginUrl);
-          setError(result.message || 'A Tebex még nem látja a belépésedet.');
+          setError(result.message || t('A Tebex még nem látja a belépésedet.'));
         }
       })
       .catch((err) => {
-        if (alive) setError(err instanceof ApiError ? err.message : 'Nem sikerült folytatni a fizetést.');
+        if (alive) setError(err instanceof ApiError ? err.message : t('Nem sikerült folytatni a fizetést.'));
       });
     return () => { alive = false; };
   }, [isLoggedIn, order, subscription]);
@@ -41,25 +42,25 @@ export function StoreTebexContinuePage() {
         {!isLoggedIn ? (
           <>
             <span className="thanks-icon" aria-hidden="true"><Icon name="user" size={34} /></span>
-            <h1>Lépj be a fiókodba</h1>
-            <p className="muted">A fizetés folytatásához lépj be ugyanazzal a fiókkal, amellyel elindítottad.</p>
-            <div className="thanks-actions"><Link to={`/store/fiok?vissza=${encodeURIComponent(here)}`} className="btn-primary">Belépés</Link></div>
+            <h1>{t('Lépj be a fiókodba')}</h1>
+            <p className="muted">{t('A fizetés folytatásához lépj be ugyanazzal a fiókkal, amellyel elindítottad.')}</p>
+            <div className="thanks-actions"><Link to={`/store/fiok?vissza=${encodeURIComponent(here)}`} className="btn-primary">{t('Belépés')}</Link></div>
           </>
         ) : error ? (
           <>
             <span className="thanks-icon" aria-hidden="true"><Icon name="alert" size={34} /></span>
-            <h1>A fizetés nem folytatható</h1>
+            <h1>{t('A fizetés nem folytatható')}</h1>
             <p className="muted">{error}</p>
             <div className="thanks-actions">
-              {loginUrl && <a href={loginUrl} className="btn-primary">Belépés a Tebexben <Icon name="arrow-right" size={16} /></a>}
-              <Link to={back} className={loginUrl ? 'btn-ghost' : 'btn-primary'}>Újrakezdem</Link>
+              {loginUrl && <a href={loginUrl} className="btn-primary">{t('Belépés a Tebexben')}{' '}<Icon name="arrow-right" size={16} /></a>}
+              <Link to={back} className={loginUrl ? 'btn-ghost' : 'btn-primary'}>{t('Újrakezdem')}</Link>
             </div>
           </>
         ) : (
           <>
             <span className="thanks-icon thanks-spin" aria-hidden="true"><Icon name="refresh" size={34} /></span>
-            <h1>Tovább a fizetéshez...</h1>
-            <p className="muted">A kosaradat előkészítjük a Tebexben, és máris átirányítunk a biztonságos fizetési oldalra.</p>
+            <h1>{t('Tovább a fizetéshez...')}</h1>
+            <p className="muted">{t('A kosaradat előkészítjük a Tebexben, és máris átirányítunk a biztonságos fizetési oldalra.')}</p>
           </>
         )}
       </section>

@@ -1,3 +1,4 @@
+import { t } from '../../i18n';
 import { useEffect, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { ApiError } from '../../api/client';
@@ -44,7 +45,7 @@ function AuthForms() {
       else await register(email, password, minecraftName.trim(), accept);
       if (back) navigate(back);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Nem sikerült. Próbáld újra.');
+      setError(err instanceof ApiError ? err.message : t('Nem sikerült. Próbáld újra.'));
     } finally {
       setBusy(false);
     }
@@ -54,31 +55,31 @@ function AuthForms() {
     <div className="store-auth">
       <section className="card store-auth-card stagger-in">
         <div className="segmented segmented-wide" role="tablist">
-          <button type="button" role="tab" aria-selected={mode === 'login'} className={mode === 'login' ? 'is-active' : ''} onClick={() => { setMode('login'); setError(null); }}>Belépés</button>
-          <button type="button" role="tab" aria-selected={mode === 'register'} className={mode === 'register' ? 'is-active' : ''} onClick={() => { setMode('register'); setError(null); }}>Regisztráció</button>
+          <button type="button" role="tab" aria-selected={mode === 'login'} className={mode === 'login' ? 'is-active' : ''} onClick={() => { setMode('login'); setError(null); }}>{t('Belépés')}</button>
+          <button type="button" role="tab" aria-selected={mode === 'register'} className={mode === 'register' ? 'is-active' : ''} onClick={() => { setMode('register'); setError(null); }}>{t('Regisztráció')}</button>
         </div>
         <form onSubmit={handleSubmit}>
           <label>
-            <span className="field-label">E-mail cím</span>
+            <span className="field-label">{t('E-mail cím')}</span>
             <input type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
           </label>
           {mode === 'register' && (
             <label>
-              <span className="field-label">Minecraft-név</span>
+              <span className="field-label">{t('Minecraft-név')}</span>
               <input
                 maxLength={32}
                 autoComplete="nickname"
                 required
                 pattern={MINECRAFT_NAME_PATTERN}
-                title="3-32 karakter: betűk, számok, alulvonás (Bedrock-névnél . vagy * előtag)"
+                title={t('3-32 karakter: betűk, számok, alulvonás (Bedrock-névnél . vagy * előtag)')}
                 value={minecraftName}
                 onChange={(e) => setMinecraftName(e.target.value)}
               />
-              <small className="muted">Ezen a néven köszönünk, és ehhez köti a Tebex a vásárlásaidat, így fizetéskor már nem kell megadnod.</small>
+              <small className="muted">{t('Ezen a néven köszönünk, és ehhez köti a Tebex a vásárlásaidat, így fizetéskor már nem kell megadnod.')}</small>
             </label>
           )}
           <label>
-            <span className="field-label">Jelszó</span>
+            <span className="field-label">{t('Jelszó')}</span>
             <input type="password" autoComplete={mode === 'login' ? 'current-password' : 'new-password'} required minLength={mode === 'register' ? 8 : undefined} value={password} onChange={(e) => setPassword(e.target.value)} />
           </label>
           {mode === 'register' && password && (
@@ -90,24 +91,24 @@ function AuthForms() {
           {mode === 'register' && (
             <label className="consent-check">
               <input type="checkbox" checked={accept} onChange={(e) => setAccept(e.target.checked)} required />
-              <span>Elolvastam és elfogadom az <Link to="/jogi/aszf">ÁSZF</Link>-et, és tudomásul veszem az <Link to="/jogi/adatkezeles">adatkezelési tájékoztatót</Link>.</span>
+              <span>{t('Elolvastam és elfogadom az')}{' '}<Link to="/jogi/aszf">{t('ÁSZF')}</Link>{t('-et, és tudomásul veszem az')}{' '}<Link to="/jogi/adatkezeles">{t('adatkezelési tájékoztatót')}</Link>.</span>
             </label>
           )}
           <button type="submit" className={`btn-primary btn-block ${busy ? 'is-loading' : ''}`} disabled={busy}>
             {busy && <span className="btn-spinner" aria-hidden="true" />}
-            {mode === 'login' ? 'Belépés' : 'Fiók létrehozása'}
+            {mode === 'login' ? t('Belépés') : t('Fiók létrehozása')}
           </button>
           {error && <p className="error-text error-in">{error}</p>}
         </form>
       </section>
       <section className="store-auth-aside stagger-in" style={{ animationDelay: '80ms' }}>
-        <h2>Miért kell fiók?</h2>
+        <h2>{t('Miért kell fiók?')}</h2>
         <ul className="check-list">
-          <li><Icon name="download" size={16} /> A megvásárolt pluginjaid, modelljeid és minden frissítésük itt lesz letölthető.</li>
-          <li><Icon name="radar" size={16} /> A PC Check előfizetésed is ehhez a fiókhoz kötődik.</li>
-          <li><Icon name="lock" size={16} /> Kártyaadatot nem tárolunk: a fizetést a Tebex intézi.</li>
+          <li><Icon name="download" size={16} />{' '}{t('A megvásárolt pluginjaid, modelljeid és minden frissítésük itt lesz letölthető.')}</li>
+          <li><Icon name="radar" size={16} />{' '}{t('A PC Check előfizetésed is ehhez a fiókhoz kötődik.')}</li>
+          <li><Icon name="lock" size={16} />{' '}{t('Kártyaadatot nem tárolunk: a fizetést a Tebex intézi.')}</li>
         </ul>
-        <p className="muted small">Staff vagy? A PC Check panelbe a <Link to="/login">staff belépésnél</Link> jutsz be.</p>
+        <p className="muted small">{t('Staff vagy? A PC Check panelbe a')}{' '}<Link to="/login">{t('staff belépésnél')}</Link>{' '}{t('jutsz be.')}</p>
       </section>
     </div>
   );
@@ -121,7 +122,7 @@ function OwnedPlugin({ item, onError }: { item: CustomerOwned; onError: (message
     try {
       await downloadRelease(release);
     } catch (err) {
-      onError(err instanceof ApiError ? err.message : 'Nem sikerült elindítani a letöltést.');
+      onError(err instanceof ApiError ? err.message : t('Nem sikerült elindítani a letöltést.'));
     }
   }
 
@@ -130,14 +131,14 @@ function OwnedPlugin({ item, onError }: { item: CustomerOwned; onError: (message
       <ProductIcon name={item.name} iconAssetId={item.iconAssetId} size={48} />
       <div className="owned-text">
         <Link to={`/store/${item.slug}`}><strong>{item.name}</strong></Link>
-        <span className="muted small">Megszerezve: {formatDate(item.grantedAt)}{latest ? ` · legújabb: v${latest.version}` : ''}</span>
+        <span className="muted small">{t('Megszerezve:')}{' '}{formatDate(item.grantedAt)}{latest ? t(' · legújabb: v{0}', latest.version) : ''}</span>
         {open && item.releases.length > 1 && (
           <ul className="owned-releases">
             {item.releases.slice(1).map((r) => (
               <li key={r.id}>
-                <span className="mono">v{r.version}</span>
+                <span className="mono">{t('v')}{r.version}</span>
                 <span className="muted small">{formatDate(r.createdAt)} · {formatBytes(r.sizeBytes)}</span>
-                <button type="button" className="btn-ghost btn-tiny" onClick={() => download(r)}><Icon name="download" size={12} /> Letöltés</button>
+                <button type="button" className="btn-ghost btn-tiny" onClick={() => download(r)}><Icon name="download" size={12} />{' '}{t('Letöltés')}</button>
               </li>
             ))}
           </ul>
@@ -145,10 +146,10 @@ function OwnedPlugin({ item, onError }: { item: CustomerOwned; onError: (message
       </div>
       <div className="owned-actions">
         {latest ? (
-          <button type="button" className="btn-primary btn-tiny" onClick={() => download(latest)}><Icon name="download" size={13} /> v{latest.version}</button>
-        ) : <span className="muted small">Még nincs letölthető verzió</span>}
+          <button type="button" className="btn-primary btn-tiny" onClick={() => download(latest)}><Icon name="download" size={13} />{' '}{t('v')}{latest.version}</button>
+        ) : <span className="muted small">{t('Még nincs letölthető verzió')}</span>}
         {item.releases.length > 1 && (
-          <button type="button" className="btn-ghost btn-tiny" onClick={() => setOpen(!open)}>{open ? 'Kevesebb' : 'Korábbi verziók'}</button>
+          <button type="button" className="btn-ghost btn-tiny" onClick={() => setOpen(!open)}>{open ? t('Kevesebb') : t('Korábbi verziók')}</button>
         )}
       </div>
     </article>
@@ -163,19 +164,19 @@ function MyInvoices({ refreshKey }: { refreshKey: string }) {
     let alive = true;
     storeApi.invoices()
       .then((list) => { if (alive) setInvoices(list); })
-      .catch((err) => { if (alive) setError(err instanceof ApiError ? err.message : 'Nem sikerült betölteni a számláidat.'); });
+      .catch((err) => { if (alive) setError(err instanceof ApiError ? err.message : t('Nem sikerült betölteni a számláidat.')); });
     return () => { alive = false; };
   }, [refreshKey]);
 
   return (
     <section id="szamlak" className="card section-gap stagger-in" style={{ animationDelay: '90ms' }}>
-      <h2 className="card-title"><Icon name="file" size={18} /> Számlák és bizonylatok</h2>
+      <h2 className="card-title"><Icon name="file" size={18} />{' '}{t('Számlák és bizonylatok')}</h2>
       {invoices === null && !error && <><Skeleton width="60%" /><Skeleton width="85%" style={{ marginTop: 10 }} /></>}
-      {invoices && <InvoiceTable invoices={invoices} download={storeApi.downloadInvoice} empty="Még nincs bizonylatod. Minden fizetés után itt jelenik meg." />}
+      {invoices && <InvoiceTable invoices={invoices} download={storeApi.downloadInvoice} empty={t('Még nincs bizonylatod. Minden fizetés után itt jelenik meg.')} />}
       {error && <p className="error-text error-in">{error}</p>}
       <p className="invoice-note small muted">
         <Icon name="shield" size={15} />
-        <span>Minden fizetésről és visszatérítésről automatikusan bizonylat készül, ami innen bármikor újra letölthető, és soha nem törlődik. A fizetést a Tebex dolgozza fel, ezért a hivatalos nyugtát vagy számlát ő küldi e-mailben.</span>
+        <span>{t('Minden fizetésről és visszatérítésről automatikusan bizonylat készül, ami innen bármikor újra letölthető, és soha nem törlődik. A fizetést a Tebex dolgozza fel, ezért a hivatalos nyugtát vagy számlát ő küldi e-mailben.')}</span>
       </p>
     </section>
   );
@@ -188,14 +189,14 @@ function ProfileSection({ me, refresh }: { me: CustomerMe; refresh: () => Promis
 
   async function saveName(e: FormEvent) {
     e.preventDefault();
-    if (!window.confirm(`A Minecraft-neved ez lesz: ${name.trim()}. Később nem módosíthatod. Biztosan jó?`)) return;
+    if (!window.confirm(t('A Minecraft-neved ez lesz: {0}. Később nem módosíthatod. Biztosan jó?', name.trim()))) return;
     setBusy(true);
     setError(null);
     try {
       await customerProfileApi.setMinecraftName(name.trim());
       await refresh();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Nem sikerült menteni.');
+      setError(err instanceof ApiError ? err.message : t('Nem sikerült menteni.'));
     } finally {
       setBusy(false);
     }
@@ -203,7 +204,7 @@ function ProfileSection({ me, refresh }: { me: CustomerMe; refresh: () => Promis
 
   return (
     <section className="card stagger-in" style={{ animationDelay: '20ms' }}>
-      <h2 className="card-title"><Icon name="user" size={18} /> Profil</h2>
+      <h2 className="card-title"><Icon name="user" size={18} />{' '}{t('Profil')}</h2>
       <ProfileCustomizer
         avatarUrl={me.avatarUrl}
         name={me.minecraftUsername ?? me.displayName ?? me.email}
@@ -212,26 +213,26 @@ function ProfileSection({ me, refresh }: { me: CustomerMe; refresh: () => Promis
       />
       {me.minecraftUsername ? (
         <div className="mc-name-locked">
-          <span className="field-label">Minecraft-név</span>
+          <span className="field-label">{t('Minecraft-név')}</span>
           <span className="mc-name-value"><Icon name="lock" size={14} /> <strong>{me.minecraftUsername}</strong></span>
-          <small className="muted">Ezzel a névvel regisztráltál, és nem módosítható: a Tebex ehhez köti a vásárlásaidat. Ha elírtad, nyiss <Link to="/tamogatas" className="text-link">ticketet</Link>.</small>
+          <small className="muted">{t('Ezzel a névvel regisztráltál, és nem módosítható: a Tebex ehhez köti a vásárlásaidat. Ha elírtad, nyiss')}{' '}<Link to="/tamogatas" className="text-link">{t('ticketet')}</Link>.</small>
         </div>
       ) : (
         <form className="account-form mc-name-form" onSubmit={saveName}>
-          <span className="field-label">Minecraft-név</span>
+          <span className="field-label">{t('Minecraft-név')}</span>
           <div className="mc-name-row">
             <input
               value={name}
               maxLength={32}
               required
               pattern={MINECRAFT_NAME_PATTERN}
-              title="3-32 karakter: betűk, számok, alulvonás (Bedrock-névnél . vagy * előtag)"
-              placeholder="pl. Steve"
+              title={t('3-32 karakter: betűk, számok, alulvonás (Bedrock-névnél . vagy * előtag)')}
+              placeholder={t('pl. Steve')}
               onChange={(e) => setName(e.target.value)}
             />
-            <button type="submit" className={`btn-secondary btn-tiny ${busy ? 'is-loading' : ''}`} disabled={busy || name.trim().length < 3}>Mentés</button>
+            <button type="submit" className={`btn-secondary btn-tiny ${busy ? 'is-loading' : ''}`} disabled={busy || name.trim().length < 3}>{t('Mentés')}</button>
           </div>
-          <small className="muted">Csak egyszer adható meg, utána nem módosítható. A Tebex ehhez köti a vásárlásaidat.</small>
+          <small className="muted">{t('Csak egyszer adható meg, utána nem módosítható. A Tebex ehhez köti a vásárlásaidat.')}</small>
           {error && <p className="error-text error-in">{error}</p>}
         </form>
       )}
@@ -264,7 +265,7 @@ function Dashboard() {
     try {
       await action();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Nem sikerült.');
+      setError(err instanceof ApiError ? err.message : t('Nem sikerült.'));
     } finally {
       setBusy(null);
     }
@@ -283,13 +284,13 @@ function Dashboard() {
       replaceToken(token);
       setCurrentPassword('');
       setNewPassword('');
-      setNotice('Jelszó megváltoztatva. Ha van PC Check panel-fiókod, ott is ez az új jelszó.');
+      setNotice(t('Jelszó megváltoztatva. Ha van PC Check panel-fiókod, ott is ez az új jelszó.'));
     });
   };
 
   const deleteAccount = (e: FormEvent) => {
     e.preventDefault();
-    if (!window.confirm('Biztosan törlöd a fiókodat? A megvásárolt pluginokhoz és modellekhez többé nem férsz hozzá, és ez nem vonható vissza.')) return;
+    if (!window.confirm(t('Biztosan törlöd a fiókodat? A megvásárolt pluginokhoz és modellekhez többé nem férsz hozzá, és ez nem vonható vissza.'))) return;
     run('delete', async () => {
       await storeApi.deleteAccount(deletePassword);
       logout();
@@ -302,20 +303,20 @@ function Dashboard() {
       <div className="account-main">
         <section className="card stagger-in">
           <div className="scans-head">
-            <h2 className="card-title"><Icon name="package" size={18} /> Termékeim</h2>
-            <Link to="/store" className="btn-ghost btn-tiny">Áruház</Link>
+            <h2 className="card-title"><Icon name="package" size={18} />{' '}{t('Termékeim')}</h2>
+            <Link to="/store" className="btn-ghost btn-tiny">{t('Áruház')}</Link>
           </div>
           {me.owned.length === 0
-            ? <p className="muted">Még nincs pluginod vagy modelled. <Link to="/store" className="text-link">Nézz körül az áruházban.</Link></p>
+            ? <p className="muted">{t('Még nincs pluginod vagy modelled.')}{' '}<Link to="/store" className="text-link">{t('Nézz körül az áruházban.')}</Link></p>
             : <div className="owned-list">{me.owned.map((item) => <OwnedPlugin key={item.productId} item={item} onError={setError} />)}</div>}
-          {me.owned.length > 0 && <p className="muted small">A még le nem töltött terméket a fizetéstől számított 3 napon belül visszatérítjük; letöltés után a vásárlás már nem téríthető vissza.</p>}
+          {me.owned.length > 0 && <p className="muted small">{t('A még le nem töltött terméket a fizetéstől számított 3 napon belül visszatérítjük; letöltés után a vásárlás már nem téríthető vissza.')}</p>}
         </section>
 
         <section className="card section-gap stagger-in" style={{ animationDelay: '60ms' }}>
-          <h2 className="card-title"><Icon name="card" size={18} /> Rendeléseim</h2>
+          <h2 className="card-title"><Icon name="card" size={18} />{' '}{t('Rendeléseim')}</h2>
           <div className="table-scroll">
             <table className="data-table">
-              <thead><tr><th>Dátum</th><th>Tételek</th><th>Összeg</th><th>Állapot</th></tr></thead>
+              <thead><tr><th>{t('Dátum')}</th><th>{t('Tételek')}</th><th>{t('Összeg')}</th><th>{t('Állapot')}</th></tr></thead>
               <tbody>
                 {me.orders.map((o) => (
                   <tr key={o.id}>
@@ -325,11 +326,11 @@ function Dashboard() {
                     <td><span className={`status-pill status-${o.status.toLowerCase()}`}>{ORDER_STATUS_LABELS[o.status] ?? o.status}</span></td>
                   </tr>
                 ))}
-                {me.orders.length === 0 && <tr><td colSpan={4} className="muted empty-row">Még nincs rendelésed.</td></tr>}
+                {me.orders.length === 0 && <tr><td colSpan={4} className="muted empty-row">{t('Még nincs rendelésed.')}</td></tr>}
               </tbody>
             </table>
           </div>
-          <p className="muted small">A bizonylataidat lent, a Számlák résznél töltheted le.</p>
+          <p className="muted small">{t('A bizonylataidat lent, a Számlák résznél töltheted le.')}</p>
         </section>
 
         <MyInvoices refreshKey={`${me.orders.length}-${me.orders.map((o) => o.status).join('')}-${sub?.status ?? ''}`} />
@@ -339,59 +340,58 @@ function Dashboard() {
         <ProfileSection me={me} refresh={refresh} />
         <DiscordLinkCard />
         <section className="card stagger-in support-mini" style={{ animationDelay: '30ms' }}>
-          <h2 className="card-title"><Icon name="message" size={18} /> Támogatás</h2>
+          <h2 className="card-title"><Icon name="message" size={18} />{' '}{t('Támogatás')}</h2>
           {(me.unreadTickets ?? 0) > 0
-            ? <p className="success-text"><Icon name="message" size={15} /> {me.unreadTickets} ticketedre új válasz érkezett.</p>
-            : <p className="muted small">Kérdésed van, vagy hibát találtál? Nyiss ticketet, és a staff itt, a weboldalon válaszol.</p>}
-          <Link to="/tamogatas" className="btn-secondary btn-block">Ticketjeim</Link>
+            ? <p className="success-text"><Icon name="message" size={15} /> {me.unreadTickets}{' '}{t('ticketedre új válasz érkezett.')}</p>
+            : <p className="muted small">{t('Kérdésed van, vagy hibát találtál? Nyiss ticketet, és a staff itt, a weboldalon válaszol.')}</p>}
+          <Link to="/tamogatas" className="btn-secondary btn-block">{t('Ticketjeim')}</Link>
         </section>
         <section className={`card sub-card stagger-in ${subLive ? 'sub-card-live' : ''}`} style={{ animationDelay: '40ms' }}>
-          <h2 className="card-title"><Icon name="radar" size={18} /> PC Check előfizetés</h2>
+          <h2 className="card-title"><Icon name="radar" size={18} />{' '}{t('PC Check előfizetés')}</h2>
           {sub ? (
             <>
               <p><span className={`status-pill status-${sub.status.toLowerCase()}`}>{SUBSCRIPTION_STATUS_LABELS[sub.status] ?? sub.status}</span></p>
               <dl className="mini-facts">
-                <div><dt>Díj</dt><dd>{formatPrice(sub.price, sub.currency)}/hó</dd></div>
-                <div><dt>{sub.status === 'Active' ? 'Következő terhelés' : 'Hozzáférés eddig'}</dt><dd>{formatDate(sub.currentPeriodEnd)}</dd></div>
+                <div><dt>{t('Díj')}</dt><dd>{formatPrice(sub.price, sub.currency)}{t('/hó')}</dd></div>
+                <div><dt>{sub.status === 'Active' ? t('Következő terhelés') : t('Hozzáférés eddig')}</dt><dd>{formatDate(sub.currentPeriodEnd)}</dd></div>
               </dl>
               {sub.note && <p className="muted small">{sub.note}</p>}
               {sub.hasPanelAccess && (
                 <button type="button" className={`btn-primary btn-block ${busy === 'panel' ? 'is-loading' : ''}`} onClick={openPanel} disabled={busy !== null}>
-                  <Icon name="radar" size={16} /> Belépés a PC Check panelbe
-                </button>
+                  <Icon name="radar" size={16} />{' '}{t('Belépés a PC Check panelbe')}</button>
               )}
               {subLive && <SubscriptionCancel subscription={sub} onChanged={refresh} />}
-              {!subLive && <Link to="/elofizetes" className="btn-secondary btn-block">Újra előfizetek</Link>}
+              {!subLive && <Link to="/elofizetes" className="btn-secondary btn-block">{t('Újra előfizetek')}</Link>}
             </>
           ) : (
             <>
-              <p className="muted small">Saját PC Check panel, korlátlan vizsgálati kód, staff fiókok - havi díjért, bármikor lemondható.</p>
-              <Link to="/elofizetes" className="btn-secondary btn-block">Részletek</Link>
+              <p className="muted small">{t('Saját PC Check panel, korlátlan vizsgálati kód, staff fiókok - havi díjért, bármikor lemondható.')}</p>
+              <Link to="/elofizetes" className="btn-secondary btn-block">{t('Részletek')}</Link>
             </>
           )}
         </section>
 
         <section className="card stagger-in" style={{ animationDelay: '80ms' }}>
-          <h2 className="card-title"><Icon name="user" size={18} /> Fiók</h2>
+          <h2 className="card-title"><Icon name="user" size={18} />{' '}{t('Fiók')}</h2>
           <dl className="mini-facts">
-            <div><dt>E-mail</dt><dd className="mono small">{me.email}</dd></div>
-            <div><dt>Regisztráció</dt><dd>{formatDate(me.createdAt)}</dd></div>
+            <div><dt>{t('E-mail')}</dt><dd className="mono small">{me.email}</dd></div>
+            <div><dt>{t('Regisztráció')}</dt><dd>{formatDate(me.createdAt)}</dd></div>
           </dl>
-          <button type="button" className="btn-ghost btn-tiny" onClick={() => { logout(); navigate('/store'); }}><Icon name="logout" size={13} /> Kijelentkezés</button>
+          <button type="button" className="btn-ghost btn-tiny" onClick={() => { logout(); navigate('/store'); }}><Icon name="logout" size={13} />{' '}{t('Kijelentkezés')}</button>
 
           <form className="account-form" onSubmit={changePassword}>
-            <span className="field-label">Jelszó megváltoztatása</span>
-            <input type="password" placeholder="Jelenlegi jelszó" autoComplete="current-password" required value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} />
-            <input type="password" placeholder="Új jelszó (min. 8 karakter)" autoComplete="new-password" required minLength={8} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
-            <button type="submit" className="btn-secondary btn-tiny" disabled={busy !== null}>Mentés</button>
+            <span className="field-label">{t('Jelszó megváltoztatása')}</span>
+            <input type="password" placeholder={t('Jelenlegi jelszó')} autoComplete="current-password" required value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} />
+            <input type="password" placeholder={t('Új jelszó (min. 8 karakter)')} autoComplete="new-password" required minLength={8} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+            <button type="submit" className="btn-secondary btn-tiny" disabled={busy !== null}>{t('Mentés')}</button>
           </form>
 
           <details className="danger-zone">
-            <summary>Fiók törlése</summary>
+            <summary>{t('Fiók törlése')}</summary>
             <form className="account-form" onSubmit={deleteAccount}>
-              <p className="muted small">A fiókod, a profilképed és a letöltési jogaid törlődnek. A kiállított bizonylatok a könyvelési kötelezettség miatt megmaradnak. Élő előfizetést előbb mondj le.</p>
-              <input type="password" placeholder="Jelszó a megerősítéshez" autoComplete="current-password" required value={deletePassword} onChange={(e) => setDeletePassword(e.target.value)} />
-              <button type="submit" className="btn-ghost btn-tiny btn-danger" disabled={busy !== null}>Végleges törlés</button>
+              <p className="muted small">{t('A fiókod, a profilképed és a letöltési jogaid törlődnek. A kiállított bizonylatok a könyvelési kötelezettség miatt megmaradnak. Élő előfizetést előbb mondj le.')}</p>
+              <input type="password" placeholder={t('Jelszó a megerősítéshez')} autoComplete="current-password" required value={deletePassword} onChange={(e) => setDeletePassword(e.target.value)} />
+              <button type="submit" className="btn-ghost btn-tiny btn-danger" disabled={busy !== null}>{t('Végleges törlés')}</button>
             </form>
           </details>
         </section>
@@ -408,9 +408,9 @@ export function StoreAccountPage() {
   return (
     <main className="page store-page">
       <header className="page-head stagger-in">
-        <span className="eyebrow">Vásárlói fiók</span>
-        <h1>{isLoggedIn ? `Szia${me?.minecraftUsername || me?.displayName ? `, ${me?.minecraftUsername || me?.displayName}` : ''}!` : 'Belépés az áruházba'}</h1>
-        <p className="muted">{isLoggedIn ? 'Itt éred el a pluginjaidat, a modelljeidet, a rendeléseidet és a PC Check előfizetésedet.' : 'Vásárláshoz és letöltéshez fiók szükséges.'}</p>
+        <span className="eyebrow">{t('Vásárlói fiók')}</span>
+        <h1>{isLoggedIn ? (me?.minecraftUsername || me?.displayName ? t('Szia, {0}!', me?.minecraftUsername || me?.displayName) : t('Szia!')) : t('Belépés az áruházba')}</h1>
+        <p className="muted">{isLoggedIn ? t('Itt éred el a pluginjaidat, a modelljeidet, a rendeléseidet és a PC Check előfizetésedet.') : t('Vásárláshoz és letöltéshez fiók szükséges.')}</p>
       </header>
       {isLoggedIn ? <Dashboard /> : <AuthForms />}
     </main>

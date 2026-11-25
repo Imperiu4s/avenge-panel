@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
@@ -42,20 +43,19 @@ export function LoginPage() {
       <div className="login-frame" ref={cardRef}>
         <div className="login-card">
           <div className="hero-logo login-logo">
-            <img src={avengeLogo} alt="Avenge" />
+            <img src={avengeLogo} alt={t('Avenge')} />
             <span className="hero-logo-glint" style={{ maskImage: `url(${avengeLogo})`, WebkitMaskImage: `url(${avengeLogo})` }} aria-hidden="true" />
           </div>
-          <h1>Belépés</h1>
-          <p className="muted">Fiókot az adminisztrátortól vagy <Link to="/elofizetes" className="text-link">előfizetéssel</Link> kapsz.</p>
+          <h1>{t('Belépés')}</h1>
+          <p className="muted">{t('Fiókot az adminisztrátortól vagy')}{' '}<Link to="/elofizetes" className="text-link">{t('előfizetéssel')}</Link>{t(' kapsz.')}</p>
 
           {sessionExpired && !error && (
             <p className="notice-text">
-              <Icon name="clock" size={16} /> A munkameneted lejárt, jelentkezz be újra.
-            </p>
+              <Icon name="clock" size={16} />{' '}{t('A munkameneted lejárt, jelentkezz be újra.')}</p>
           )}
 
           <form onSubmit={handleSubmit}>
-            <label className="field-label" htmlFor="email">Email</label>
+            <label className="field-label" htmlFor="email">{t('Email')}</label>
             <input
               id="email"
               type="email"
@@ -65,7 +65,7 @@ export function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
             />
 
-            <label className="field-label" htmlFor="password">Jelszó</label>
+            <label className="field-label" htmlFor="password">{t('Jelszó')}</label>
             <div className="input-with-action">
               <input
                 id="password"
@@ -79,7 +79,7 @@ export function LoginPage() {
                 type="button"
                 className="input-action"
                 onClick={() => setShowPassword((v) => !v)}
-                aria-label={showPassword ? 'Jelszó elrejtése' : 'Jelszó megjelenítése'}
+                aria-label={showPassword ? t('Jelszó elrejtése') : t('Jelszó megjelenítése')}
               >
                 <Icon name={showPassword ? 'eye-off' : 'eye'} size={18} />
               </button>
@@ -89,7 +89,7 @@ export function LoginPage() {
 
             <button type="submit" className={`btn-primary btn-block btn-large ${isLoading ? 'is-loading' : ''}`} disabled={isLoading}>
               {isLoading && <span className="btn-spinner" aria-hidden="true" />}
-              {isLoading ? 'Bejelentkezés...' : 'Bejelentkezés'}
+              {isLoading ? t('Bejelentkezés...') : t('Bejelentkezés')}
             </button>
           </form>
         </div>

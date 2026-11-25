@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { API_BASE } from './config';
 import { getStoredToken } from './client';
 import { getCustomerToken, send } from './store';
@@ -79,9 +80,9 @@ export interface AdminTicketList {
 }
 
 export const TICKET_STATUS_LABELS: Record<TicketStatus, string> = {
-  open: 'Válaszra vár',
-  answered: 'Megválaszolva',
-  closed: 'Lezárva'
+  open: t('Válaszra vár'),
+  answered: t('Megválaszolva'),
+  closed: t('Lezárva')
 };
 
 export function ticketNumber(n: number): string {

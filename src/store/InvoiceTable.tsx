@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useState, type ReactNode } from 'react';
 import { ApiError } from '../api/client';
 import type { StoreInvoice } from '../api/store';
@@ -13,7 +14,7 @@ export function InvoiceTable({
   download,
   showBuyer = false,
   actions,
-  empty = 'Még nincs bizonylatod.'
+  empty = t('Még nincs bizonylatod.')
 }: {
   invoices: StoreInvoice[];
   download: (invoice: StoreInvoice) => Promise<void>;
@@ -30,7 +31,7 @@ export function InvoiceTable({
     try {
       await download(invoice);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Nem sikerült letölteni a bizonylatot.');
+      setError(err instanceof ApiError ? err.message : t('Nem sikerült letölteni a bizonylatot.'));
     } finally {
       setBusy(null);
     }
@@ -44,11 +45,11 @@ export function InvoiceTable({
         <table className="data-table invoice-table">
           <thead>
             <tr>
-              <th>Bizonylatszám</th>
-              <th>Dátum</th>
-              {showBuyer && <th>Vevő</th>}
-              <th>Megnevezés</th>
-              <th className="num">Összeg</th>
+              <th>{t('Bizonylatszám')}</th>
+              <th>{t('Dátum')}</th>
+              {showBuyer && <th>{t('Vevő')}</th>}
+              <th>{t('Megnevezés')}</th>
+              <th className="num">{t('Összeg')}</th>
               <th />
               {actions && <th />}
             </tr>
@@ -69,14 +70,13 @@ export function InvoiceTable({
                 )}
                 <td>
                   <span>{invoice.title}</span>
-                  {invoice.refundedByNumber && <span className="muted small block">Visszatérítve: {invoice.refundedByNumber}</span>}
-                  {invoice.refundOfNumber && <span className="muted small block">Eredeti: {invoice.refundOfNumber}{invoice.reason ? ` · ${invoice.reason}` : ''}</span>}
+                  {invoice.refundedByNumber && <span className="muted small block">{t('Visszatérítve:')}{' '}{invoice.refundedByNumber}</span>}
+                  {invoice.refundOfNumber && <span className="muted small block">{t('Eredeti:')}{' '}{invoice.refundOfNumber}{invoice.reason ? ` · ${invoice.reason}` : ''}</span>}
                 </td>
                 <td className={`mono num ${invoice.total < 0 ? 'amount-negative' : ''}`}>{formatPrice(invoice.total, invoice.currency)}</td>
                 <td className="num">
                   <button type="button" className={`btn-ghost btn-tiny ${busy === invoice.id ? 'is-loading' : ''}`} onClick={() => save(invoice)} disabled={busy !== null}>
-                    <Icon name="download" size={12} /> PDF
-                  </button>
+                    <Icon name="download" size={12} />{' '}{t('PDF')}</button>
                 </td>
                 {actions && <td className="num">{actions(invoice)}</td>}
               </tr>

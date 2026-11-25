@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import type { MinecraftSession } from '../api/types';
 
 export function sessionLabel(session: MinecraftSession): string {
@@ -7,10 +8,10 @@ export function sessionLabel(session: MinecraftSession): string {
 function span(ms: number): string {
   const minutes = Math.round(Math.abs(ms) / 60000);
   if (minutes < 1) return 'kevesebb mint 1 perccel';
-  if (minutes < 60) return `${minutes} perccel`;
+  if (minutes < 60) return t('{0} perccel', minutes);
   const hours = Math.floor(minutes / 60);
-  if (hours < 48) return minutes % 60 === 0 ? `${hours} órával` : `${hours} óra ${minutes % 60} perccel`;
-  return `${Math.round(hours / 24)} nappal`;
+  if (hours < 48) return minutes % 60 === 0 ? t('{0} órával', hours) : t('{0} óra {1} perccel', hours, minutes % 60);
+  return t('{0} nappal', Math.round(hours / 24));
 }
 
 export interface GameRelation {
@@ -25,8 +26,8 @@ export function relationToGame(when: string | null, sessions: MinecraftSession[]
   const sorted = [...sessions].sort((a, b) => Date.parse(b.startedAt) - Date.parse(a.startedAt));
   const running = sorted.find((s) => Date.parse(s.startedAt) <= time);
   if (running) {
-    return { during: true, text: `a futó Minecraft (${sessionLabel(running)}) indítása után ${span(time - Date.parse(running.startedAt))}, ugyanabban a játékmenetben` };
+    return { during: true, text: t('a futó Minecraft ({0}) indítása után {1}, ugyanabban a játékmenetben', sessionLabel(running), span(time - Date.parse(running.startedAt))) };
   }
   const first = sorted[sorted.length - 1];
-  return { during: false, text: `a futó Minecraft (${sessionLabel(first)}) indítása előtt ${span(Date.parse(first.startedAt) - time)}` };
+  return { during: false, text: t('a futó Minecraft ({0}) indítása előtt {1}', sessionLabel(first), span(Date.parse(first.startedAt) - time)) };
 }

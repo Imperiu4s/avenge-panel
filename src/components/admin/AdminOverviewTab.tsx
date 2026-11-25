@@ -1,3 +1,4 @@
+import { t } from '../../i18n';
 import { useEffect, useState } from 'react';
 import { api } from '../../api/client';
 import type { AdminOverviewView, DailyCount } from '../../api/types';
@@ -11,7 +12,7 @@ interface Props {
 
 const SERIES: { key: keyof Pick<DailyCount, 'legit' | 'inconclusive' | 'unlegit'>; label: string }[] = [
   { key: 'legit', label: 'Legit' },
-  { key: 'inconclusive', label: 'Nem egyértelmű' },
+  { key: 'inconclusive', label: t('Nem egyértelmű') },
   { key: 'unlegit', label: 'Unlegit' }
 ];
 
@@ -25,7 +26,7 @@ export function AdminOverviewTab({ onOpenTab }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    api.getAdminOverview().then(setOverview).catch(() => setError('Nem sikerült betölteni az áttekintést.'));
+    api.getAdminOverview().then(setOverview).catch(() => setError(t('Nem sikerült betölteni az áttekintést.')));
   }, []);
 
   if (error) return <p className="error-text">{error}</p>;
@@ -39,14 +40,14 @@ export function AdminOverviewTab({ onOpenTab }: Props) {
 
   const maxDay = Math.max(1, ...overview.daily.map((d) => d.scans));
   const tiles: { label: string; value: number; tone?: string; hint?: string; tab?: string }[] = [
-    { label: 'Befejezett vizsgálat', value: overview.completed, tab: 'scans' },
+    { label: t('Befejezett vizsgálat'), value: overview.completed, tab: 'scans' },
     { label: 'Unlegit', value: overview.unlegit, tone: 'kpi-hot', tab: 'scans' },
-    { label: 'Nem egyértelmű', value: overview.inconclusive, tone: 'kpi-warm', tab: 'scans' },
+    { label: t('Nem egyértelmű'), value: overview.inconclusive, tone: 'kpi-warm', tab: 'scans' },
     { label: 'Legit', value: overview.legit, tone: 'kpi-cool', tab: 'scans' },
-    { label: 'Elmúlt 24 óra', value: overview.last24Hours, hint: `7 nap: ${overview.last7Days} · 30 nap: ${overview.last30Days}` },
-    { label: 'Felhasználó', value: overview.users, hint: `${overview.activeUsers} aktív · ${overview.admins} admin`, tab: 'users' },
-    { label: 'Aktív megosztó link', value: overview.activeShareLinks, tab: 'settings' },
-    { label: 'Befejezetlen kód', value: overview.unfinished, hint: 'lejárt, fel nem használt vagy megszakadt', tab: 'scans' }
+    { label: t('Elmúlt 24 óra'), value: overview.last24Hours, hint: t('7 nap: {0} · 30 nap: {1}', overview.last7Days, overview.last30Days) },
+    { label: t('Felhasználó'), value: overview.users, hint: t('{0} aktív · {1} admin', overview.activeUsers, overview.admins), tab: 'users' },
+    { label: t('Aktív megosztó link'), value: overview.activeShareLinks, tab: 'settings' },
+    { label: t('Befejezetlen kód'), value: overview.unfinished, hint: t('lejárt, fel nem használt vagy megszakadt'), tab: 'scans' }
   ];
 
   return (
@@ -71,14 +72,14 @@ export function AdminOverviewTab({ onOpenTab }: Props) {
       <div className="panel-grid section-gap">
         <section className="card stagger-in" style={{ animationDelay: '120ms' }}>
           <div className="chart-head">
-            <h2 className="card-title"><Icon name="activity" size={18} /> Vizsgálatok naponta, az elmúlt 14 napban</h2>
-            <ul className="chart-legend" aria-label="Jelmagyarázat">
+            <h2 className="card-title"><Icon name="activity" size={18} />{' '}{t('Vizsgálatok naponta, az elmúlt 14 napban')}</h2>
+            <ul className="chart-legend" aria-label={t('Jelmagyarázat')}>
               {SERIES.map((series) => (
                 <li key={series.key}><i className={`swatch swatch-${series.key}`} aria-hidden="true" />{series.label}</li>
               ))}
             </ul>
           </div>
-          <div className="day-chart" role="img" aria-label="Napi vizsgálatok eredmény szerint">
+          <div className="day-chart" role="img" aria-label={t('Napi vizsgálatok eredmény szerint')}>
             <span className="day-chart-max mono">{maxDay}</span>
             <div className="day-chart-plot">
               {overview.daily.map((day) => (
@@ -93,7 +94,7 @@ export function AdminOverviewTab({ onOpenTab }: Props) {
                   <span className="day-label mono">{dayLabel(day.date)}</span>
                   <span className="day-tip" role="tooltip">
                     <strong>{day.date.replaceAll('-', '. ')}.</strong>
-                    <span>{day.scans} vizsgálat</span>
+                    <span>{day.scans}{' '}{t('vizsgálat')}</span>
                     {SERIES.map((series) => (
                       <span key={series.key}><i className={`swatch swatch-${series.key}`} aria-hidden="true" />{series.label}: {day[series.key]}</span>
                     ))}
@@ -105,15 +106,15 @@ export function AdminOverviewTab({ onOpenTab }: Props) {
         </section>
 
         <section className="card stagger-in" style={{ animationDelay: '180ms' }}>
-          <h2 className="card-title"><Icon name="users" size={18} /> Ki mennyit vizsgált</h2>
+          <h2 className="card-title"><Icon name="users" size={18} />{' '}{t('Ki mennyit vizsgált')}</h2>
           <div className="table-scroll">
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>Staff</th>
-                  <th className="align-right">Vizsgálat</th>
-                  <th className="align-right">Unlegit</th>
-                  <th>Utolsó</th>
+                  <th>{t('Staff')}</th>
+                  <th className="align-right">{t('Vizsgálat')}</th>
+                  <th className="align-right">{t('Unlegit')}</th>
+                  <th>{t('Utolsó')}</th>
                 </tr>
               </thead>
               <tbody>

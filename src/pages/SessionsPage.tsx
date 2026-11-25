@@ -1,3 +1,4 @@
+import { t, locale } from '../i18n';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api, ApiError, clientDownloadUrl } from '../api/client';
@@ -8,18 +9,18 @@ import { ScrambleText, Skeleton, useCopyFeedback, useNow } from '../components/m
 import { onScanProgress, onSessionStatusChanged, type ScanProgressEvent } from '../realtime/scanHub';
 
 const STATUS_LABELS: Record<string, string> = {
-  Pending: 'Várakozik a kliensre',
-  ClientConnected: 'Kliens csatlakozott',
-  Scanning: 'Vizsgálat folyamatban',
-  Completed: 'Sikeres vizsgálat',
-  Interrupted: 'Megszakadt',
-  Expired: 'Lejárt'
+  Pending: t('Várakozik a kliensre'),
+  ClientConnected: t('Kliens csatlakozott'),
+  Scanning: t('Vizsgálat folyamatban'),
+  Completed: t('Sikeres vizsgálat'),
+  Interrupted: t('Megszakadt'),
+  Expired: t('Lejárt')
 };
 
 const VERDICT_LABELS: Record<string, string> = {
   Legit: 'LEGIT',
   Unlegit: 'UNLEGIT',
-  Inconclusive: 'Nem egyértelmű'
+  Inconclusive: t('Nem egyértelmű')
 };
 
 const PAGE_SIZE = 8;
@@ -60,7 +61,7 @@ export function SessionsPage() {
       setSessions(await api.listSessions(targetPage, PAGE_SIZE));
     } catch (err) {
       if (!(err instanceof ApiError && err.status === 401)) {
-        setListError('Nem sikerült betölteni a vizsgálatokat.');
+        setListError(t('Nem sikerült betölteni a vizsgálatokat.'));
       }
     } finally {
       setIsLoadingList(false);
@@ -117,12 +118,12 @@ export function SessionsPage() {
   }, [loadSessions, page]);
 
   async function handleDelete(s: SessionListItem) {
-    if (!window.confirm(`Törlöd a #${s.code} vizsgálatot az eredményével együtt? Ez nem vonható vissza.`)) return;
+    if (!window.confirm(t('Törlöd a #{0} vizsgálatot az eredményével együtt? Ez nem vonható vissza.', s.code))) return;
     try {
       await api.deleteSession(s.code);
       setSessions((prev) => prev.filter((item) => item.code !== s.code));
     } catch (err) {
-      setListError(err instanceof ApiError ? err.message : 'Nem sikerült törölni a vizsgálatot.');
+      setListError(err instanceof ApiError ? err.message : t('Nem sikerült törölni a vizsgálatot.'));
     }
   }
 
@@ -140,7 +141,7 @@ export function SessionsPage() {
       if (err instanceof ApiError && (err.status === 402 || err.status === 403)) {
         setGenerateError(err.message);
       } else if (!(err instanceof ApiError && err.status === 401)) {
-        setGenerateError('Nem sikerült kódot generálni.');
+        setGenerateError(t('Nem sikerült kódot generálni.'));
       }
     } finally {
       setIsGenerating(false);
@@ -155,7 +156,7 @@ export function SessionsPage() {
       window.location.assign(clientDownloadUrl({ ticket }));
     } catch (err) {
       if (!(err instanceof ApiError && err.status === 401)) {
-        setDownloadError(err instanceof ApiError ? err.message : 'Nem sikerült elindítani a letöltést.');
+        setDownloadError(err instanceof ApiError ? err.message : t('Nem sikerült elindítani a letöltést.'));
       }
     } finally {
       setIsDownloading(false);
@@ -174,28 +175,28 @@ export function SessionsPage() {
   return (
     <main className="page">
       <header className="page-head stagger-in">
-        <span className="eyebrow">Vizsgálatok</span>
-        <h1>Panel</h1>
-        <p className="muted">Generálj kódot a játékosnak, és kövesd élőben a vizsgálatot.</p>
+        <span className="eyebrow">{t('Vizsgálatok')}</span>
+        <h1>{t('Panel')}</h1>
+        <p className="muted">{t('Generálj kódot a játékosnak, és kövesd élőben a vizsgálatot.')}</p>
       </header>
 
       <div className="console-grid">
         <section className="card console-card stagger-in" style={{ animationDelay: '80ms' }}>
-          <h2 className="card-title"><Icon name="key" size={18} /> Session kód</h2>
+          <h2 className="card-title"><Icon name="key" size={18} />{' '}{t('Session kód')}</h2>
 
-          <div className={`code-cells ${newSession ? 'code-cells-live' : ''}`} aria-label={newSession ? `Kód: ${newSession.code}` : 'Még nincs kód'}>
+          <div className={`code-cells ${newSession ? 'code-cells-live' : ''}`} aria-label={newSession ? t('Kód: {0}', newSession.code) : t('Még nincs kód')}>
             <ScrambleText text={code} renderChar={(char, i) => <span className="code-cell" key={i}>{char}</span>} />
           </div>
 
           {newSession && isCodeUnused && !isCodeExpired && (
-            <div className="code-timer" title="Eddig használható fel a kód">
+            <div className="code-timer" title={t('Eddig használható fel a kód')}>
               <span className="code-timer-bar">
                 <span style={{ transform: `scaleX(${Math.max(0, remainingMs / newSessionTotalMs)})` }} />
               </span>
               <span className="mono small">{formatCountdown(remainingMs)}</span>
             </div>
           )}
-          {isCodeExpired && <p className="notice-text"><Icon name="clock" size={16} /> Ez a kód lejárt, generálj újat.</p>}
+          {isCodeExpired && <p className="notice-text"><Icon name="clock" size={16} />{' '}{t('Ez a kód lejárt, generálj újat.')}</p>}
 
           {newSession && currentSession && !isCodeUnused && (
             <div className="code-live">
@@ -222,9 +223,9 @@ export function SessionsPage() {
             </div>
           )}
 
-          <button className={`btn-primary btn-block btn-large ${isGenerating ? 'is-loading' : ''}`} onClick={handleGenerate} disabled={isGenerating || createBlocked} title={createBlocked ? 'A rangod nem indíthat vizsgálatot.' : undefined}>
+          <button className={`btn-primary btn-block btn-large ${isGenerating ? 'is-loading' : ''}`} onClick={handleGenerate} disabled={isGenerating || createBlocked} title={createBlocked ? t('A rangod nem indíthat vizsgálatot.') : undefined}>
             {isGenerating && <span className="btn-spinner" aria-hidden="true" />}
-            {isGenerating ? 'Generálás...' : newSession ? 'Új kód generálása' : 'Kód generálása'}
+            {isGenerating ? t('Generálás...') : newSession ? t('Új kód generálása') : t('Kód generálása')}
           </button>
           {generateError && <p className="error-text">{generateError}</p>}
 
@@ -232,40 +233,38 @@ export function SessionsPage() {
             <div className="console-actions">
               <button className="btn-secondary" onClick={() => copy('code', newSession.code)}>
                 <Icon name={copiedKey === 'code' ? 'check' : 'copy'} size={16} />
-                {copiedKey === 'code' ? 'Kód másolva' : 'Kód másolása'}
+                {copiedKey === 'code' ? t('Kód másolva') : t('Kód másolása')}
               </button>
               {playerLink && (
                 <button className="btn-secondary" onClick={() => copy('link', playerLink)}>
                   <Icon name={copiedKey === 'link' ? 'check' : 'link'} size={16} />
-                  {copiedKey === 'link' ? 'Link másolva' : 'Link a játékosnak'}
+                  {copiedKey === 'link' ? t('Link másolva') : t('Link a játékosnak')}
                 </button>
               )}
             </div>
           )}
           {newSession && (
-            <p className="muted small console-hint">
-              A linken a játékos a kód érvényessége alatt töltheti le az Avenge-et. Fiók nem kell hozzá.
-            </p>
+            <p className="muted small console-hint">{t('A linken a játékos a kód érvényessége alatt töltheti le az Avenge-et. Fiók nem kell hozzá.')}</p>
           )}
 
           <div className="console-divider" />
 
           <button className="btn-ghost btn-block" onClick={handleDownload} disabled={isDownloading}>
             <Icon name="download" size={17} />
-            {isDownloading ? 'Letöltés indítása...' : 'Avenge letöltése magamnak'}
+            {isDownloading ? t('Letöltés indítása...') : t('Avenge letöltése magamnak')}
           </button>
           {downloadError && <p className="error-text">{downloadError}</p>}
         </section>
 
         <section className="card stagger-in" style={{ animationDelay: '150ms' }}>
-          <h2 className="card-title"><Icon name="activity" size={18} /> Korábbi vizsgálatok</h2>
+          <h2 className="card-title"><Icon name="activity" size={18} />{' '}{t('Korábbi vizsgálatok')}</h2>
           <div className="table-scroll">
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>Kód</th>
-                  <th>Időpont</th>
-                  <th className="align-right">Eredmény</th>
+                  <th>{t('Kód')}</th>
+                  <th>{t('Időpont')}</th>
+                  <th className="align-right">{t('Eredmény')}</th>
                 </tr>
               </thead>
               <tbody key={`page-${page}`}>
@@ -288,7 +287,7 @@ export function SessionsPage() {
                       <td className="mono">
                         {s.resultIdHash ? <Link to={`/results/${s.resultIdHash}`}>#{s.code}</Link> : <>#{s.code}</>}
                       </td>
-                      <td className="muted">{new Date(s.createdAt).toLocaleString('hu-HU')}</td>
+                      <td className="muted">{new Date(s.createdAt).toLocaleString(locale)}</td>
                       <td className="align-right">
                         {s.verdict ? (
                           <span className={`verdict-badge verdict-pop verdict-${s.verdict.toLowerCase()}`} key={s.verdict}>
@@ -312,8 +311,8 @@ export function SessionsPage() {
                             type="button"
                             className="icon-button row-delete"
                             onClick={() => handleDelete(s)}
-                            aria-label={`#${s.code} törlése`}
-                            title="Vizsgálat törlése"
+                            aria-label={t('#{0} törlése', s.code)}
+                            title={t('Vizsgálat törlése')}
                           >
                             <Icon name="trash" size={14} />
                           </button>
@@ -324,7 +323,7 @@ export function SessionsPage() {
                 })}
                 {!isLoadingList && sessions.length === 0 && (
                   <tr>
-                    <td colSpan={3} className="muted empty-row">Még nincs vizsgálat. Generálj egy kódot a kezdéshez.</td>
+                    <td colSpan={3} className="muted empty-row">{t('Még nincs vizsgálat. Generálj egy kódot a kezdéshez.')}</td>
                   </tr>
                 )}
               </tbody>
@@ -333,9 +332,9 @@ export function SessionsPage() {
           {listError && <p className="error-text">{listError}</p>}
 
           <div className="pager">
-            <button className="btn-ghost btn-tiny" disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>Előző</button>
+            <button className="btn-ghost btn-tiny" disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>{t('Előző')}</button>
             <span className="mono small pager-page">{page}</span>
-            <button className="btn-ghost btn-tiny" disabled={!hasNextPage} onClick={() => setPage((p) => p + 1)}>Következő</button>
+            <button className="btn-ghost btn-tiny" disabled={!hasNextPage} onClick={() => setPage((p) => p + 1)}>{t('Következő')}</button>
           </div>
         </section>
       </div>

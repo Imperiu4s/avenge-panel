@@ -1,3 +1,6 @@
+import { lang } from '../i18n';
+import { LEGAL_DOCUMENTS_EN } from './documents-en';
+
 export interface LegalDocument {
   slug: string;
   title: string;
@@ -75,7 +78,7 @@ A Szolgáltató az ÁSZF-et módosíthatja; a módosítást a weboldalon közzé
     slug: 'adatkezeles',
     title: 'Adatkezelési tájékoztató',
     short: 'Adatkezelés',
-    updated: '2026. november 24.',
+    updated: '2026. november 25.',
     body: `
 Ez a tájékoztató az Európai Parlament és a Tanács (EU) 2016/679 rendelete (GDPR) és az Infotv. (2011. évi CXII. törvény) alapján mutatja be, milyen személyes adatokat kezelünk, miért és meddig.
 
@@ -93,6 +96,9 @@ Ez a tájékoztató az Európai Parlament és a Tanács (EU) 2016/679 rendelete 
 | Megvásárolt pluginok és modellek, letöltések száma | letöltési jog biztosítása | szerződés teljesítése | a fiók törléséig |
 | Előfizetés állapota, Tebex-hivatkozás | a havi előfizetés kezelése | szerződés teljesítése | a fiók törléséig |
 | Kitiltás oka (ha van) | visszaélések megelőzése | jogos érdek | a fiók törléséig |
+| Discord-fiók azonosítója és neve (ha összekapcsolod) | az Avenge bot hozzáadása az alkalmazásaidhoz, és a szerepkörök (Előfizető, Plugin vásárló) automatikus kiosztása az Avenge Discordon | hozzájárulás (GDPR 6. cikk (1) a)), a Fiókom oldalon bármikor leválasztható | a leválasztásig vagy a fiók törléséig |
+
+**Discord-összekapcsolás**: ha a Fiókom oldalon összekapcsolod a Discord-fiókodat, a Discord csak a felhasználói azonosítódat és a nevedet adja át nekünk (identify); a Discord hozzáférési tokent nem tároljuk. Az azonosító alapján a bot az Avenge Discordon a vásárlásaid és az előfizetésed szerint szerepkört ad, illetve lejáratkor, visszatérítéskor, leválasztáskor és a fiók törlésekor elveszi.
 
 **Ügyfélszolgálati ticketek**: ha a weboldal Támogatás oldalán ticketet nyitsz, a vásárlói fiókodhoz rögzítjük a ticket témáját, tárgyát, a megadott azonosítót (pl. bizonylatszám), a veled folytatott levelezést és a csatolt képeket, valamint a nyitás, a válaszok és a lezárás idejét. Cél: a kérésed megválaszolása és a „egyszerre egy nyitott ticket, újat 3 naponta” szabály betartatása; jogalap: a kérésed teljesítése (GDPR 6. cikk (1) b)) és jogos érdek (f)). A ticketeket a lezárásuktól számított 1 évig őrizzük, a fiókod törlésekor pedig a csatolmányokkal együtt azonnal töröljük. Csatolmányként csak képet fogadunk el; ne küldj jelszót vagy bankkártyaadatot.
 
@@ -113,11 +119,11 @@ A szerverre a vizsgálat **eredménye** kerül: a találatok (fájlnév, eléré
 - **Minecraft-plugin**: ha a szerver az Avenge Velocity-pluginját használja, a vizsgálati kód kérésekor a játékos nevét és UUID-ját, a vizsgálatot kérő staff nevét és a szerver nevét a szervezet tevékenységnaplója rögzíti. A PC Check eseményeiről (indulás, a vizsgálat elkezdése, eredménye és legfontosabb találatai, megtagadása, automatikus kitiltás, kilépés, a PC Check vége) naplóüzenet kerül a Szolgáltató Discord szerverére, és ha a szerver beállította, a szerver saját Discord szerverére is. Az üzenet tartalmazza a játékos és a staff nevét, a szerver és a szervezet nevét, a vizsgálati kódot, az eredményt és az eredmény linkjét. Cél: a vizsgálatok és a visszaélések nyomon követése; jogalap: a Szolgáltató és a szerver jogos érdeke (GDPR 6. cikk (1) f)).
 
 ## 4. Technikai adatok
-A weboldal a bejelentkezéshez a böngésző helyi tárolójában (localStorage) tárol egy belépési tokent, és megjegyzi az oldal aktuális témáját. Követő (marketing vagy analitikai) sütit nem használunk. A szerver a biztonság érdekében naplózza a kérések IP-címét és idejét, a staff műveleteit pedig a szervezet tevékenységnaplójában rögzíti. {{naplo.megorzes}} Részletek: [Süti tájékoztató](/jogi/cookie).
+A weboldal a bejelentkezéshez a böngésző helyi tárolójában (localStorage) tárol egy belépési tokent, és megjegyzi az oldal aktuális témáját és a választott nyelvet. Követő (marketing vagy analitikai) sütit nem használunk. A szerver a biztonság érdekében naplózza a kérések IP-címét és idejét, a staff műveleteit pedig a szervezet tevékenységnaplójában rögzíti. {{naplo.megorzes}} Részletek: [Süti tájékoztató](/jogi/cookie).
 
 ## 5. Adatfeldolgozók, címzettek
 - **{{viszontelado.nev}}** (Egyesült Királyság) - fizetés, számlázás (önálló adatkezelő).
-- **Discord Inc.** (USA) - ha a Discord szerverünkön ({{kapcsolat.discord}}) keresel minket, az üzeneteidet a Discord a saját adatvédelmi tájékoztatója szerint kezeli. A Minecraft-plugin PC Check naplójának üzeneteit is a Discord tárolja.
+- **Discord Inc.** (USA) - ha a Discord szerverünkön ({{kapcsolat.discord}}) keresel minket, az üzeneteidet a Discord a saját adatvédelmi tájékoztatója szerint kezeli. A Minecraft-plugin PC Check naplójának üzeneteit is a Discord tárolja, és a Discord-összekapcsolás és a szerepkörök kiosztása is a Discord felületén történik.
 - **Tárhelyszolgáltatók** (adatfeldolgozók):
 {{tarhely.lista}}
 
@@ -225,7 +231,7 @@ A Minecraft a Mojang AB védjegye. A(z) {{szolgaltatas.nev}} nem áll kapcsolatb
     slug: 'cookie',
     title: 'Süti (cookie) tájékoztató',
     short: 'Sütik',
-    updated: '2026. november 24.',
+    updated: '2026. november 25.',
     body: `
 ## Mit tárolunk a böngésződben?
 Az avenge.hu **nem használ követő, reklám- vagy analitikai sütit**, ezért nem kérünk hozzájárulást süti-sávval.
@@ -237,6 +243,7 @@ A működéshez szükséges, a böngésző helyi tárolójában (localStorage) t
 | \`avenge_customer_token\` | vásárlói bejelentkezés | legfeljebb 7 nap, vagy kijelentkezésig |
 | \`avenge_staff_token\` | staff (PC Check panel) bejelentkezés | legfeljebb 8 óra, vagy kijelentkezésig |
 | \`avenge.siteTheme\` | az oldal aktuális (ünnepi) témájának megjegyzése, hogy betöltéskor ne villanjon | amíg nem törlöd |
+| \`avenge.lang\` | a választott nyelv (magyar vagy angol) | amíg nem törlöd |
 
 Ezek a bejelentkezéshez, illetve a kért megjelenéshez feltétlenül szükségesek (az ePrivacy irányelv 5. cikk (3) bekezdése szerinti kivétel), és csak a te böngésződben vannak.
 
@@ -249,6 +256,10 @@ Kijelentkezéskor a token törlődik; a böngésző beállításaiban az avenge.
   }
 ];
 
+export function localizedLegalDocuments(): LegalDocument[] {
+  return lang === 'en' ? LEGAL_DOCUMENTS_EN : LEGAL_DOCUMENTS;
+}
+
 export function findLegalDocument(slug: string | undefined): LegalDocument | undefined {
-  return LEGAL_DOCUMENTS.find((d) => d.slug === slug);
+  return localizedLegalDocuments().find((d) => d.slug === slug);
 }

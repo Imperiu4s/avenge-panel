@@ -1,3 +1,4 @@
+import { t } from '../../i18n';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ApiError } from '../../api/client';
@@ -13,23 +14,23 @@ import { formatSecond } from '../timeline';
 import { AUDIT_ACTION_LABELS } from './auditLabels';
 
 const STATUS_LABELS: Record<string, string> = {
-  Pending: 'Várakozik',
-  ClientConnected: 'Kliens csatlakozott',
-  Scanning: 'Folyamatban',
-  Completed: 'Sikeres',
-  Interrupted: 'Megszakadt',
-  Expired: 'Lejárt'
+  Pending: t('Várakozik'),
+  ClientConnected: t('Kliens csatlakozott'),
+  Scanning: t('Folyamatban'),
+  Completed: t('Sikeres'),
+  Interrupted: t('Megszakadt'),
+  Expired: t('Lejárt')
 };
 
 const VERDICT_LABELS: Record<string, string> = {
   Legit: 'LEGIT',
   Unlegit: 'UNLEGIT',
-  Inconclusive: 'Nem egyértelmű'
+  Inconclusive: t('Nem egyértelmű')
 };
 
 function kindLabel(org: AdminOrganizationRow): string {
   if (org.isPlatform) return 'Platform';
-  return org.isSubscription ? 'Előfizető' : 'Saját';
+  return org.isSubscription ? t('Előfizető') : t('Saját');
 }
 
 function OrganizationScans({ id }: { id: string }) {
@@ -44,7 +45,7 @@ function OrganizationScans({ id }: { id: string }) {
     const timer = window.setTimeout(() => {
       organizationsApi.sessions(id, { page, q: query.trim() || undefined, verdict: verdict || undefined })
         .then((d) => { if (alive) setData(d); })
-        .catch((err) => { if (alive) setError(err instanceof ApiError ? err.message : 'Nem sikerült betölteni a vizsgálatokat.'); });
+        .catch((err) => { if (alive) setError(err instanceof ApiError ? err.message : t('Nem sikerült betölteni a vizsgálatokat.')); });
     }, query ? 250 : 0);
     return () => { alive = false; window.clearTimeout(timer); };
   }, [id, page, query, verdict]);
@@ -54,23 +55,23 @@ function OrganizationScans({ id }: { id: string }) {
   return (
     <section className="card section-gap stagger-in" style={{ animationDelay: '120ms' }}>
       <div className="scans-head">
-        <h2 className="card-title"><Icon name="history" size={18} /> Vizsgálatok</h2>
-        <span className="muted small">{data ? `${data.total} találat` : ''}</span>
+        <h2 className="card-title"><Icon name="history" size={18} />{' '}{t('Vizsgálatok')}</h2>
+        <span className="muted small">{data ? t('{0} találat', data.total) : ''}</span>
       </div>
       <div className="admin-filters">
-        <input type="search" placeholder="Kód, Minecraft név, gépnév vagy staff..." value={query} onChange={(e) => { setQuery(e.target.value); setPage(1); }} aria-label="Keresés" />
-        <select value={verdict} onChange={(e) => { setVerdict(e.target.value); setPage(1); }} aria-label="Eredmény">
-          <option value="">Minden eredmény</option>
-          <option value="Unlegit">UNLEGIT</option>
-          <option value="Inconclusive">Nem egyértelmű</option>
-          <option value="Legit">LEGIT</option>
+        <input type="search" placeholder={t('Kód, Minecraft név, gépnév vagy staff...')} value={query} onChange={(e) => { setQuery(e.target.value); setPage(1); }} aria-label={t('Keresés')} />
+        <select value={verdict} onChange={(e) => { setVerdict(e.target.value); setPage(1); }} aria-label={t('Eredmény')}>
+          <option value="">{t('Minden eredmény')}</option>
+          <option value="Unlegit">{t('UNLEGIT')}</option>
+          <option value="Inconclusive">{t('Nem egyértelmű')}</option>
+          <option value="Legit">{t('LEGIT')}</option>
         </select>
       </div>
       {error && <p className="error-text">{error}</p>}
       <div className="table-scroll">
         <table className="data-table">
           <thead>
-            <tr><th>Kód</th><th>Időpont</th><th>Staff</th><th>Játékos / gép</th><th className="align-right">Találat</th><th>Eredmény</th></tr>
+            <tr><th>{t('Kód')}</th><th>{t('Időpont')}</th><th>{t('Staff')}</th><th>{t('Játékos / gép')}</th><th className="align-right">{t('Találat')}</th><th>{t('Eredmény')}</th></tr>
           </thead>
           <tbody>
             {!data && Array.from({ length: 4 }, (_, i) => <tr key={`sk-${i}`}><td colSpan={6}><Skeleton width="100%" /></td></tr>)}
@@ -78,7 +79,7 @@ function OrganizationScans({ id }: { id: string }) {
               <tr key={s.code}>
                 <td className="mono">{s.resultIdHash ? <Link to={`/results/${s.resultIdHash}`}>#{s.code}</Link> : <>#{s.code}</>}</td>
                 <td className="muted small">{formatSecond(s.createdAt)}</td>
-                <td className="mono small">{s.createdByEmail ?? 'törölt felhasználó'}</td>
+                <td className="mono small">{s.createdByEmail ?? t('törölt felhasználó')}</td>
                 <td className="small">{s.minecraftUsername ?? '-'}{s.hostname && <span className="muted"> · {s.hostname}</span>}</td>
                 <td className="align-right mono">{s.verdict ? s.findingCount : '-'}</td>
                 <td>
@@ -88,14 +89,14 @@ function OrganizationScans({ id }: { id: string }) {
                 </td>
               </tr>
             ))}
-            {data && data.items.length === 0 && <tr><td colSpan={6} className="muted empty-row">Nincs ilyen vizsgálat.</td></tr>}
+            {data && data.items.length === 0 && <tr><td colSpan={6} className="muted empty-row">{t('Nincs ilyen vizsgálat.')}</td></tr>}
           </tbody>
         </table>
       </div>
       <div className="pager">
-        <button className="btn-ghost btn-tiny" disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>Előző</button>
+        <button className="btn-ghost btn-tiny" disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>{t('Előző')}</button>
         <span className="mono small pager-page">{page} / {totalPages}</span>
-        <button className="btn-ghost btn-tiny" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>Következő</button>
+        <button className="btn-ghost btn-tiny" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>{t('Következő')}</button>
       </div>
     </section>
   );
@@ -114,7 +115,7 @@ function OrganizationDetail({ id, onBack, onDeleted }: { id: string; onBack: () 
   const load = useCallback(() => {
     organizationsApi.detail(id)
       .then((d) => { setDetail(d); setName(d.summary.name); })
-      .catch((err) => setError(err instanceof ApiError ? err.message : 'Nem sikerült betölteni a szervezetet.'));
+      .catch((err) => setError(err instanceof ApiError ? err.message : t('Nem sikerült betölteni a szervezetet.')));
   }, [id]);
 
   useEffect(() => { load(); }, [load]);
@@ -128,7 +129,7 @@ function OrganizationDetail({ id, onBack, onDeleted }: { id: string; onBack: () 
       if (done) setNotice(done);
       load();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Nem sikerült.');
+      setError(err instanceof ApiError ? err.message : t('Nem sikerült.'));
     } finally {
       setBusy(null);
     }
@@ -136,7 +137,7 @@ function OrganizationDetail({ id, onBack, onDeleted }: { id: string; onBack: () 
 
   async function remove() {
     if (!detail) return;
-    const typed = window.prompt(`A(z) „${detail.summary.name}” szervezet MINDEN adatával együtt törlődik: tagok, ${detail.stats.total} vizsgálat az eredményekkel, plugin-kulcsok, napló. Ez nem vonható vissza.${detail.summary.hasAccess && detail.summary.isSubscription ? ' Az előfizetése még él: a következő megújításkor új, üres szervezetet kap.' : ''}\n\nA megerősítéshez írd be pontosan a szervezet nevét:`);
+    const typed = window.prompt(t('A(z) „{0}” szervezet MINDEN adatával együtt törlődik: tagok, {1} vizsgálat az eredményekkel, plugin-kulcsok, napló. Ez nem vonható vissza.{2}\n\nA megerősítéshez írd be pontosan a szervezet nevét:', detail.summary.name, detail.stats.total, detail.summary.hasAccess && detail.summary.isSubscription ? t(' Az előfizetése még él: a következő megújításkor új, üres szervezetet kap.') : ''));
     if (typed === null) return;
     setBusy('delete');
     setError(null);
@@ -144,12 +145,12 @@ function OrganizationDetail({ id, onBack, onDeleted }: { id: string; onBack: () 
       await organizationsApi.remove(id, typed);
       onDeleted();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Nem sikerült törölni.');
+      setError(err instanceof ApiError ? err.message : t('Nem sikerült törölni.'));
       setBusy(null);
     }
   }
 
-  const back = <button type="button" className="back-link org-back" onClick={onBack}><Icon name="arrow-right" size={15} className="flip-x" /> Vissza a szervezetekhez</button>;
+  const back = <button type="button" className="back-link org-back" onClick={onBack}><Icon name="arrow-right" size={15} className="flip-x" />{' '}{t('Vissza a szervezetekhez')}</button>;
 
   if (!detail) {
     return (
@@ -162,12 +163,12 @@ function OrganizationDetail({ id, onBack, onDeleted }: { id: string; onBack: () 
 
   const { summary, owner, subscription, stats } = detail;
   const tiles = [
-    { label: 'Vizsgálat összesen', value: stats.total },
-    { label: 'Az elmúlt 30 napban', value: stats.last30Days },
+    { label: t('Vizsgálat összesen'), value: stats.total },
+    { label: t('Az elmúlt 30 napban'), value: stats.last30Days },
     { label: 'LEGIT', value: stats.legit, tone: 'kpi-cool' },
     { label: 'UNLEGIT', value: stats.unlegit, tone: 'kpi-hot' },
-    { label: 'Nem egyértelmű', value: stats.inconclusive },
-    { label: 'Megszakadt', value: stats.interrupted }
+    { label: t('Nem egyértelmű'), value: stats.inconclusive },
+    { label: t('Megszakadt'), value: stats.interrupted }
   ];
 
   return (
@@ -175,29 +176,28 @@ function OrganizationDetail({ id, onBack, onDeleted }: { id: string; onBack: () 
       {back}
       {summary.deletesAt && (
         <p className="foreign-org-banner org-deletion-banner">
-          <Icon name="alert" size={15} /> Az előfizetése lejárt: a szervezet {formatDateTime(summary.deletesAt)} körül minden adatával automatikusan törlődik.
-          {canStore && owner && ' Ha meg akarod tartani, írj jóvá napokat az előfizetésére.'}
+          <Icon name="alert" size={15} />{' '}{t('Az előfizetése lejárt: a szervezet')}{' '}{formatDateTime(summary.deletesAt)}{' '}{t('körül minden adatával automatikusan törlődik.')}{canStore && owner && t(' Ha meg akarod tartani, írj jóvá napokat az előfizetésére.')}
         </p>
       )}
       <section className="card stagger-in">
         <div className="scans-head">
           <h2 className="card-title"><Icon name="layers" size={18} /> {summary.name}</h2>
-          <span className={`status-pill ${summary.hasAccess ? 'status-active' : 'status-ended'}`}>{kindLabel(summary)} · {summary.hasAccess ? 'van hozzáférése' : 'nincs hozzáférése'}</span>
+          <span className={`status-pill ${summary.hasAccess ? 'status-active' : 'status-ended'}`}>{kindLabel(summary)} · {summary.hasAccess ? t('van hozzáférése') : t('nincs hozzáférése')}</span>
         </div>
         <dl className="org-facts">
-          <div><dt>Létrehozva</dt><dd>{formatDate(summary.createdAt)}</dd></div>
-          <div><dt>Tagok</dt><dd>{summary.members}</dd></div>
-          <div><dt>Utolsó vizsgálat</dt><dd>{summary.lastScanAt ? formatDateTime(summary.lastScanAt) : 'még nem volt'}</dd></div>
-          <div><dt>PC Check plugin</dt><dd>{summary.pluginOwned ? `megvan · ${summary.activePluginKeys} aktív kulcs` : 'nincs megvéve'}</dd></div>
-          {owner && <div><dt>Előfizető vásárló</dt><dd>{owner.email}{owner.minecraftUsername ? ` · ${owner.minecraftUsername}` : ''}{owner.isBanned ? ' · kitiltva' : ''}</dd></div>}
-          {owner && <div><dt>Vásárlói fiók</dt><dd>regisztrált: {formatDate(owner.createdAt)} · utolsó belépés: {owner.lastLoginAt ? formatDateTime(owner.lastLoginAt) : '-'}</dd></div>}
+          <div><dt>{t('Létrehozva')}</dt><dd>{formatDate(summary.createdAt)}</dd></div>
+          <div><dt>{t('Tagok')}</dt><dd>{summary.members}</dd></div>
+          <div><dt>{t('Utolsó vizsgálat')}</dt><dd>{summary.lastScanAt ? formatDateTime(summary.lastScanAt) : t('még nem volt')}</dd></div>
+          <div><dt>{t('PC Check plugin')}</dt><dd>{summary.pluginOwned ? t('megvan · {0} aktív kulcs', summary.activePluginKeys) : t('nincs megvéve')}</dd></div>
+          {owner && <div><dt>{t('Előfizető vásárló')}</dt><dd>{owner.email}{owner.minecraftUsername ? ` · ${owner.minecraftUsername}` : ''}{owner.isBanned ? t(' · kitiltva') : ''}</dd></div>}
+          {owner && <div><dt>{t('Vásárlói fiók')}</dt><dd>{t('regisztrált:')}{' '}{formatDate(owner.createdAt)}{' '}{t('· utolsó belépés:')}{' '}{owner.lastLoginAt ? formatDateTime(owner.lastLoginAt) : '-'}</dd></div>}
           {subscription && (
             <div>
-              <dt>Előfizetés</dt>
+              <dt>{t('Előfizetés')}</dt>
               <dd>
                 {SUBSCRIPTION_STATUS_LABELS[subscription.status] ?? subscription.status}
-                {subscription.currentPeriodEnd ? ` · időszak vége: ${formatDate(subscription.currentPeriodEnd)}` : ''}
-                {subscription.startedAt ? ` · indult: ${formatDate(subscription.startedAt)}` : ''}
+                {subscription.currentPeriodEnd ? t(' · időszak vége: {0}', formatDate(subscription.currentPeriodEnd)) : ''}
+                {subscription.startedAt ? t(' · indult: {0}', formatDate(subscription.startedAt)) : ''}
               </dd>
             </div>
           )}
@@ -206,22 +206,20 @@ function OrganizationDetail({ id, onBack, onDeleted }: { id: string; onBack: () 
         {(canManage || (canStore && owner)) && (
           <div className="org-manage">
             {canManage && (
-              <form className="inline-form" onSubmit={(e) => { e.preventDefault(); run('rename', () => organizationsApi.rename(id, name.trim()), 'A szervezet új neve elmentve.'); }}>
-                <input value={name} maxLength={80} onChange={(e) => setName(e.target.value)} aria-label="A szervezet neve" />
-                <button type="submit" className={`btn-secondary btn-tiny ${busy === 'rename' ? 'is-loading' : ''}`} disabled={busy !== null || name.trim().length < 2 || name.trim() === summary.name}>Átnevezés</button>
+              <form className="inline-form" onSubmit={(e) => { e.preventDefault(); run('rename', () => organizationsApi.rename(id, name.trim()), t('A szervezet új neve elmentve.')); }}>
+                <input value={name} maxLength={80} onChange={(e) => setName(e.target.value)} aria-label={t('A szervezet neve')} />
+                <button type="submit" className={`btn-secondary btn-tiny ${busy === 'rename' ? 'is-loading' : ''}`} disabled={busy !== null || name.trim().length < 2 || name.trim() === summary.name}>{t('Átnevezés')}</button>
               </form>
             )}
             <div className="org-manage-actions">
               {canStore && owner && (
                 <button type="button" className={`btn-secondary btn-tiny ${busy === 'grant' ? 'is-loading' : ''}`} disabled={busy !== null}
-                  onClick={() => window.confirm(`30 nap ingyenes PC Check-hozzáférést adsz ${owner.email} részére?`) && run('grant', () => storeAdminApi.grantSubscription(owner.id, 30), '30 nap jóváírva az előfizetésen.')}>
-                  <Icon name="plus" size={13} /> +30 nap előfizetés
-                </button>
+                  onClick={() => window.confirm(t('30 nap ingyenes PC Check-hozzáférést adsz {0} részére?', owner.email)) && run('grant', () => storeAdminApi.grantSubscription(owner.id, 30), t('30 nap jóváírva az előfizetésen.'))}>
+                  <Icon name="plus" size={13} />{' '}{t('+30 nap előfizetés')}</button>
               )}
               {canManage && !summary.isPlatform && (
                 <button type="button" className={`btn-ghost btn-tiny btn-danger ${busy === 'delete' ? 'is-loading' : ''}`} disabled={busy !== null} onClick={remove}>
-                  <Icon name="trash" size={13} /> Szervezet törlése
-                </button>
+                  <Icon name="trash" size={13} />{' '}{t('Szervezet törlése')}</button>
               )}
             </div>
           </div>
@@ -240,23 +238,23 @@ function OrganizationDetail({ id, onBack, onDeleted }: { id: string; onBack: () 
       </div>
 
       <section className="card section-gap stagger-in" style={{ animationDelay: '60ms' }}>
-        <h2 className="card-title"><Icon name="users" size={18} /> Tagok</h2>
+        <h2 className="card-title"><Icon name="users" size={18} />{' '}{t('Tagok')}</h2>
         <div className="table-scroll">
           <table className="data-table">
-            <thead><tr><th>E-mail</th><th>Rang</th><th>Állapot</th><th>Utolsó belépés</th><th className="align-right">Vizsgálat</th></tr></thead>
+            <thead><tr><th>{t('E-mail')}</th><th>{t('Rang')}</th><th>{t('Állapot')}</th><th>{t('Utolsó belépés')}</th><th className="align-right">{t('Vizsgálat')}</th></tr></thead>
             <tbody>
               {detail.members.map((m) => {
                 const editable = canManage && !m.isPlatformAdmin;
                 return (
                   <tr key={m.id}>
-                    <td className="mono small">{m.email}{m.isPlatformAdmin && <span className="muted"> · platform admin</span>}</td>
+                    <td className="mono small">{m.email}{m.isPlatformAdmin && <span className="muted">{' '}{t('· platform admin')}</span>}</td>
                     <td>
                       {editable ? (
-                        <select value={m.role} disabled={busy !== null} aria-label={`${m.email} rangja`}
+                        <select value={m.role} disabled={busy !== null} aria-label={t('{0} rangja', m.email)}
                           onChange={(e) => {
                             const role = e.target.value;
-                            if (window.confirm(`${m.email} új rangja: ${ROLE_LABELS[role]}. Mented? (A fiók ezzel kijelentkezik.)`)) {
-                              run(`role-${m.id}`, () => organizationsApi.updateMember(id, m.id, { role }), `${m.email} rangja módosítva.`);
+                            if (window.confirm(t('{0} új rangja: {1}. Mented? (A fiók ezzel kijelentkezik.)', m.email, ROLE_LABELS[role]))) {
+                              run(`role-${m.id}`, () => organizationsApi.updateMember(id, m.id, { role }), t('{0} rangja módosítva.', m.email));
                             }
                           }}>
                           {['Owner', 'Admin', 'Staff'].map((r) => <option key={r} value={r}>{ROLE_LABELS[r]}</option>)}
@@ -266,19 +264,19 @@ function OrganizationDetail({ id, onBack, onDeleted }: { id: string; onBack: () 
                     <td>
                       {editable ? (
                         <button type="button" className={`status-pill status-toggle ${m.isActive ? 'status-active' : 'status-ended'}`} disabled={busy !== null}
-                          title={m.isActive ? 'Kattints a kikapcsoláshoz' : 'Kattints a bekapcsoláshoz'}
-                          onClick={() => window.confirm(`${m.email} fiókját ${m.isActive ? 'kikapcsolod (azonnal kijelentkezik)' : 'újra bekapcsolod'}?`) &&
+                          title={m.isActive ? t('Kattints a kikapcsoláshoz') : t('Kattints a bekapcsoláshoz')}
+                          onClick={() => window.confirm(t('{0} fiókját {1}?', m.email, m.isActive ? t('kikapcsolod (azonnal kijelentkezik)') : t('újra bekapcsolod'))) &&
                             run(`active-${m.id}`, () => organizationsApi.updateMember(id, m.id, { isActive: !m.isActive }), m.isActive ? `${m.email} kikapcsolva.` : `${m.email} bekapcsolva.`)}>
-                          {m.isActive ? 'Aktív' : 'Kikapcsolva'}
+                          {m.isActive ? t('Aktív') : t('Kikapcsolva')}
                         </button>
-                      ) : m.isActive ? <span className="status-pill status-active">Aktív</span> : <span className="status-pill status-ended">Kikapcsolva</span>}
+                      ) : m.isActive ? <span className="status-pill status-active">{t('Aktív')}</span> : <span className="status-pill status-ended">{t('Kikapcsolva')}</span>}
                     </td>
-                    <td className="small muted">{m.lastLoginAt ? formatDateTime(m.lastLoginAt) : 'még nem'}</td>
+                    <td className="small muted">{m.lastLoginAt ? formatDateTime(m.lastLoginAt) : t('még nem')}</td>
                     <td className="align-right mono">{m.scans}</td>
                   </tr>
                 );
               })}
-              {detail.members.length === 0 && <tr><td colSpan={5} className="muted empty-row">Nincs tagja.</td></tr>}
+              {detail.members.length === 0 && <tr><td colSpan={5} className="muted empty-row">{t('Nincs tagja.')}</td></tr>}
             </tbody>
           </table>
         </div>
@@ -287,40 +285,38 @@ function OrganizationDetail({ id, onBack, onDeleted }: { id: string; onBack: () 
       <OrganizationScans id={id} />
 
       <section className="card section-gap stagger-in" style={{ animationDelay: '160ms' }}>
-        <h2 className="card-title"><Icon name="key" size={18} /> Plugin-kulcsok</h2>
+        <h2 className="card-title"><Icon name="key" size={18} />{' '}{t('Plugin-kulcsok')}</h2>
         <div className="table-scroll">
           <table className="data-table">
-            <thead><tr><th>Név</th><th>Kulcs</th><th>Létrehozva</th><th>Utoljára használva</th><th>Állapot</th><th /></tr></thead>
+            <thead><tr><th>{t('Név')}</th><th>{t('Kulcs')}</th><th>{t('Létrehozva')}</th><th>{t('Utoljára használva')}</th><th>{t('Állapot')}</th><th /></tr></thead>
             <tbody>
               {detail.pluginKeys.map((k) => (
                 <tr key={k.id}>
                   <td>{k.name}</td>
                   <td className="mono small">{k.prefix}</td>
                   <td className="small muted">{formatDateTime(k.createdAt)}</td>
-                  <td className="small muted">{k.lastUsedAt ? formatDateTime(k.lastUsedAt) : 'még nem'}</td>
-                  <td>{k.revokedAt ? <span className="status-pill status-ended">Visszavonva</span> : <span className="status-pill status-active">Aktív</span>}</td>
+                  <td className="small muted">{k.lastUsedAt ? formatDateTime(k.lastUsedAt) : t('még nem')}</td>
+                  <td>{k.revokedAt ? <span className="status-pill status-ended">{t('Visszavonva')}</span> : <span className="status-pill status-active">{t('Aktív')}</span>}</td>
                   <td className="row-actions">
                     {canManage && !k.revokedAt && (
                       <button type="button" className="btn-ghost btn-tiny btn-danger" disabled={busy !== null}
-                        onClick={() => window.confirm(`Visszavonod a(z) „${k.name}” kulcsot? Az ezt használó plugin nem tud több kódot kérni.`) && run(`key-${k.id}`, () => organizationsApi.revokeKey(id, k.id), 'Kulcs visszavonva.')}>
-                        Visszavonás
-                      </button>
+                        onClick={() => window.confirm(t('Visszavonod a(z) „{0}” kulcsot? Az ezt használó plugin nem tud több kódot kérni.', k.name)) && run(`key-${k.id}`, () => organizationsApi.revokeKey(id, k.id), t('Kulcs visszavonva.'))}>{t('Visszavonás')}</button>
                     )}
                   </td>
                 </tr>
               ))}
-              {detail.pluginKeys.length === 0 && <tr><td colSpan={6} className="muted empty-row">Nincs plugin-kulcs.</td></tr>}
+              {detail.pluginKeys.length === 0 && <tr><td colSpan={6} className="muted empty-row">{t('Nincs plugin-kulcs.')}</td></tr>}
             </tbody>
           </table>
         </div>
       </section>
 
       <section className="card section-gap stagger-in" style={{ animationDelay: '200ms' }}>
-        <h2 className="card-title"><Icon name="clock" size={18} /> Tevékenységnapló</h2>
-        <p className="muted small">A szervezet legutóbbi 60 eseménye.</p>
+        <h2 className="card-title"><Icon name="clock" size={18} />{' '}{t('Tevékenységnapló')}</h2>
+        <p className="muted small">{t('A szervezet legutóbbi 60 eseménye.')}</p>
         <div className="table-scroll">
           <table className="data-table">
-            <thead><tr><th>Időpont</th><th>Ki</th><th>Mit</th></tr></thead>
+            <thead><tr><th>{t('Időpont')}</th><th>{t('Ki')}</th><th>{t('Mit')}</th></tr></thead>
             <tbody>
               {detail.audit.map((a, i) => (
                 <tr key={`${a.createdAt}-${i}`}>
@@ -329,7 +325,7 @@ function OrganizationDetail({ id, onBack, onDeleted }: { id: string; onBack: () 
                   <td className="small">{AUDIT_ACTION_LABELS[a.action] ?? a.action}</td>
                 </tr>
               ))}
-              {detail.audit.length === 0 && <tr><td colSpan={3} className="muted empty-row">Még nincs esemény.</td></tr>}
+              {detail.audit.length === 0 && <tr><td colSpan={3} className="muted empty-row">{t('Még nincs esemény.')}</td></tr>}
             </tbody>
           </table>
         </div>
@@ -346,7 +342,7 @@ export function OrganizationsAdminTab() {
   const [selected, setSelected] = useState<string | null>(() => new URLSearchParams(window.location.search).get('org'));
 
   const load = useCallback(() => {
-    organizationsApi.list().then(setRows).catch((err) => setError(err instanceof ApiError ? err.message : 'Nem sikerült betölteni a szervezeteket.'));
+    organizationsApi.list().then(setRows).catch((err) => setError(err instanceof ApiError ? err.message : t('Nem sikerült betölteni a szervezeteket.')));
   }, []);
 
   useEffect(() => { load(); }, [load]);
@@ -374,23 +370,23 @@ export function OrganizationsAdminTab() {
   return (
     <section className="card stagger-in">
       <div className="scans-head">
-        <h2 className="card-title"><Icon name="layers" size={18} /> Szervezetek</h2>
-        <span className="muted small">{rows ? `${rows.length} szervezet · ${subscribers.length} előfizető · ${subscribers.filter((o) => o.hasAccess).length} élő előfizetés` : ''}</span>
+        <h2 className="card-title"><Icon name="layers" size={18} />{' '}{t('Szervezetek')}</h2>
+        <span className="muted small">{rows ? t('{0} szervezet · {1} előfizető · {2} élő előfizetés', rows.length, subscribers.length, subscribers.filter((o) => o.hasAccess).length) : ''}</span>
       </div>
-      <p className="muted small">Az összes szervezet, az előfizetők saját szervezeteivel együtt. Egy sorra kattintva látod a tagjait, a vizsgálatait (az eredményekkel), az előfizetését és a plugin-kulcsait. Csak megtekintés, és minden megnyitás bekerül a saját tevékenységnaplódba.</p>
+      <p className="muted small">{t('Az összes szervezet, az előfizetők saját szervezeteivel együtt. Egy sorra kattintva látod a tagjait, a vizsgálatait (az eredményekkel), az előfizetését és a plugin-kulcsait. Csak megtekintés, és minden megnyitás bekerül a saját tevékenységnaplódba.')}</p>
       <div className="admin-filters">
-        <input type="search" placeholder="Név vagy előfizető e-mail..." value={query} onChange={(e) => setQuery(e.target.value)} aria-label="Keresés" />
-        <select value={kind} onChange={(e) => setKind(e.target.value)} aria-label="Típus">
-          <option value="all">Minden szervezet</option>
-          <option value="subscription">Előfizetők</option>
-          <option value="own">Saját / platform</option>
+        <input type="search" placeholder={t('Név vagy előfizető e-mail...')} value={query} onChange={(e) => setQuery(e.target.value)} aria-label={t('Keresés')} />
+        <select value={kind} onChange={(e) => setKind(e.target.value)} aria-label={t('Típus')}>
+          <option value="all">{t('Minden szervezet')}</option>
+          <option value="subscription">{t('Előfizetők')}</option>
+          <option value="own">{t('Saját / platform')}</option>
         </select>
       </div>
       {error && <p className="error-text">{error}</p>}
       <div className="table-scroll">
         <table className="data-table org-table">
           <thead>
-            <tr><th>Szervezet</th><th>Típus</th><th>Előfizetés</th><th className="align-right">Tagok</th><th className="align-right">Vizsgálat</th><th>Utolsó vizsgálat</th><th>Plugin</th></tr>
+            <tr><th>{t('Szervezet')}</th><th>{t('Típus')}</th><th>{t('Előfizetés')}</th><th className="align-right">{t('Tagok')}</th><th className="align-right">{t('Vizsgálat')}</th><th>{t('Utolsó vizsgálat')}</th><th>{t('Plugin')}</th></tr>
           </thead>
           <tbody>
             {!rows && Array.from({ length: 4 }, (_, i) => <tr key={`sk-${i}`}><td colSpan={7}><Skeleton width="100%" /></td></tr>)}
@@ -403,16 +399,16 @@ export function OrganizationsAdminTab() {
                 <td className="small">{kindLabel(o)}</td>
                 <td className="small">
                   {o.isSubscription
-                    ? <>{SUBSCRIPTION_STATUS_LABELS[o.subscriptionStatus ?? ''] ?? 'nincs'}{o.subscriptionEnd && <div className="muted">{formatDate(o.subscriptionEnd)}</div>}{o.deletesAt && <div className="org-deletes">törlés: {formatDateTime(o.deletesAt)}</div>}</>
-                    : <span className="muted">nem kell</span>}
+                    ? <>{SUBSCRIPTION_STATUS_LABELS[o.subscriptionStatus ?? ''] ?? 'nincs'}{o.subscriptionEnd && <div className="muted">{formatDate(o.subscriptionEnd)}</div>}{o.deletesAt && <div className="org-deletes">{t('törlés:')}{' '}{formatDateTime(o.deletesAt)}</div>}</>
+                    : <span className="muted">{t('nem kell')}</span>}
                 </td>
                 <td className="align-right mono">{o.members}</td>
                 <td className="align-right mono">{o.scans}</td>
                 <td className="small muted">{o.lastScanAt ? formatDateTime(o.lastScanAt) : '-'}</td>
-                <td className="small">{o.pluginOwned ? `megvan${o.activePluginKeys ? ` · ${o.activePluginKeys} kulcs` : ''}` : <span className="muted">nincs</span>}</td>
+                <td className="small">{o.pluginOwned ? t('megvan') + (o.activePluginKeys ? t(' · {0} kulcs', o.activePluginKeys) : '') : <span className="muted">{t('nincs')}</span>}</td>
               </tr>
             ))}
-            {rows && filtered.length === 0 && <tr><td colSpan={7} className="muted empty-row">Nincs ilyen szervezet.</td></tr>}
+            {rows && filtered.length === 0 && <tr><td colSpan={7} className="muted empty-row">{t('Nincs ilyen szervezet.')}</td></tr>}
           </tbody>
         </table>
       </div>

@@ -1,3 +1,4 @@
+import { t as tr } from '../../i18n';
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 import { ApiError } from '../../api/client';
 import { discordAdminApi, type DiscordChannel, type DiscordEmbedFieldInput, type DiscordSendRequest } from '../../api/store';
@@ -40,10 +41,10 @@ const EMPTY: Draft = {
 };
 
 const TEMPLATES: { label: string; draft: Partial<Draft> }[] = [
-  { label: 'Bejelentés', draft: { useEmbed: true, title: '📢 Bejelentés', color: '#ff2d37', description: 'Írd ide a bejelentés szövegét.', footer: 'Avenge', timestamp: true } },
-  { label: 'Frissítés', draft: { useEmbed: true, title: '🆕 Frissítés', color: '#3ddc84', description: '**Újdonságok:**\n• \n• ', footer: 'avenge.hu/changelogs', timestamp: true, buttons: [{ label: 'Részletek', url: 'https://avenge.hu' }] } },
-  { label: 'Karbantartás', draft: { useEmbed: true, title: '🛠️ Karbantartás', color: '#f59e0b', description: 'A szolgáltatás rövid ideig nem lesz elérhető.\n\n**Mikor:** \n**Várható időtartam:** ', footer: 'Köszönjük a türelmet!', timestamp: true } },
-  { label: 'Plugin', draft: { useEmbed: true, title: '🔌 PC Check plugin', color: '#ff6a4d', description: 'A PC Check Velocity-plugin befagyasztja a vizsgált játékost, külön chatet nyit a staffal, kódot kér, és Discordra naplózza az eredményt.', buttons: [{ label: 'Megvásárlom', url: 'https://avenge.hu/store/avenge-ss' }] } }
+  { label: tr('Bejelentés'), draft: { useEmbed: true, title: tr('📢 Bejelentés'), color: '#ff2d37', description: tr('Írd ide a bejelentés szövegét.'), footer: 'Avenge', timestamp: true } },
+  { label: tr('Frissítés'), draft: { useEmbed: true, title: tr('🆕 Frissítés'), color: '#3ddc84', description: tr('**Újdonságok:**\n• \n• '), footer: 'avenge.hu/changelogs', timestamp: true, buttons: [{ label: tr('Részletek'), url: 'https://avenge.hu' }] } },
+  { label: tr('Karbantartás'), draft: { useEmbed: true, title: tr('🛠️ Karbantartás'), color: '#f59e0b', description: tr('A szolgáltatás rövid ideig nem lesz elérhető.\n\n**Mikor:** \n**Várható időtartam:** '), footer: tr('Köszönjük a türelmet!'), timestamp: true } },
+  { label: 'Plugin', draft: { useEmbed: true, title: '🔌 PC Check plugin', color: '#ff6a4d', description: tr('A PC Check Velocity-plugin befagyasztja a vizsgált játékost, külön chatet nyit a staffal, kódot kér, és Discordra naplózza az eredményt.'), buttons: [{ label: tr('Megvásárlom'), url: 'https://avenge.hu/store/avenge-ss' }] } }
 ];
 
 function loadDraft(): Draft {
@@ -90,7 +91,7 @@ export function DiscordComposer() {
 
   const loadChannels = useCallback(() => {
     setError(null);
-    discordAdminApi.channels().then(setChannels).catch((err) => setError(err instanceof ApiError ? err.message : 'Nem sikerült lekérni a csatornákat.'));
+    discordAdminApi.channels().then(setChannels).catch((err) => setError(err instanceof ApiError ? err.message : tr('Nem sikerült lekérni a csatornákat.')));
   }, []);
 
   useEffect(() => { loadChannels(); }, [loadChannels]);
@@ -110,7 +111,7 @@ export function DiscordComposer() {
   const groups = useMemo(() => {
     const map = new Map<string, DiscordChannel[]>();
     for (const c of channels ?? []) {
-      const key = c.category ?? 'Kategória nélkül';
+      const key = c.category ?? tr('Kategória nélkül');
       map.set(key, [...(map.get(key) ?? []), c]);
     }
     return [...map.entries()];
@@ -122,7 +123,7 @@ export function DiscordComposer() {
 
   async function send(e: FormEvent) {
     e.preventDefault();
-    if (!channel || !window.confirm(`Elküldöd az üzenetet a #${channel.name} csatornába?${draft.allowMentions ? ' A pingek (@everyone, szerepkörök) is értesítenek.' : ''}`)) return;
+    if (!channel || !window.confirm(tr('Elküldöd az üzenetet a #{0} csatornába?{1}', channel.name, draft.allowMentions ? tr(' A pingek (@everyone, szerepkörök) is értesítenek.') : ''))) return;
     setBusy(true);
     setError(null);
     setSent(null);
@@ -142,7 +143,7 @@ export function DiscordComposer() {
       const result = await discordAdminApi.send(body);
       setSent({ url: result.url, channel: channel.name });
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Nem sikerült elküldeni.');
+      setError(err instanceof ApiError ? err.message : tr('Nem sikerült elküldeni.'));
     } finally {
       setBusy(false);
     }
@@ -151,145 +152,142 @@ export function DiscordComposer() {
   return (
     <section className="card section-gap stagger-in" style={{ animationDelay: '120ms' }}>
       <div className="scans-head">
-        <h2 className="card-title"><Icon name="message" size={18} /> Üzenet küldése a bottal</h2>
+        <h2 className="card-title"><Icon name="message" size={18} />{' '}{tr('Üzenet küldése a bottal')}</h2>
         <div className="chip-row">
           {TEMPLATES.map((t) => (
             <button key={t.label} type="button" className="chip chip-dim" onClick={() => setDraft((d) => ({ ...d, ...t.draft }))}>{t.label}</button>
           ))}
-          <button type="button" className="chip chip-dim" onClick={() => { setDraft({ ...EMPTY, channelId: draft.channelId }); setSent(null); }}>Új üzenet</button>
+          <button type="button" className="chip chip-dim" onClick={() => { setDraft({ ...EMPTY, channelId: draft.channelId }); setSent(null); }}>{tr('Új üzenet')}</button>
         </div>
       </div>
-      <p className="muted small">
-        Bármelyik csatornába írhatsz sima szöveget Discord-formázással (**félkövér**, *dőlt*, __aláhúzott__, ~~áthúzott~~, `kód`, &gt; idézet, # címsor, [szöveg](link)),
-        embedet színnel, mezőkkel és képpel, és link-gombokat. A pingek alapból ki vannak kapcsolva. A piszkozat ebben a böngészőben megmarad.
-      </p>
+      <p className="muted small">{tr('Bármelyik csatornába írhatsz sima szöveget Discord-formázással (**félkövér**, *dőlt*, __aláhúzott__, ~~áthúzott~~, `kód`, > idézet, # címsor, [szöveg](link)), embedet színnel, mezőkkel és képpel, és link-gombokat. A pingek alapból ki vannak kapcsolva. A piszkozat ebben a böngészőben megmarad.')}</p>
 
       <form className="dc-composer" onSubmit={send}>
         <div className="dc-editor">
           <label>
-            <span className="field-label">Csatorna</span>
+            <span className="field-label">{tr('Csatorna')}</span>
             <div className="inline-form">
               <select value={draft.channelId} onChange={(e) => set('channelId', e.target.value)} required>
-                <option value="">Válassz csatornát...</option>
+                <option value="">{tr('Válassz csatornát...')}</option>
                 {groups.map(([category, list]) => (
                   <optgroup key={category} label={category}>
                     {list.map((c) => <option key={c.id} value={c.id}>{c.type === 5 ? '📢 ' : '# '}{c.name}</option>)}
                   </optgroup>
                 ))}
               </select>
-              <button type="button" className="btn-ghost btn-tiny" onClick={loadChannels} title="Csatornák frissítése"><Icon name="refresh" size={13} /></button>
+              <button type="button" className="btn-ghost btn-tiny" onClick={loadChannels} title={tr('Csatornák frissítése')}><Icon name="refresh" size={13} /></button>
             </div>
           </label>
 
           <label>
-            <span className="field-label">Szöveg (az embed fölött jelenik meg)</span>
-            <textarea rows={4} maxLength={2000} value={draft.content} onChange={(e) => set('content', e.target.value)} placeholder="Pl. @everyone Megjelent az új frissítés!" />
+            <span className="field-label">{tr('Szöveg (az embed fölött jelenik meg)')}</span>
+            <textarea rows={4} maxLength={2000} value={draft.content} onChange={(e) => set('content', e.target.value)} placeholder={tr('Pl. @everyone Megjelent az új frissítés!')} />
           </label>
 
           <label className="consent-check">
             <input type="checkbox" checked={draft.useEmbed} onChange={(e) => set('useEmbed', e.target.checked)} />
-            <span>Embed (keretes, színes üzenet)</span>
+            <span>{tr('Embed (keretes, színes üzenet)')}</span>
           </label>
 
           {draft.useEmbed && (
             <div className="dc-embed-form">
               <div className="dc-row">
                 <label className="dc-grow">
-                  <span className="field-label">Cím</span>
+                  <span className="field-label">{tr('Cím')}</span>
                   <input maxLength={256} value={draft.title} onChange={(e) => set('title', e.target.value)} />
                 </label>
                 <label>
-                  <span className="field-label">Szín</span>
+                  <span className="field-label">{tr('Szín')}</span>
                   <span className="dc-color">
-                    <input type="color" value={/^#[0-9a-f]{6}$/i.test(draft.color) ? draft.color : '#ff2d37'} onChange={(e) => set('color', e.target.value)} aria-label="Szín" />
+                    <input type="color" value={/^#[0-9a-f]{6}$/i.test(draft.color) ? draft.color : '#ff2d37'} onChange={(e) => set('color', e.target.value)} aria-label={tr('Szín')} />
                     <input className="mono" maxLength={7} value={draft.color} onChange={(e) => set('color', e.target.value)} />
                   </span>
                 </label>
               </div>
               <label>
-                <span className="field-label">A cím linkje (nem kötelező)</span>
+                <span className="field-label">{tr('A cím linkje (nem kötelező)')}</span>
                 <input value={draft.url} onChange={(e) => set('url', e.target.value)} placeholder="https://avenge.hu" />
               </label>
               <label>
-                <span className="field-label">Leírás</span>
+                <span className="field-label">{tr('Leírás')}</span>
                 <textarea rows={6} maxLength={4096} value={draft.description} onChange={(e) => set('description', e.target.value)} />
               </label>
 
               <div className="dc-fields">
-                <span className="field-label">Mezők</span>
+                <span className="field-label">{tr('Mezők')}</span>
                 {draft.fields.map((f, i) => (
                   <div key={i} className="dc-field">
-                    <input placeholder="Név" maxLength={256} value={f.name} onChange={(e) => set('fields', draft.fields.map((x, j) => j === i ? { ...x, name: e.target.value } : x))} />
-                    <textarea placeholder="Érték" rows={2} maxLength={1024} value={f.value} onChange={(e) => set('fields', draft.fields.map((x, j) => j === i ? { ...x, value: e.target.value } : x))} />
+                    <input placeholder={tr('Név')} maxLength={256} value={f.name} onChange={(e) => set('fields', draft.fields.map((x, j) => j === i ? { ...x, name: e.target.value } : x))} />
+                    <textarea placeholder={tr('Érték')} rows={2} maxLength={1024} value={f.value} onChange={(e) => set('fields', draft.fields.map((x, j) => j === i ? { ...x, value: e.target.value } : x))} />
                     <label className="consent-check dc-inline">
                       <input type="checkbox" checked={f.inline} onChange={(e) => set('fields', draft.fields.map((x, j) => j === i ? { ...x, inline: e.target.checked } : x))} />
-                      <span>egymás mellett</span>
+                      <span>{tr('egymás mellett')}</span>
                     </label>
-                    <button type="button" className="icon-button" aria-label="Mező törlése" onClick={() => set('fields', draft.fields.filter((_, j) => j !== i))}><Icon name="x" size={14} /></button>
+                    <button type="button" className="icon-button" aria-label={tr('Mező törlése')} onClick={() => set('fields', draft.fields.filter((_, j) => j !== i))}><Icon name="x" size={14} /></button>
                   </div>
                 ))}
                 {draft.fields.length < 25 && (
-                  <button type="button" className="btn-ghost btn-tiny" onClick={() => set('fields', [...draft.fields, { name: '', value: '', inline: false }])}><Icon name="plus" size={13} /> Mező</button>
+                  <button type="button" className="btn-ghost btn-tiny" onClick={() => set('fields', [...draft.fields, { name: '', value: '', inline: false }])}><Icon name="plus" size={13} />{' '}{tr('Mező')}</button>
                 )}
               </div>
 
               <div className="dc-row">
                 <label className="dc-grow">
-                  <span className="field-label">Nagy kép (link)</span>
+                  <span className="field-label">{tr('Nagy kép (link)')}</span>
                   <input value={draft.imageUrl} onChange={(e) => set('imageUrl', e.target.value)} placeholder="https://..." />
                 </label>
                 <label className="dc-grow">
-                  <span className="field-label">Kis kép jobbra (link)</span>
+                  <span className="field-label">{tr('Kis kép jobbra (link)')}</span>
                   <input value={draft.thumbnailUrl} onChange={(e) => set('thumbnailUrl', e.target.value)} placeholder="https://avenge.hu/favicon-512.png" />
                 </label>
               </div>
               <div className="dc-row">
                 <label className="dc-grow">
-                  <span className="field-label">Lábléc</span>
+                  <span className="field-label">{tr('Lábléc')}</span>
                   <input maxLength={2048} value={draft.footer} onChange={(e) => set('footer', e.target.value)} />
                 </label>
                 <label className="consent-check dc-inline">
                   <input type="checkbox" checked={draft.timestamp} onChange={(e) => set('timestamp', e.target.checked)} />
-                  <span>időbélyeg</span>
+                  <span>{tr('időbélyeg')}</span>
                 </label>
               </div>
             </div>
           )}
 
           <div className="dc-fields">
-            <span className="field-label">Link-gombok (max. 5)</span>
+            <span className="field-label">{tr('Link-gombok (max. 5)')}</span>
             {draft.buttons.map((b, i) => (
               <div key={i} className="dc-field dc-button-row">
-                <input placeholder="Felirat" maxLength={80} value={b.label} onChange={(e) => set('buttons', draft.buttons.map((x, j) => j === i ? { ...x, label: e.target.value } : x))} />
+                <input placeholder={tr('Felirat')} maxLength={80} value={b.label} onChange={(e) => set('buttons', draft.buttons.map((x, j) => j === i ? { ...x, label: e.target.value } : x))} />
                 <input placeholder="https://..." value={b.url} onChange={(e) => set('buttons', draft.buttons.map((x, j) => j === i ? { ...x, url: e.target.value } : x))} />
-                <button type="button" className="icon-button" aria-label="Gomb törlése" onClick={() => set('buttons', draft.buttons.filter((_, j) => j !== i))}><Icon name="x" size={14} /></button>
+                <button type="button" className="icon-button" aria-label={tr('Gomb törlése')} onClick={() => set('buttons', draft.buttons.filter((_, j) => j !== i))}><Icon name="x" size={14} /></button>
               </div>
             ))}
             {draft.buttons.length < 5 && (
-              <button type="button" className="btn-ghost btn-tiny" onClick={() => set('buttons', [...draft.buttons, { label: '', url: '' }])}><Icon name="plus" size={13} /> Gomb</button>
+              <button type="button" className="btn-ghost btn-tiny" onClick={() => set('buttons', [...draft.buttons, { label: '', url: '' }])}><Icon name="plus" size={13} />{' '}{tr('Gomb')}</button>
             )}
           </div>
 
           <label className="consent-check">
             <input type="checkbox" checked={draft.allowMentions} onChange={(e) => set('allowMentions', e.target.checked)} />
-            <span>Pingek engedélyezése (@everyone, @here, szerepkörök és felhasználók)</span>
+            <span>{tr('Pingek engedélyezése (@everyone, @here, szerepkörök és felhasználók)')}</span>
           </label>
 
           <div className="dc-send">
             <button type="submit" className={`btn-primary ${busy ? 'is-loading' : ''}`} disabled={!canSend}>
-              <Icon name="message" size={15} /> Küldés{channel ? ` ide: #${channel.name}` : ''}
+              <Icon name="message" size={15} />{' '}{tr('Küldés')}{channel ? tr(' ide: #{0}', channel.name) : ''}
             </button>
-            {sent && <a className="text-link small" href={sent.url} target="_blank" rel="noreferrer"><Icon name="check" size={13} /> Elküldve a #{sent.channel} csatornába · megnyitás</a>}
+            {sent && <a className="text-link small" href={sent.url} target="_blank" rel="noreferrer"><Icon name="check" size={13} />{' '}{tr('Elküldve a #')}{sent.channel}{' '}{tr('csatornába · megnyitás')}</a>}
           </div>
           {error && <p className="error-text error-in">{error}</p>}
         </div>
 
-        <div className="dc-preview" aria-label="Előnézet">
-          <span className="field-label">Előnézet</span>
+        <div className="dc-preview" aria-label={tr('Előnézet')}>
+          <span className="field-label">{tr('Előnézet')}</span>
           <div className="dc-message">
-            <div className="dc-avatar" aria-hidden="true">A</div>
+            <div className="dc-avatar" aria-hidden="true">{tr('A')}</div>
             <div className="dc-body">
-              <div className="dc-author"><strong>Avenge</strong> <span className="dc-bot">BOT</span> <small>ma</small></div>
+              <div className="dc-author"><strong>{tr('Avenge')}</strong> <span className="dc-bot">{tr('BOT')}</span> <small>{tr('ma')}</small></div>
               {draft.content.trim() && <Rendered className="dc-content" text={draft.content} />}
               {hasEmbed && (
                 <div className="dc-embed" style={{ borderLeftColor: /^#[0-9a-f]{6}$/i.test(draft.color) ? draft.color : '#202225' }}>
@@ -321,7 +319,7 @@ export function DiscordComposer() {
                   {draft.buttons.filter((b) => b.label.trim()).map((b, i) => <span key={i} className="dc-button">{b.label} <Icon name="external" size={12} /></span>)}
                 </div>
               )}
-              {!draft.content.trim() && !hasEmbed && <p className="muted small">Az üzenet itt jelenik meg, ahogy a Discordon látszani fog.</p>}
+              {!draft.content.trim() && !hasEmbed && <p className="muted small">{tr('Az üzenet itt jelenik meg, ahogy a Discordon látszani fog.')}</p>}
             </div>
           </div>
         </div>

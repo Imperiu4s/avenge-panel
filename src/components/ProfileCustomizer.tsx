@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useRef, useState, type ChangeEvent } from 'react';
 import { ApiError } from '../api/client';
 import { avatarSrc } from '../api/profile';
@@ -33,7 +34,7 @@ export function ProfileCustomizer({ avatarUrl, name, onUpload, onRemove }: Profi
     try {
       await action();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Nem sikerült menteni.');
+      setError(err instanceof ApiError ? err.message : t('Nem sikerült menteni.'));
     } finally {
       setBusy(null);
     }
@@ -44,12 +45,12 @@ export function ProfileCustomizer({ avatarUrl, name, onUpload, onRemove }: Profi
     e.target.value = '';
     if (!file) return;
     if (!file.type.startsWith('image/')) {
-      setError('Képfájlt válassz (PNG, JPG, WEBP vagy GIF).');
+      setError(t('Képfájlt válassz (PNG, JPG, WEBP vagy GIF).'));
       return;
     }
     run('upload', async () => {
       const image = await shrinkAvatar(file).catch(() => file);
-      if (image.size > 1024 * 1024) throw new ApiError(400, 'A kép túl nagy, válassz kisebbet (legfeljebb 1 MB).');
+      if (image.size > 1024 * 1024) throw new ApiError(400, t('A kép túl nagy, válassz kisebbet (legfeljebb 1 MB).'));
       await onUpload(image);
     });
   }
@@ -59,18 +60,17 @@ export function ProfileCustomizer({ avatarUrl, name, onUpload, onRemove }: Profi
       <div className="profile-custom-avatar">
         <Avatar url={avatarUrl} name={name} className="profile-avatar profile-avatar-large" />
         <div className="profile-custom-actions">
-          <span className="field-label">Profilkép</span>
+          <span className="field-label">{t('Profilkép')}</span>
           <div className="profile-custom-buttons">
             <button type="button" className={`btn-secondary btn-tiny ${busy === 'upload' ? 'is-loading' : ''}`} onClick={() => input.current?.click()} disabled={busy !== null}>
-              <Icon name="upload" size={13} /> {avatarUrl ? 'Csere' : 'Feltöltés'}
+              <Icon name="upload" size={13} /> {avatarUrl ? t('Csere') : t('Feltöltés')}
             </button>
             {avatarUrl && (
               <button type="button" className="btn-ghost btn-tiny btn-danger" onClick={() => run('remove', onRemove)} disabled={busy !== null}>
-                <Icon name="trash" size={13} /> Eltávolítás
-              </button>
+                <Icon name="trash" size={13} />{' '}{t('Eltávolítás')}</button>
             )}
           </div>
-          <small className="muted">Négyzetesre vágjuk, 256×256 pixelre kicsinyítve.</small>
+          <small className="muted">{t('Négyzetesre vágjuk, 256×256 pixelre kicsinyítve.')}</small>
           <input ref={input} type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden onChange={pick} />
         </div>
       </div>

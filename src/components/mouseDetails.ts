@@ -1,3 +1,4 @@
+import { t, locale } from '../i18n';
 export interface MacroDetailView {
   name: string;
   kind: string;
@@ -72,14 +73,14 @@ export function formatMs(ms: number): string {
   if (ms >= 60_000) {
     const minutes = Math.floor(ms / 60_000);
     const seconds = Math.round((ms % 60_000) / 1000);
-    return seconds > 0 ? `${minutes} perc ${seconds} mp` : `${minutes} perc`;
+    return seconds > 0 ? t('{0} perc {1} mp', minutes, seconds) : t('{0} perc', minutes);
   }
-  if (ms >= 1000) return `${(ms / 1000).toLocaleString('hu-HU', { maximumFractionDigits: 2 })} mp`;
+  if (ms >= 1000) return `${(ms / 1000).toLocaleString(locale, { maximumFractionDigits: 2 })} mp`;
   return `${ms} ms`;
 }
 
 export function formatCps(cps: number): string {
-  return cps.toLocaleString('hu-HU', { maximumFractionDigits: cps < 1 ? 3 : 1 });
+  return cps.toLocaleString(locale, { maximumFractionDigits: cps < 1 ? 3 : 1 });
 }
 
 export function isHotKind(kind: string): boolean {

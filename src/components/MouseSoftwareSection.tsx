@@ -1,3 +1,4 @@
+import { t, locale } from '../i18n';
 import { useState } from 'react';
 import type { FindingDto } from '../api/types';
 import { Icon } from './Icon';
@@ -15,10 +16,10 @@ import {
 } from './timeline';
 
 const SEVERITY_LABELS: Record<string, string> = {
-  Critical: 'Kritikus',
-  High: 'Magas',
-  Medium: 'Közepes',
-  Low: 'Alacsony',
+  Critical: t('Kritikus'),
+  High: t('Magas'),
+  Medium: t('Közepes'),
+  Low: t('Alacsony'),
   Info: 'Info'
 };
 
@@ -84,7 +85,7 @@ function ChangeList({ changes, scanTime, limit = 12 }: { changes: TimedChange[];
       </ul>
       {sorted.length > limit && (
         <button className="text-action change-more" onClick={() => setShowAll((v) => !v)}>
-          {showAll ? 'Kevesebb' : `Mind a ${sorted.length} változás`}
+          {showAll ? t('Kevesebb') : t('Mind a {0} változás', sorted.length)}
         </button>
       )}
     </>
@@ -104,37 +105,37 @@ function ProductCard({
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const state = detail(product, 'Állapot') ?? '';
-  const activeProfiles = splitNames(detail(product, 'Aktív profil'));
-  const profiles = splitNames(detail(product, 'Profilok'));
-  const macroNames = splitNames(detail(product, 'Makrók'));
-  const warnings = splitLines(detail(product, 'Figyelmeztetések'));
-  const notes = splitLines(detail(product, 'Megjegyzések'));
-  const folders = splitLines(detail(product, 'Mappák'));
-  const timeline = parseEvents(detail(product, 'Változások'));
-  const contentChanges = parseChanges(detail(product, 'Tartalmi változások'));
-  const bindings = parseBindings(detail(product, 'Gombkiosztás'));
-  const compareChanges = change ? parseChanges(detail(change, 'Tartalmi változások')) : [];
-  const bundled = detail(product, 'Gyári makrók');
-  const started = detail(product, 'Indult');
-  const lastRun = detail(product, 'Utolsó futás');
-  const suspiciousNames = new Set(macros.map((m) => detail(m, 'Makró neve')));
+  const state = detail(product, t('Állapot')) ?? '';
+  const activeProfiles = splitNames(detail(product, t('Aktív profil')));
+  const profiles = splitNames(detail(product, t('Profilok')));
+  const macroNames = splitNames(detail(product, t('Makrók')));
+  const warnings = splitLines(detail(product, t('Figyelmeztetések')));
+  const notes = splitLines(detail(product, t('Megjegyzések')));
+  const folders = splitLines(detail(product, t('Mappák')));
+  const timeline = parseEvents(detail(product, t('Változások')));
+  const contentChanges = parseChanges(detail(product, t('Tartalmi változások')));
+  const bindings = parseBindings(detail(product, t('Gombkiosztás')));
+  const compareChanges = change ? parseChanges(detail(change, t('Tartalmi változások'))) : [];
+  const bundled = detail(product, t('Gyári makrók'));
+  const started = detail(product, t('Indult'));
+  const lastRun = detail(product, t('Utolsó futás'));
+  const suspiciousNames = new Set(macros.map((m) => detail(m, t('Makró neve'))));
   const bindingProfiles = [...new Set(bindings.map((b) => b.profile))];
-  const macroDetails = parseMacroDetails(detail(product, 'Makrók részletesen'));
-  const deviceSettings = parseDeviceSettings(detail(product, 'Eszközbeállítások'));
-  const programSettings = parseProgramSettings(detail(product, 'Program beállításai'));
-  const knownDevices = splitLines(detail(product, 'Eszközök'));
+  const macroDetails = parseMacroDetails(detail(product, t('Makrók részletesen')));
+  const deviceSettings = parseDeviceSettings(detail(product, t('Eszközbeállítások')));
+  const programSettings = parseProgramSettings(detail(product, t('Program beállításai')));
+  const knownDevices = splitLines(detail(product, t('Eszközök')));
   const detailedNames = new Set(macroDetails.map((m) => m.name.toLowerCase()));
   const isMacroAction = (action: string) =>
     suspiciousNames.has(action) || macroNames.includes(action) || detailedNames.has(action.toLowerCase());
 
   const facts: [string, string][] = [];
-  if (detail(product, 'Verzió')) facts.push(['Verzió', detail(product, 'Verzió')!]);
-  if (started) facts.push(['Most futó példány indult', formatSecond(started)]);
-  if (lastRun) facts.push(['Utolsó futás', formatSecond(lastRun)]);
-  if (detail(product, 'Futtatások száma')) facts.push(['Futtatások száma', detail(product, 'Futtatások száma')!]);
-  if (bundled) facts.push(['Gyári mintamakrók', `${bundled} db (nem számítanak)`]);
-  if (detail(product, 'Felderítve')) facts.push(['Honnan tudjuk', detail(product, 'Felderítve')!]);
+  if (detail(product, t('Verzió'))) facts.push([t('Verzió'), detail(product, t('Verzió'))!]);
+  if (started) facts.push([t('Most futó példány indult'), formatSecond(started)]);
+  if (lastRun) facts.push([t('Utolsó futás'), formatSecond(lastRun)]);
+  if (detail(product, t('Futtatások száma'))) facts.push([t('Futtatások száma'), detail(product, t('Futtatások száma'))!]);
+  if (bundled) facts.push([t('Gyári mintamakrók'), t('{0} db (nem számítanak)', bundled)]);
+  if (detail(product, t('Felderítve'))) facts.push([t('Honnan tudjuk'), detail(product, t('Felderítve'))!]);
 
   const latestContent = contentChanges.find((c) => c.exact);
 
@@ -146,18 +147,18 @@ function ProductCard({
         </span>
         <span className="mouse-card-title">
           <strong>{product.label}</strong>
-          <small>{detail(product, 'Típus')} · {detail(product, 'Gyártó')}</small>
+          <small>{detail(product, t('Típus'))} · {detail(product, t('Gyártó'))}</small>
         </span>
         <span className="mouse-card-summary">
-          {activeProfiles.length > 0 && <span>Aktív profil: <b>{activeProfiles.join(', ')}</b></span>}
+          {activeProfiles.length > 0 && <span>{t('Aktív profil:')}{' '}<b>{activeProfiles.join(', ')}</b></span>}
           {knownDevices.length > 0 && <span>{knownDevices.join(', ')}</span>}
-          {bindings.length > 0 && <span>{bindings.length} gombkiosztás</span>}
-          {deviceSettings.some((s) => s.warning) && <span className="mouse-hot">beállítás-figyelmeztetés</span>}
-          {macroNames.length > 0 && <span className={macros.length > 0 ? 'mouse-hot' : ''}>{macroNames.length} makró</span>}
-          {contentChanges.length > 0 && <span className="mouse-hot">{contentChanges.length} tartalmi változás</span>}
+          {bindings.length > 0 && <span>{bindings.length}{' '}{t('gombkiosztás')}</span>}
+          {deviceSettings.some((s) => s.warning) && <span className="mouse-hot">{t('beállítás-figyelmeztetés')}</span>}
+          {macroNames.length > 0 && <span className={macros.length > 0 ? 'mouse-hot' : ''}>{macroNames.length}{' '}{t('makró')}</span>}
+          {contentChanges.length > 0 && <span className="mouse-hot">{contentChanges.length}{' '}{t('tartalmi változás')}</span>}
           {latestContent?.exact
-            ? <span>Utolsó átállítás: <b>{formatSecond(latestContent.exact)}</b></span>
-            : timeline.length > 0 && <span>Utolsó változás: {beforeScan(timeline[0].time, scanTime)}</span>}
+            ? <span>{t('Utolsó átállítás:')}{' '}<b>{formatSecond(latestContent.exact)}</b></span>
+            : timeline.length > 0 && <span>{t('Utolsó változás:')}{' '}{beforeScan(timeline[0].time, scanTime)}</span>}
         </span>
         {product.severity !== 'Info' && (
           <span className={`severity-badge severity-${product.severity.toLowerCase()}`}>
@@ -178,14 +179,14 @@ function ProductCard({
 
             {contentChanges.length > 0 && (
               <div className="mouse-block">
-                <h4>Pontosan mi változott</h4>
+                <h4>{t('Pontosan mi változott')}</h4>
                 <ChangeList changes={contentChanges} scanTime={scanTime} />
               </div>
             )}
 
             {macroDetails.length > 0 && (
               <div className="mouse-block">
-                <h4>Makrók pontosan ({macroDetails.length})</h4>
+                <h4>{t('Makrók pontosan (')}{macroDetails.length})</h4>
                 <div className="macro-grid">
                   {macroDetails.map((macro) => <MacroCard key={`${macro.name}-${macro.source}`} macro={macro} />)}
                 </div>
@@ -194,7 +195,7 @@ function ProductCard({
 
             {deviceSettings.length > 0 && (
               <div className="mouse-block">
-                <h4>Az egér beállításai</h4>
+                <h4>{t('Az egér beállításai')}</h4>
                 <table className="setting-table">
                   <tbody>
                     {deviceSettings.map((setting, i) => (
@@ -211,7 +212,7 @@ function ProductCard({
 
             {programSettings.length > 0 && (
               <div className="mouse-block">
-                <h4>A program saját beállításai</h4>
+                <h4>{t('A program saját beállításai')}</h4>
                 <table className="setting-table">
                   <tbody>
                     {programSettings.map((setting, i) => (
@@ -227,7 +228,7 @@ function ProductCard({
 
             {change && (
               <div className="mouse-compare">
-                <h4><Icon name="history" size={15} /> Az előző vizsgálat óta ({formatSecond(detail(change, 'Előző vizsgálat') ?? scanTime)})</h4>
+                <h4><Icon name="history" size={15} />{' '}{t('Az előző vizsgálat óta (')}{formatSecond(detail(change, t('Előző vizsgálat')) ?? scanTime)})</h4>
                 {compareChanges.length > 0
                   ? <ChangeList changes={compareChanges} scanTime={scanTime} limit={8} />
                   : <p className="muted small">{change.label}</p>}
@@ -238,7 +239,7 @@ function ProductCard({
               <div>
                 {bindings.length > 0 && (
                   <>
-                    <h4>Gombkiosztás most</h4>
+                    <h4>{t('Gombkiosztás most')}</h4>
                     {bindingProfiles.map((profile) => (
                       <div className="binding-group" key={profile || 'nincs'}>
                         {profile && <span className={`binding-profile ${activeProfiles.includes(profile) ? 'binding-profile-active' : ''}`}>{profile}</span>}
@@ -249,7 +250,7 @@ function ProductCard({
                                 <td className="mono">{b.button}</td>
                                 <td className={isMacroAction(b.action) ? 'mouse-hot' : ''}>
                                   {b.action}
-                                  {isMacroAction(b.action) && <span className="binding-macro-tag">makró</span>}
+                                  {isMacroAction(b.action) && <span className="binding-macro-tag">{t('makró')}</span>}
                                 </td>
                               </tr>
                             ))}
@@ -262,23 +263,23 @@ function ProductCard({
 
                 {knownDevices.length > 0 && (
                   <>
-                    <h4>Eszközök a programban</h4>
+                    <h4>{t('Eszközök a programban')}</h4>
                     <div className="mouse-chips">
                       {knownDevices.map((d) => <span key={d} className="mouse-chip">{d}</span>)}
                     </div>
                   </>
                 )}
 
-                <h4>Profilok</h4>
-                {profiles.length === 0 && <p className="muted small">Nem olvasható ki a programból.</p>}
+                <h4>{t('Profilok')}</h4>
+                {profiles.length === 0 && <p className="muted small">{t('Nem olvasható ki a programból.')}</p>}
                 <div className="mouse-chips">
                   {profiles.map((p) => (
                     <span key={p} className={activeProfiles.includes(p) ? 'mouse-chip mouse-chip-active' : 'mouse-chip'}>{p}</span>
                   ))}
                 </div>
 
-                <h4>Makrók</h4>
-                {macroNames.length === 0 && <p className="muted small">Nem találtunk saját makrót.</p>}
+                <h4>{t('Makrók')}</h4>
+                {macroNames.length === 0 && <p className="muted small">{t('Nem találtunk saját makrót.')}</p>}
                 <div className="mouse-chips">
                   {macroNames.map((m) => (
                     <span key={m} className={suspiciousNames.has(m) ? 'mouse-chip mouse-chip-hot' : 'mouse-chip'}>{m}</span>
@@ -286,14 +287,14 @@ function ProductCard({
                 </div>
                 {macros.map((m) => (
                   <div className="mouse-macro" key={m.label}>
-                    <strong>{detail(m, 'Makró neve')}</strong>
-                    <span className="type-pill">{detail(m, 'Makró típusa')}</span>
+                    <strong>{detail(m, t('Makró neve'))}</strong>
+                    <span className="type-pill">{detail(m, t('Makró típusa'))}</span>
                     <small>
                       {[
-                        detail(m, 'Kattintások') && `${detail(m, 'Kattintások')} kattintás`,
-                        detail(m, 'Legkisebb késleltetés') && `legkisebb késleltetés: ${detail(m, 'Legkisebb késleltetés')}`,
-                        detail(m, 'Egérmozgatások') && `${detail(m, 'Egérmozgatások')} egérmozgatás`,
-                        detail(m, 'Ismétlődik') && 'ismétlődik'
+                        detail(m, t('Kattintások')) && t('{0} kattintás', detail(m, t('Kattintások'))),
+                        detail(m, t('Legkisebb késleltetés')) && t('legkisebb késleltetés: {0}', detail(m, t('Legkisebb késleltetés'))),
+                        detail(m, t('Egérmozgatások')) && t('{0} egérmozgatás', detail(m, t('Egérmozgatások'))),
+                        detail(m, t('Ismétlődik')) && t('ismétlődik')
                       ].filter(Boolean).join(' · ')}
                     </small>
                   </div>
@@ -308,15 +309,15 @@ function ProductCard({
                 </dl>
                 {folders.length > 0 && (
                   <details className="mouse-folders">
-                    <summary>Mappák ({folders.length})</summary>
+                    <summary>{t('Mappák (')}{folders.length})</summary>
                     {folders.map((f) => <div className="mono small" key={f}>{f}</div>)}
                   </details>
                 )}
               </div>
 
               <div>
-                <h4>Idővonal (másodpercre, az elmúlt 30 napból)</h4>
-                {timeline.length === 0 && <p className="muted small">Nem látszik változás ebben az időszakban.</p>}
+                <h4>{t('Idővonal (másodpercre, az elmúlt 30 napból)')}</h4>
+                {timeline.length === 0 && <p className="muted small">{t('Nem látszik változás ebben az időszakban.')}</p>}
                 {timeline.length > 0 && (
                   <ol className="mouse-timeline">
                     {timeline.map((item, i) => {
@@ -353,25 +354,25 @@ export function MouseSoftwareSection({
 }) {
   const devices = findings.filter((f) => detail(f, 'VID'));
   const products = findings
-    .filter((f) => detail(f, 'Gyártó'))
-    .sort((a, b) => (SEVERITY_RANK[b.severity] ?? 0) - (SEVERITY_RANK[a.severity] ?? 0) || a.label.localeCompare(b.label, 'hu'));
-  const macros = findings.filter((f) => detail(f, 'Makró típusa'));
-  const changes = findings.filter((f) => detail(f, 'Kapcsolódó program'));
+    .filter((f) => detail(f, t('Gyártó')))
+    .sort((a, b) => (SEVERITY_RANK[b.severity] ?? 0) - (SEVERITY_RANK[a.severity] ?? 0) || a.label.localeCompare(b.label, locale));
+  const macros = findings.filter((f) => detail(f, t('Makró típusa')));
+  const changes = findings.filter((f) => detail(f, t('Kapcsolódó program')));
   const productNames = new Set(products.map((p) => p.label));
 
   const orphanMacros = macros.filter((m) => !productNames.has(detail(m, 'Program') ?? ''));
-  const removed = changes.filter((c) => !productNames.has(detail(c, 'Kapcsolódó program') ?? ''));
+  const removed = changes.filter((c) => !productNames.has(detail(c, t('Kapcsolódó program')) ?? ''));
 
   return (
     <section className="card section-gap stagger-in" style={{ animationDelay: '240ms' }}>
-      <h2 className="card-title"><Icon name="activity" size={18} /> Egérprogramok és makrók</h2>
+      <h2 className="card-title"><Icon name="activity" size={18} />{' '}{t('Egérprogramok és makrók')}</h2>
 
       {devices.length > 0 && (
         <div className="mouse-devices">
           {devices.map((d) => (
             <span className="mouse-device" key={d.label} title={`VID ${detail(d, 'VID')}, PID ${detail(d, 'PID')}`}>
-              <strong>{detail(d, 'Eszköz')}</strong>
-              <small>{detail(d, 'Eszköz gyártója')}</small>
+              <strong>{detail(d, t('Eszköz'))}</strong>
+              <small>{detail(d, t('Eszköz gyártója'))}</small>
             </span>
           ))}
         </div>
@@ -386,8 +387,8 @@ export function MouseSoftwareSection({
       {products.length === 0 && orphanMacros.length === 0 && (
         <p className="muted empty-row">
           {checksMouseSoftware(clientVersion)
-            ? 'Nem találtunk egérprogramot ezen a gépen.'
-            : 'Ez a vizsgálat régebbi klienssel készült, ami még nem nézte az egérprogramokat.'}
+            ? t('Nem találtunk egérprogramot ezen a gépen.')
+            : t('Ez a vizsgálat régebbi klienssel készült, ami még nem nézte az egérprogramokat.')}
         </p>
       )}
 
@@ -405,16 +406,16 @@ export function MouseSoftwareSection({
 
       {orphanMacros.length > 0 && (
         <div className="mouse-loose">
-          <h4>Különálló makró-fájlok</h4>
+          <h4>{t('Különálló makró-fájlok')}</h4>
           {orphanMacros.map((m) => {
-            const parsed = parseMacroDetails(detail(m, 'Makrók részletesen'));
+            const parsed = parseMacroDetails(detail(m, t('Makrók részletesen')));
             return parsed.length > 0
               ? <MacroCard key={m.label} macro={parsed[0]} />
               : (
                 <div className="mouse-macro" key={m.label}>
-                  <strong>{detail(m, 'Makró neve')}</strong>
-                  <span className="type-pill">{detail(m, 'Makró típusa')}</span>
-                  <small className="mono">{detail(m, 'Fájl')}</small>
+                  <strong>{detail(m, t('Makró neve'))}</strong>
+                  <span className="type-pill">{detail(m, t('Makró típusa'))}</span>
+                  <small className="mono">{detail(m, t('Fájl'))}</small>
                 </div>
               );
           })}

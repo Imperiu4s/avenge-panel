@@ -1,3 +1,4 @@
+import { t } from '../../../i18n';
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { ApiError } from '../../../api/client';
 import { storeAdminApi, type RefundResult, type RefundsOverview, type StoreInvoice } from '../../../api/store';
@@ -5,12 +6,12 @@ import { formatDateTime, formatPrice, INVOICE_KIND_LABELS, timeLeft } from '../.
 import { InvoiceKindPill, InvoiceTable } from '../../../store/InvoiceTable';
 import { Icon } from '../../Icon';
 
-const REASONS = ['A vásárló kérte (még nem töltötte le)', 'Véletlen / dupla vásárlás', 'Technikai hiba a fizetésnél'];
-const EXCEPTIONAL_REASONS = ['Lényegesen hibás termék, nem javítottuk', 'Dupla fizetés', 'A termék nem vált letölthetővé'];
+const REASONS = [t('A vásárló kérte (még nem töltötte le)'), t('Véletlen / dupla vásárlás'), t('Technikai hiba a fizetésnél')];
+const EXCEPTIONAL_REASONS = [t('Lényegesen hibás termék, nem javítottuk'), t('Dupla fizetés'), t('A termék nem vált letölthetővé')];
 
 function consequence(invoice: StoreInvoice): string {
-  if (invoice.kind === 'subscription') return 'Az előfizetés azonnal megszűnik, a megújítás leáll, és a panel-hozzáférés megszűnik.';
-  return 'A plugin letöltési joga megszűnik a vásárlónál.';
+  if (invoice.kind === 'subscription') return t('Az előfizetés azonnal megszűnik, a megújítás leáll, és a panel-hozzáférés megszűnik.');
+  return t('A plugin letöltési joga megszűnik a vásárlónál.');
 }
 
 function RefundDialog({ invoice, exceptional, onDone, onCancel }: { invoice: StoreInvoice; exceptional: boolean; onDone: (result: RefundResult) => void; onCancel: () => void }) {
@@ -26,7 +27,7 @@ function RefundDialog({ invoice, exceptional, onDone, onCancel }: { invoice: Sto
     try {
       onDone(await storeAdminApi.refund(invoice.id, reason.trim(), exceptional));
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Nem sikerült a visszatérítés.');
+      setError(err instanceof ApiError ? err.message : t('Nem sikerült a visszatérítés.'));
     } finally {
       setBusy(false);
     }
@@ -34,31 +35,28 @@ function RefundDialog({ invoice, exceptional, onDone, onCancel }: { invoice: Sto
 
   return (
     <form className="refund-dialog error-in" onSubmit={submit}>
-      <h3 className="card-title"><Icon name="refresh" size={17} /> {exceptional ? 'Kivételes visszatérítés' : 'Visszatérítés'}: {invoice.number}</h3>
+      <h3 className="card-title"><Icon name="refresh" size={17} /> {exceptional ? t('Kivételes visszatérítés') : t('Visszatérítés')}: {invoice.number}</h3>
       {exceptional && (
         <p className="invoice-note small">
           <Icon name="alert" size={15} />
           <span>
-            {invoice.downloaded ? 'A vásárló már letöltötte a terméket' : 'A 3 napos határidő lejárt'}, ezért a szokásos szabály szerint nem téríthető vissza.
-            Kivételt csak lényegesen hibás termék, dupla fizetés vagy le nem tölthető termék esetén tegyél.
-          </span>
+            {invoice.downloaded ? t('A vásárló már letöltötte a terméket') : t('A 3 napos határidő lejárt')}{t(', ezért a szokásos szabály szerint nem téríthető vissza. Kivételt csak lényegesen hibás termék, dupla fizetés vagy le nem tölthető termék esetén tegyél.')}</span>
         </p>
       )}
       <dl className="refund-summary">
-        <div><dt>Vevő</dt><dd className="small">{invoice.buyerName ? `${invoice.buyerName} · ` : ''}<span className="mono">{invoice.buyerEmail}</span></dd></div>
-        <div><dt>Tétel</dt><dd className="small">{invoice.title}</dd></div>
-        <div><dt>Összeg</dt><dd className="mono">{formatPrice(invoice.total, invoice.currency)}</dd></div>
-        <div><dt>Fizetve</dt><dd className="small">{formatDateTime(invoice.paidAt)}</dd></div>
+        <div><dt>{t('Vevő')}</dt><dd className="small">{invoice.buyerName ? `${invoice.buyerName} · ` : ''}<span className="mono">{invoice.buyerEmail}</span></dd></div>
+        <div><dt>{t('Tétel')}</dt><dd className="small">{invoice.title}</dd></div>
+        <div><dt>{t('Összeg')}</dt><dd className="mono">{formatPrice(invoice.total, invoice.currency)}</dd></div>
+        <div><dt>{t('Fizetve')}</dt><dd className="small">{formatDateTime(invoice.paidAt)}</dd></div>
       </dl>
       <p className="small">
         {invoice.tebexTransactionId
-          ? <>A teljes összeget a Tebex visszaküldi a vásárló fizetési módjára (<span className="mono">{invoice.tebexTransactionId}</span>). </>
-          : <>Ehhez a fizetéshez nincs Tebex-tranzakció, ezért a pénzt kézzel kell visszaküldened. </>}
-        {consequence(invoice)} Visszatérítési bizonylat készül, ami a vásárló fiókjában is megjelenik.
-      </p>
+          ? <>{t('A teljes összeget a Tebex visszaküldi a vásárló fizetési módjára (')}<span className="mono">{invoice.tebexTransactionId}</span>). </>
+          : <>{t('Ehhez a fizetéshez nincs Tebex-tranzakció, ezért a pénzt kézzel kell visszaküldened.')}{' '}</>}
+        {consequence(invoice)}{' '}{t('Visszatérítési bizonylat készül, ami a vásárló fiókjában is megjelenik.')}</p>
       <label>
-        <span className="field-label">A visszatérítés oka (a bizonylaton is szerepel)</span>
-        <textarea required maxLength={300} value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Pl. a vásárló kérte, mert nem működött a szerverén" />
+        <span className="field-label">{t('A visszatérítés oka (a bizonylaton is szerepel)')}</span>
+        <textarea required maxLength={300} value={reason} onChange={(e) => setReason(e.target.value)} placeholder={t('Pl. a vásárló kérte, mert nem működött a szerverén')} />
       </label>
       <div className="chip-row">
         {(exceptional ? EXCEPTIONAL_REASONS : REASONS).map((r) => (
@@ -67,14 +65,13 @@ function RefundDialog({ invoice, exceptional, onDone, onCancel }: { invoice: Sto
       </div>
       <label className="consent-check">
         <input type="checkbox" checked={confirm} onChange={(e) => setConfirm(e.target.checked)} />
-        <span>Értem, hogy a visszatérítés nem vonható vissza.</span>
+        <span>{t('Értem, hogy a visszatérítés nem vonható vissza.')}</span>
       </label>
       <div className="refund-dialog-actions">
         <button type="submit" className={`btn-primary ${busy ? 'is-loading' : ''}`} disabled={busy || !confirm || reason.trim().length === 0}>
           {busy && <span className="btn-spinner" aria-hidden="true" />}
-          {formatPrice(invoice.total, invoice.currency)} visszatérítése
-        </button>
-        <button type="button" className="btn-ghost" onClick={onCancel} disabled={busy}>Mégse</button>
+          {formatPrice(invoice.total, invoice.currency)}{' '}{t('visszatérítése')}</button>
+        <button type="button" className="btn-ghost" onClick={onCancel} disabled={busy}>{t('Mégse')}</button>
       </div>
       {error && <p className="error-text error-in">{error}</p>}
     </form>
@@ -92,12 +89,12 @@ export function StoreRefundsAdmin() {
   const load = useCallback(() => {
     storeAdminApi.refunds()
       .then((overview) => { setData(overview); setLoadedAt(Date.now()); })
-      .catch((err) => setError(err instanceof ApiError ? err.message : 'Nem sikerült betölteni.'));
+      .catch((err) => setError(err instanceof ApiError ? err.message : t('Nem sikerült betölteni.')));
   }, []);
 
   useEffect(() => { load(); }, [load]);
 
-  if (!data) return <section className="card stagger-in">{error ? <p className="error-text">{error}</p> : <p className="muted">Betöltés...</p>}</section>;
+  if (!data) return <section className="card stagger-in">{error ? <p className="error-text">{error}</p> : <p className="muted">{t('Betöltés...')}</p>}</section>;
 
   const open = data.recent.filter((i) => i.refundable);
 
@@ -105,23 +102,19 @@ export function StoreRefundsAdmin() {
     <>
       <section className="card stagger-in">
         <div className="refund-toolbar">
-          <h2 className="card-title"><Icon name="refresh" size={18} /> Visszatérítés</h2>
-          <span className="refund-window"><Icon name="clock" size={14} /> {data.windowDays} napos visszatérítési ablak · {open.length} visszatéríthető</span>
+          <h2 className="card-title"><Icon name="refresh" size={18} />{' '}{t('Visszatérítés')}</h2>
+          <span className="refund-window"><Icon name="clock" size={14} /> {data.windowDays}{' '}{t('napos visszatérítési ablak ·')}{' '}{open.length}{' '}{t('visszatéríthető')}</span>
         </div>
-        <p className="muted small">
-          Az utóbbi hetek fizetései (plugin- és modellvásárlás, előfizetés). A szokásos visszatérítés a fizetéstől számított {data.windowDays} napon belül,
-          és csak akkor lehetséges, ha a vásárló még nem töltötte le a terméket; mindig a teljes összeget küldjük vissza.
-          Lényegesen hibás termék, dupla fizetés vagy le nem tölthető termék esetén kivételes visszatérítést indíthatsz.
-        </p>
+        <p className="muted small">{t('Az utóbbi hetek fizetései (plugin- és modellvásárlás, előfizetés). A szokásos visszatérítés a fizetéstől számított')}{' '}{data.windowDays}{' '}{t('napon belül, és csak akkor lehetséges, ha a vásárló még nem töltötte le a terméket; mindig a teljes összeget küldjük vissza. Lényegesen hibás termék, dupla fizetés vagy le nem tölthető termék esetén kivételes visszatérítést indíthatsz.')}</p>
         {!data.paymentsConfigured && (
-          <p className="invoice-note small"><Icon name="alert" size={15} /><span>A Tebex nincs beállítva: Tebexen keresztül fizetett összeget most nem lehet visszaküldeni.</span></p>
+          <p className="invoice-note small"><Icon name="alert" size={15} /><span>{t('A Tebex nincs beállítva: Tebexen keresztül fizetett összeget most nem lehet visszaküldeni.')}</span></p>
         )}
 
         {result && (
           <div className="invoice-note small error-in">
             <Icon name="check" size={15} />
             <div>
-              <strong>Visszatérítve: {result.refund.refundOfNumber} → {result.refund.number} ({formatPrice(result.refund.total, result.refund.currency)})</strong>
+              <strong>{t('Visszatérítve:')}{' '}{result.refund.refundOfNumber} → {result.refund.number} ({formatPrice(result.refund.total, result.refund.currency)})</strong>
               {result.warnings.length > 0 && (
                 <ul className="warning-list">{result.warnings.map((w) => <li key={w}><Icon name="alert" size={14} /> {w}</li>)}</ul>
               )}
@@ -141,7 +134,7 @@ export function StoreRefundsAdmin() {
         <div className="table-scroll section-gap">
           <table className="data-table invoice-table">
             <thead>
-              <tr><th>Bizonylat</th><th>Fizetve</th><th>Vevő</th><th>Tétel</th><th className="num">Összeg</th><th>Határidő</th><th /></tr>
+              <tr><th>{t('Bizonylat')}</th><th>{t('Fizetve')}</th><th>{t('Vevő')}</th><th>{t('Tétel')}</th><th className="num">{t('Összeg')}</th><th>{t('Határidő')}</th><th /></tr>
             </thead>
             <tbody>
               {data.recent.map((invoice) => {
@@ -156,27 +149,24 @@ export function StoreRefundsAdmin() {
                     <td className="mono num">{formatPrice(invoice.total, invoice.currency)}</td>
                     <td>
                       {invoice.refundedByNumber
-                        ? <span className="status-pill status-refunded">Visszatérítve · {invoice.refundedByNumber}</span>
+                        ? <span className="status-pill status-refunded">{t('Visszatérítve ·')}{' '}{invoice.refundedByNumber}</span>
                         : invoice.downloaded
-                          ? <span className="status-pill status-ended">Letöltve</span>
-                          : <span className={`refund-deadline ${close ? 'is-close' : ''}`}>{left ? `még ${left}` : 'lejárt'}</span>}
+                          ? <span className="status-pill status-ended">{t('Letöltve')}</span>
+                          : <span className={`refund-deadline ${close ? 'is-close' : ''}`}>{left ? t('még {0}', left) : t('lejárt')}</span>}
                     </td>
                     <td className="num">
                       {invoice.refundable && (
                         <button type="button" className="btn-ghost btn-tiny btn-danger" onClick={() => { setSelected(invoice); setExceptional(false); setResult(null); }}>
-                          <Icon name="refresh" size={12} /> Visszatérítés
-                        </button>
+                          <Icon name="refresh" size={12} />{' '}{t('Visszatérítés')}</button>
                       )}
                       {!invoice.refundable && !invoice.refundedByNumber && invoice.total > 0 && (
-                        <button type="button" className="btn-ghost btn-tiny" onClick={() => { setSelected(invoice); setExceptional(true); setResult(null); }}>
-                          Kivételes
-                        </button>
+                        <button type="button" className="btn-ghost btn-tiny" onClick={() => { setSelected(invoice); setExceptional(true); setResult(null); }}>{t('Kivételes')}</button>
                       )}
                     </td>
                   </tr>
                 );
               })}
-              {data.recent.length === 0 && <tr><td colSpan={7} className="muted empty-row">Az utóbbi hetekben nem volt fizetés.</td></tr>}
+              {data.recent.length === 0 && <tr><td colSpan={7} className="muted empty-row">{t('Az utóbbi hetekben nem volt fizetés.')}</td></tr>}
             </tbody>
           </table>
         </div>
@@ -184,9 +174,9 @@ export function StoreRefundsAdmin() {
       </section>
 
       <section className="card section-gap stagger-in" style={{ animationDelay: '60ms' }}>
-        <h2 className="card-title"><Icon name="file" size={18} /> Korábbi visszatérítések</h2>
-        <InvoiceTable invoices={data.history} download={storeAdminApi.downloadInvoice} showBuyer empty="Még nem volt visszatérítés." />
-        <p className="muted small">A Tebex felületén indított visszatérítés és az elvesztett chargeback is automatikusan ide kerül ({INVOICE_KIND_LABELS.refund.toLowerCase()} bizonylattal).</p>
+        <h2 className="card-title"><Icon name="file" size={18} />{' '}{t('Korábbi visszatérítések')}</h2>
+        <InvoiceTable invoices={data.history} download={storeAdminApi.downloadInvoice} showBuyer empty={t('Még nem volt visszatérítés.')} />
+        <p className="muted small">{t('A Tebex felületén indított visszatérítés és az elvesztett chargeback is automatikusan ide kerül (')}{INVOICE_KIND_LABELS.refund.toLowerCase()}{' '}{t('bizonylattal).')}</p>
       </section>
     </>
   );

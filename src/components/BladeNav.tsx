@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
@@ -5,6 +6,7 @@ import { API_BASE } from '../api/config';
 import { Avatar } from './ProfileCustomizer';
 import { SeasonalHat, SeasonalNavTrim } from '../seasonal/SeasonalDecor';
 import { Icon, type IconName } from './Icon';
+import { LanguageSwitch } from './LanguageSwitch';
 import { prefersReducedMotion } from './motion';
 import { accentChannels } from '../theme';
 import avengeLogo from '../assets/avenge-logo-crop.png';
@@ -18,11 +20,11 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { to: '/home', label: 'Főoldal', icon: 'home', match: ['/home'], requiresAuth: false },
-  { to: '/store', label: 'Áruház', icon: 'cart', match: ['/store', '/elofizetes'], requiresAuth: false },
+  { to: '/home', label: t('Főoldal'), icon: 'home', match: ['/home'], requiresAuth: false },
+  { to: '/store', label: t('Áruház'), icon: 'cart', match: ['/store', '/elofizetes'], requiresAuth: false },
   { to: '/panel', label: 'Panel', icon: 'radar', match: ['/panel', '/results'], requiresAuth: true },
-  { to: '/account', label: 'Fiók', icon: 'user', match: ['/account'], requiresAuth: true },
-  { to: '/changelogs', label: 'Újdonságok', icon: 'history', match: ['/changelogs'], requiresAuth: true }
+  { to: '/account', label: t('Fiók'), icon: 'user', match: ['/account'], requiresAuth: true },
+  { to: '/changelogs', label: t('Újdonságok'), icon: 'history', match: ['/changelogs'], requiresAuth: true }
 ];
 
 const TOOTH_SPACING = 7;
@@ -283,7 +285,7 @@ export function BladeNav() {
         <span className="blade-steel" aria-hidden="true">
           <span className="blade-glint" />
         </span>
-        <Link to="/home" className="blade-brand" aria-label="Avenge főoldal">
+        <Link to="/home" className="blade-brand" aria-label={t('Avenge főoldal')}>
           <img src={avengeLogo} alt="" />
           <SeasonalHat />
         </Link>
@@ -291,7 +293,7 @@ export function BladeNav() {
         <nav
           className={`blade-links ${items.length < 2 ? 'blade-links-single' : ''}`}
           ref={motion.linksRef}
-          aria-label="Fő navigáció"
+          aria-label={t('Fő navigáció')}
         >
           <span className={`blade-reticle ${hasActive ? '' : 'blade-reticle-idle'}`} ref={motion.reticleRef} aria-hidden="true">
             <i /><i /><i /><i />
@@ -322,32 +324,34 @@ export function BladeNav() {
       <div className="blade-grip">
         <span
           className={`grip-ping ${isOnline ? '' : 'grip-ping-down'}`}
-          title={isOnline ? 'A szerver elérhető' : 'A szerver nem érhető el'}
+          title={isOnline ? t('A szerver elérhető') : t('A szerver nem érhető el')}
         >
           <span className="grip-ping-dot" />
           <span className="grip-ping-text">{isOnline ? (latency !== null ? `${latency} ms` : '...') : 'offline'}</span>
         </span>
 
+        <LanguageSwitch />
+
         {isAdmin && (
           <Link to="/admin" className={`btn-steel grip-admin ${location.pathname.startsWith('/admin') ? 'grip-admin-active' : ''}`}>
             <Icon name="shield" size={16} />
-            <span className="grip-admin-label">Admin Panel</span>
+            <span className="grip-admin-label">{t('Admin Panel')}</span>
           </Link>
         )}
 
         {isAuthenticated ? (
           <div className="grip-account">
-            <Link to="/account" className="grip-avatar" title={user?.email ?? 'Fiók'} aria-label="Fiók">
+            <Link to="/account" className="grip-avatar" title={user?.email ?? t('Fiók')} aria-label={t('Fiók')}>
               <Avatar url={user?.avatarUrl} name={user?.email ?? '•'} className="avatar-fill" />
             </Link>
-            <button className="grip-logout" onClick={logout} title="Kijelentkezés" aria-label="Kijelentkezés">
+            <button className="grip-logout" onClick={logout} title={t('Kijelentkezés')} aria-label={t('Kijelentkezés')}>
               <Icon name="logout" size={17} />
             </button>
           </div>
         ) : (
           <Link to="/login" className="btn-steel grip-login">
             <Icon name="lock" size={15} />
-            <span>Belépés</span>
+            <span>{t('Belépés')}</span>
           </Link>
         )}
       </div>

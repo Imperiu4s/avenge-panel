@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import * as signalR from '@microsoft/signalr';
 import { API_BASE } from '../api/config';
 import { getStoredToken } from '../api/client';
@@ -21,7 +22,7 @@ let connection: signalR.HubConnection | null = null;
 
 function startWithRetry(hub: signalR.HubConnection, attempt = 0) {
   hub.start().catch((err) => {
-    console.error('[scanHub] Nem sikerült csatlakozni:', err);
+    console.error(t('[scanHub] Nem sikerült csatlakozni:'), err);
     scheduleRetry(hub, attempt + 1);
   });
 }

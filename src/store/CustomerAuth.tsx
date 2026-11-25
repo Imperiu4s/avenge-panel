@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 import { ApiError } from '../api/client';
 import {
@@ -96,6 +97,6 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
 
 export function useCustomer(): CustomerAuthValue {
   const ctx = useContext(CustomerAuthContext);
-  if (!ctx) throw new Error('useCustomer csak CustomerAuthProvider-en belül használható.');
+  if (!ctx) throw new Error(t('useCustomer csak CustomerAuthProvider-en belül használható.'));
   return ctx;
 }

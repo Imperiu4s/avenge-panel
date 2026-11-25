@@ -1,3 +1,4 @@
+import { t } from '../../../i18n';
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { ApiError } from '../../../api/client';
@@ -14,8 +15,8 @@ const PLATFORM_PRESETS: Record<ProductKind, string[]> = {
 };
 
 const KIND_TEXT: Record<ProductKind, { one: string; many: string; files: string; accept: string; created: string }> = {
-  plugin: { one: 'plugin', many: 'Pluginok', files: '.jar / .zip', accept: '.jar,.zip', created: 'Plugin létrehozva' },
-  model: { one: 'modell', many: 'Modellek', files: '.zip / .bbmodel / .jar', accept: '.zip,.bbmodel,.jar', created: 'Modell létrehozva' }
+  plugin: { one: 'plugin', many: t('Pluginok'), files: '.jar / .zip', accept: '.jar,.zip', created: t('Plugin létrehozva') },
+  model: { one: 'modell', many: t('Modellek'), files: '.zip / .bbmodel / .jar', accept: '.zip,.bbmodel,.jar', created: t('Modell létrehozva') }
 };
 
 const EMPTY: ProductUpsert = {
@@ -74,7 +75,7 @@ function ProductEditor({ product, currency, onSaved, onClose }: {
     try {
       await action();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Nem sikerült.');
+      setError(err instanceof ApiError ? err.message : t('Nem sikerült.'));
     } finally {
       setBusy(null);
     }
@@ -86,7 +87,7 @@ function ProductEditor({ product, currency, onSaved, onClose }: {
       const result = product
         ? await storeAdminApi.updateProduct(product.id, draft)
         : await storeAdminApi.createProduct(draft);
-      const base = product ? 'Mentve.' : `${text.created} - most már feltölthetsz ikont, képeket és verziót.`;
+      const base = product ? 'Mentve.' : t('{0} - most már feltölthetsz ikont, képeket és verziót.', text.created);
       setNotice(result.notice ? `${base} ${result.notice}` : base);
       onSaved(result.id);
     });
@@ -110,12 +111,12 @@ function ProductEditor({ product, currency, onSaved, onClose }: {
       setReleaseFile(null);
       setReleaseVersion('');
       setReleaseChangelog('');
-      setNotice('Verzió feltöltve - a vásárlók azonnal letölthetik.');
+      setNotice(t('Verzió feltöltve - a vásárlók azonnal letölthetik.'));
       onSaved(product.id);
     });
   };
 
-  const remove = () => product && window.confirm(`Törlöd a(z) ${product.name} ${text.one}t? Csak a még soha el nem adott termék törölhető.`) && run('delete', async () => {
+  const remove = () => product && window.confirm(t('Törlöd a(z) {0} {1}t? Csak a még soha el nem adott termék törölhető.', product.name, t(text.one))) && run('delete', async () => {
     await storeAdminApi.deleteProduct(product.id);
     onClose();
     onSaved('');
@@ -124,57 +125,57 @@ function ProductEditor({ product, currency, onSaved, onClose }: {
   return (
     <section className="card product-editor stagger-in">
       <div className="scans-head">
-        <h2 className="card-title"><Icon name={draft.kind === 'model' ? 'cube' : 'package'} size={18} /> {product ? product.name : draft.kind === 'model' ? 'Új modell' : 'Új plugin'}</h2>
+        <h2 className="card-title"><Icon name={draft.kind === 'model' ? 'cube' : 'package'} size={18} /> {product ? product.name : draft.kind === 'model' ? t('Új modell') : t('Új plugin')}</h2>
         <div className="editor-head-actions">
-          {product?.isPublished && <Link to={`/store/${product.slug}`} className="btn-ghost btn-tiny" target="_blank"><Icon name="eye" size={13} /> Megtekintés</Link>}
-          <button type="button" className="btn-ghost btn-tiny" onClick={onClose}><Icon name="x" size={13} /> Bezárás</button>
+          {product?.isPublished && <Link to={`/store/${product.slug}`} className="btn-ghost btn-tiny" target="_blank"><Icon name="eye" size={13} />{' '}{t('Megtekintés')}</Link>}
+          <button type="button" className="btn-ghost btn-tiny" onClick={onClose}><Icon name="x" size={13} />{' '}{t('Bezárás')}</button>
         </div>
       </div>
 
       <form onSubmit={save}>
-        <span className="field-label">Típus</span>
-        <div className="segmented kind-switch" role="radiogroup" aria-label="Termék típusa">
+        <span className="field-label">{t('Típus')}</span>
+        <div className="segmented kind-switch" role="radiogroup" aria-label={t('Termék típusa')}>
           {(['plugin', 'model'] as const).map((kind) => (
             <button key={kind} type="button" role="radio" aria-checked={draft.kind === kind} className={draft.kind === kind ? 'is-active' : ''} onClick={() => changeKind(kind)}>
-              <Icon name={kind === 'model' ? 'cube' : 'package'} size={13} /> {kind === 'model' ? 'Modell' : 'Plugin'}
+              <Icon name={kind === 'model' ? 'cube' : 'package'} size={13} /> {kind === 'model' ? t('Modell') : 'Plugin'}
             </button>
           ))}
         </div>
         <div className="settings-grid">
           <label>
-            <span className="field-label">Név</span>
-            <input required maxLength={80} value={draft.name} onChange={(e) => set('name', e.target.value)} placeholder="pl. Avenge Duels" />
+            <span className="field-label">{t('Név')}</span>
+            <input required maxLength={80} value={draft.name} onChange={(e) => set('name', e.target.value)} placeholder={t('pl. Avenge Duels')} />
           </label>
           <label>
-            <span className="field-label">URL (slug)</span>
-            <input maxLength={60} value={draft.slug} onChange={(e) => set('slug', e.target.value)} placeholder="automatikus a névből" />
+            <span className="field-label">{t('URL (slug)')}</span>
+            <input maxLength={60} value={draft.slug} onChange={(e) => set('slug', e.target.value)} placeholder={t('automatikus a névből')} />
             <small className="muted">avenge.hu/store/{draft.slug || '…'}</small>
           </label>
           <label>
-            <span className="field-label">Ár ({currency})</span>
+            <span className="field-label">{t('Ár (')}{currency})</span>
             <input type="number" min={0} max={10000} step="0.01" value={draft.price} onChange={(e) => set('price', Number(e.target.value))} />
-            <small className="muted">0 = ingyenes (fiókkal letölthető)</small>
+            <small className="muted">{t('0 = ingyenes (fiókkal letölthető)')}</small>
           </label>
           <label>
-            <span className="field-label">Rövid leírás</span>
-            <input maxLength={160} value={draft.tagline} onChange={(e) => set('tagline', e.target.value)} placeholder="Egy mondat a kártyára" />
+            <span className="field-label">{t('Rövid leírás')}</span>
+            <input maxLength={160} value={draft.tagline} onChange={(e) => set('tagline', e.target.value)} placeholder={t('Egy mondat a kártyára')} />
           </label>
           <label>
-            <span className="field-label">Kategória</span>
-            <input maxLength={40} value={draft.category} onChange={(e) => set('category', e.target.value)} placeholder={draft.kind === 'model' ? 'pl. Mob, Fegyver, Bútor, Kozmetika' : 'pl. Minigame, Gazdaság, Admin'} />
+            <span className="field-label">{t('Kategória')}</span>
+            <input maxLength={40} value={draft.category} onChange={(e) => set('category', e.target.value)} placeholder={draft.kind === 'model' ? t('pl. Mob, Fegyver, Bútor, Kozmetika') : t('pl. Minigame, Gazdaság, Admin')} />
           </label>
           <label>
-            <span className="field-label">Tebex csomag azonosító</span>
-            <input maxLength={60} value={draft.tebexPackageId} onChange={(e) => set('tebexPackageId', e.target.value)} placeholder="pl. 6276316" />
-            <small className="muted">A Tebexben létrehozott csomag száma. Megadva a vásárlás ezen a csomagon át megy, és az árat a Tebexből veszi át.</small>
+            <span className="field-label">{t('Tebex csomag azonosító')}</span>
+            <input maxLength={60} value={draft.tebexPackageId} onChange={(e) => set('tebexPackageId', e.target.value)} placeholder={t('pl. 6276316')} />
+            <small className="muted">{t('A Tebexben létrehozott csomag száma. Megadva a vásárlás ezen a csomagon át megy, és az árat a Tebexből veszi át.')}</small>
           </label>
           <label>
-            <span className="field-label">Támogatott Minecraft-verziók</span>
-            <input maxLength={80} value={draft.supportedVersions} onChange={(e) => set('supportedVersions', e.target.value)} placeholder="pl. 1.8.8 – 1.21.4" />
+            <span className="field-label">{t('Támogatott Minecraft-verziók')}</span>
+            <input maxLength={80} value={draft.supportedVersions} onChange={(e) => set('supportedVersions', e.target.value)} placeholder={t('pl. 1.8.8 – 1.21.4')} />
           </label>
         </div>
 
-        <span className="field-label">{draft.kind === 'model' ? 'Kompatibilitás' : 'Szerverszoftver'}</span>
+        <span className="field-label">{draft.kind === 'model' ? t('Kompatibilitás') : t('Szerverszoftver')}</span>
         <div className="platform-picker">
           {[...new Set([...PLATFORM_PRESETS[draft.kind], ...platforms])].map((name) => (
             <button type="button" key={name} className={`chip-toggle ${platforms.includes(name) ? 'is-active' : ''}`} onClick={() => togglePlatform(name)}>
@@ -184,11 +185,11 @@ function ProductEditor({ product, currency, onSaved, onClose }: {
         </div>
 
         <div className="field-label-row">
-          <span className="field-label">Részletes leírás (Markdown)</span>
-          <button type="button" className="btn-ghost btn-tiny" onClick={() => setPreview(!preview)}>{preview ? 'Szerkesztés' : 'Előnézet'}</button>
+          <span className="field-label">{t('Részletes leírás (Markdown)')}</span>
+          <button type="button" className="btn-ghost btn-tiny" onClick={() => setPreview(!preview)}>{preview ? t('Szerkesztés') : t('Előnézet')}</button>
         </div>
         {preview
-          ? <div className="markdown-preview"><Markdown source={draft.description || '_Üres leírás_'} /></div>
+          ? <div className="markdown-preview"><Markdown source={draft.description || t('_Üres leírás_')} /></div>
           : (
             <textarea
               className="textarea-code"
@@ -198,24 +199,24 @@ function ProductEditor({ product, currency, onSaved, onClose }: {
               placeholder={'## Funkciók\n- Gyors arénák\n- Testreszabható kitek\n\n## Parancsok\n| Parancs | Leírás |\n|---|---|\n| /duel <játékos> | Kihívás |'}
             />
           )}
-        <small className="muted">Támogatott: # címek, **félkövér**, *dőlt*, `kód`, listák, táblázat, [link](https://…), ![kép](https://…).</small>
+        <small className="muted">{t('Támogatott: # címek, **félkövér**, *dőlt*, `kód`, listák, táblázat, [link](https://…), ![kép](https://…).')}</small>
 
         <div className="toggle-list">
           <label className="toggle-row">
-            <span className="toggle-text"><strong>Közzétéve</strong><small>Megjelenik az áruházban és megvásárolható. Kikapcsolva rejtett, de a vevők továbbra is letölthetik.</small></span>
+            <span className="toggle-text"><strong>{t('Közzétéve')}</strong><small>{t('Megjelenik az áruházban és megvásárolható. Kikapcsolva rejtett, de a vevők továbbra is letölthetik.')}</small></span>
             <input type="checkbox" className="switch" checked={draft.isPublished} onChange={(e) => set('isPublished', e.target.checked)} />
           </label>
           <label className="toggle-row">
-            <span className="toggle-text"><strong>Kiemelt</strong><small>A lista elején, "Kiemelt" jelöléssel.</small></span>
+            <span className="toggle-text"><strong>{t('Kiemelt')}</strong><small>{t('A lista elején, "Kiemelt" jelöléssel.')}</small></span>
             <input type="checkbox" className="switch" checked={draft.isFeatured} onChange={(e) => set('isFeatured', e.target.checked)} />
           </label>
         </div>
 
         <div className="settings-actions">
-          {product ? <button type="button" className="btn-ghost btn-tiny btn-danger" onClick={remove} disabled={busy !== null}><Icon name="trash" size={13} /> {draft.kind === 'model' ? 'Modell törlése' : 'Plugin törlése'}</button> : <span />}
+          {product ? <button type="button" className="btn-ghost btn-tiny btn-danger" onClick={remove} disabled={busy !== null}><Icon name="trash" size={13} /> {draft.kind === 'model' ? t('Modell törlése') : t('Plugin törlése')}</button> : <span />}
           <button type="submit" className={`btn-primary ${busy === 'save' ? 'is-loading' : ''}`} disabled={busy !== null}>
             {busy === 'save' && <span className="btn-spinner" aria-hidden="true" />}
-            {product ? 'Mentés' : 'Létrehozás'}
+            {product ? t('Mentés') : t('Létrehozás')}
           </button>
         </div>
       </form>
@@ -223,30 +224,30 @@ function ProductEditor({ product, currency, onSaved, onClose }: {
       {product && (
         <div className="editor-media">
           <div>
-            <span className="field-label">Ikon</span>
+            <span className="field-label">{t('Ikon')}</span>
             <div className="icon-upload">
               <ProductIcon name={product.name} iconAssetId={product.iconAssetId} size={72} />
               <label className="btn-secondary btn-tiny file-button">
-                <Icon name="plus" size={13} /> {product.iconAssetId ? 'Csere' : 'Feltöltés'}
+                <Icon name="plus" size={13} /> {product.iconAssetId ? t('Csere') : t('Feltöltés')}
                 <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={(e) => { uploadIcon(e.target.files?.[0]); e.target.value = ''; }} />
               </label>
-              <small className="muted">Négyzetes, min. 256×256 px, max. 5 MB</small>
+              <small className="muted">{t('Négyzetes, min. 256×256 px, max. 5 MB')}</small>
             </div>
           </div>
           <div>
-            <span className="field-label">Képek (galéria)</span>
+            <span className="field-label">{t('Képek (galéria)')}</span>
             <div className="gallery-admin">
               {product.gallery.map((asset) => (
                 <figure key={asset.id}>
                   <img src={storeAssetUrl(asset.id)} alt="" />
-                  <button type="button" className="gallery-remove" aria-label="Kép törlése" onClick={() => run('asset', async () => { await storeAdminApi.deleteAsset(asset.id); onSaved(product.id); })}>
+                  <button type="button" className="gallery-remove" aria-label={t('Kép törlése')} onClick={() => run('asset', async () => { await storeAdminApi.deleteAsset(asset.id); onSaved(product.id); })}>
                     <Icon name="x" size={13} />
                   </button>
                 </figure>
               ))}
               <label className="gallery-add file-button">
                 <Icon name="plus" size={20} />
-                <span className="small">Kép hozzáadása</span>
+                <span className="small">{t('Kép hozzáadása')}</span>
                 <input type="file" multiple accept="image/png,image/jpeg,image/webp,image/gif" onChange={(e) => { uploadGallery(e.target.files); e.target.value = ''; }} />
               </label>
             </div>
@@ -256,38 +257,35 @@ function ProductEditor({ product, currency, onSaved, onClose }: {
 
       {product && (
         <div className="editor-releases">
-          <span className="field-label">Verziók</span>
+          <span className="field-label">{t('Verziók')}</span>
           <form className="release-upload" onSubmit={uploadRelease}>
             <label className="btn-secondary btn-tiny file-button">
-              <Icon name="file" size={13} /> {releaseFile ? releaseFile.name : `${text.files} kiválasztása`}
+              <Icon name="file" size={13} /> {releaseFile ? releaseFile.name : t('{0} kiválasztása', text.files)}
               <input type="file" accept={product?.kind === 'model' ? KIND_TEXT.model.accept : KIND_TEXT.plugin.accept} onChange={(e) => setReleaseFile(e.target.files?.[0] ?? null)} />
             </label>
-            <input required maxLength={40} placeholder="Verzió (pl. 1.2.0)" value={releaseVersion} onChange={(e) => setReleaseVersion(e.target.value)} />
-            <textarea rows={3} placeholder="Változásnapló (Markdown, nem kötelező)" value={releaseChangelog} onChange={(e) => setReleaseChangelog(e.target.value)} />
+            <input required maxLength={40} placeholder={t('Verzió (pl. 1.2.0)')} value={releaseVersion} onChange={(e) => setReleaseVersion(e.target.value)} />
+            <textarea rows={3} placeholder={t('Változásnapló (Markdown, nem kötelező)')} value={releaseChangelog} onChange={(e) => setReleaseChangelog(e.target.value)} />
             <button type="submit" className={`btn-primary btn-tiny ${busy === 'release' ? 'is-loading' : ''}`} disabled={!releaseFile || busy !== null}>
               {busy === 'release' && <span className="btn-spinner" aria-hidden="true" />}
-              <Icon name="download" size={13} /> Feltöltés
-            </button>
+              <Icon name="download" size={13} />{' '}{t('Feltöltés')}</button>
           </form>
           <div className="table-scroll">
             <table className="data-table">
-              <thead><tr><th>Verzió</th><th>Fájl</th><th>Méret</th><th>Feltöltve</th><th>SHA-256</th><th /></tr></thead>
+              <thead><tr><th>{t('Verzió')}</th><th>{t('Fájl')}</th><th>{t('Méret')}</th><th>{t('Feltöltve')}</th><th>{t('SHA-256')}</th><th /></tr></thead>
               <tbody>
                 {product.releases.map((r) => (
                   <tr key={r.id}>
-                    <td className="mono">v{r.version}</td>
+                    <td className="mono">{t('v')}{r.version}</td>
                     <td className="small">{r.fileName}</td>
                     <td className="small muted">{formatBytes(r.sizeBytes)}</td>
                     <td className="small muted">{formatDate(r.createdAt)}</td>
                     <td className="mono small muted" title={r.sha256}>{r.sha256.slice(0, 12)}…</td>
                     <td>
-                      <button type="button" className="btn-ghost btn-tiny btn-danger" onClick={() => window.confirm(`Törlöd a v${r.version} verziót? A vevők ezt a verziót többé nem tölthetik le.`) && run('release-del', async () => { await storeAdminApi.deleteRelease(r.id); onSaved(product.id); })}>
-                        Törlés
-                      </button>
+                      <button type="button" className="btn-ghost btn-tiny btn-danger" onClick={() => window.confirm(t('Törlöd a v{0} verziót? A vevők ezt a verziót többé nem tölthetik le.', r.version)) && run('release-del', async () => { await storeAdminApi.deleteRelease(r.id); onSaved(product.id); })}>{t('Törlés')}</button>
                     </td>
                   </tr>
                 ))}
-                {product.releases.length === 0 && <tr><td colSpan={6} className="muted empty-row">Még nincs feltöltött verzió - a vásárlók addig nem tudnak letölteni.</td></tr>}
+                {product.releases.length === 0 && <tr><td colSpan={6} className="muted empty-row">{t('Még nincs feltöltött verzió - a vásárlók addig nem tudnak letölteni.')}</td></tr>}
               </tbody>
             </table>
           </div>
@@ -309,7 +307,7 @@ export function StoreProductsAdmin({ currency }: { currency: string }) {
     try {
       setProducts(await storeAdminApi.products());
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Nem sikerült betölteni a termékeket.');
+      setError(err instanceof ApiError ? err.message : t('Nem sikerült betölteni a termékeket.'));
     }
   }, []);
 
@@ -331,39 +329,39 @@ export function StoreProductsAdmin({ currency }: { currency: string }) {
 
       <section className="card section-gap stagger-in">
         <div className="scans-head">
-          <h2 className="card-title"><Icon name="package" size={18} /> Pluginok és modellek</h2>
-          <button type="button" className="btn-primary btn-tiny" onClick={() => setEditing('new')}><Icon name="plus" size={13} /> Új termék</button>
+          <h2 className="card-title"><Icon name="package" size={18} />{' '}{t('Pluginok és modellek')}</h2>
+          <button type="button" className="btn-primary btn-tiny" onClick={() => setEditing('new')}><Icon name="plus" size={13} />{' '}{t('Új termék')}</button>
         </div>
         {error && <p className="error-text">{error}</p>}
         {!products && !error && <Skeleton width="100%" height={60} />}
         {products && (
           <div className="table-scroll">
             <table className="data-table">
-              <thead><tr><th>Termék</th><th>Ár</th><th>Állapot</th><th className="align-right">Eladás</th><th className="align-right">Tulajdonos</th><th className="align-right">Letöltés</th><th>Verzió</th><th /></tr></thead>
+              <thead><tr><th>{t('Termék')}</th><th>{t('Ár')}</th><th>{t('Állapot')}</th><th className="align-right">{t('Eladás')}</th><th className="align-right">{t('Tulajdonos')}</th><th className="align-right">{t('Letöltés')}</th><th>{t('Verzió')}</th><th /></tr></thead>
               <tbody>
                 {products.map((p) => (
                   <tr key={p.id} className={editing === p.id ? 'row-selected' : ''}>
                     <td>
                       <span className="product-cell">
                         <ProductIcon name={p.name} iconAssetId={p.iconAssetId} size={34} />
-                        <span><strong>{p.name}</strong><small className="muted">{p.kind === 'model' ? 'Modell' : 'Plugin'} · /{p.slug}</small></span>
+                        <span><strong>{p.name}</strong><small className="muted">{p.kind === 'model' ? t('Modell') : 'Plugin'} · /{p.slug}</small></span>
                       </span>
                     </td>
                     <td className="mono small">
                       {p.discountPercent > 0 ? <><s className="muted">{formatPrice(p.price, currency)}</s> {formatPrice(p.effectivePrice, currency)}</> : formatPrice(p.price, currency)}
                     </td>
                     <td>
-                      <span className={`status-pill ${p.isPublished ? 'status-paid' : 'status-pending'}`}>{p.isPublished ? 'Közzétéve' : 'Rejtett'}</span>
+                      <span className={`status-pill ${p.isPublished ? 'status-paid' : 'status-pending'}`}>{p.isPublished ? t('Közzétéve') : t('Rejtett')}</span>
                       {p.isFeatured && <span className="chip chip-hot chip-inline"><Icon name="star" size={10} /></span>}
                     </td>
                     <td className="align-right mono">{p.salesCount}</td>
                     <td className="align-right mono">{p.owners}</td>
                     <td className="align-right mono">{p.downloadCount}</td>
-                    <td className="mono small">{p.releases[0] ? `v${p.releases[0].version}` : <span className="notice-inline">nincs</span>}</td>
-                    <td><button type="button" className="btn-ghost btn-tiny" onClick={() => { setEditing(p.id); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>Szerkesztés</button></td>
+                    <td className="mono small">{p.releases[0] ? `v${p.releases[0].version}` : <span className="notice-inline">{t('nincs')}</span>}</td>
+                    <td><button type="button" className="btn-ghost btn-tiny" onClick={() => { setEditing(p.id); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>{t('Szerkesztés')}</button></td>
                   </tr>
                 ))}
-                {products.length === 0 && <tr><td colSpan={8} className="muted empty-row">Még nincs termék. Kezdd az "Új termék" gombbal.</td></tr>}
+                {products.length === 0 && <tr><td colSpan={8} className="muted empty-row">{t('Még nincs termék. Kezdd az "Új termék" gombbal.')}</td></tr>}
               </tbody>
             </table>
           </div>

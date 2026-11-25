@@ -1,3 +1,4 @@
+import { t as tr } from '../../i18n';
 import { useCallback, useEffect, useState } from 'react';
 import { ApiError } from '../../api/client';
 import { supportAdminApi, ticketNumber, TICKET_STATUS_LABELS, type AdminTicketList, type SupportTicketDetail } from '../../api/support';
@@ -7,14 +8,14 @@ import { Icon } from '../Icon';
 import { Skeleton } from '../motion';
 
 const FILTERS: { key: string; label: string }[] = [
-  { key: 'open', label: 'Válaszra vár' },
-  { key: 'answered', label: 'Megválaszolva' },
-  { key: 'closed', label: 'Lezárva' },
-  { key: 'all', label: 'Összes' }
+  { key: 'open', label: tr('Válaszra vár') },
+  { key: 'answered', label: tr('Megválaszolva') },
+  { key: 'closed', label: tr('Lezárva') },
+  { key: 'all', label: tr('Összes') }
 ];
 
 const COOLDOWNS = [
-  { hours: 0, label: 'nincs korlát' },
+  { hours: 0, label: tr('nincs korlát') },
   { hours: 24, label: '1 naponta' },
   { hours: 48, label: '2 naponta' },
   { hours: 72, label: '3 naponta' },
@@ -28,7 +29,7 @@ function TicketDetail({ id, onChanged, onDeleted }: { id: string; onChanged: () 
 
   useEffect(() => {
     let alive = true;
-    const load = () => supportAdminApi.ticket(id).then((d) => { if (alive) setDetail(d); }).catch(() => { if (alive) setError('Nem sikerült betölteni a ticketet.'); });
+    const load = () => supportAdminApi.ticket(id).then((d) => { if (alive) setDetail(d); }).catch(() => { if (alive) setError(tr('Nem sikerült betölteni a ticketet.')); });
     load();
     const timer = window.setInterval(load, 20000);
     return () => { alive = false; window.clearInterval(timer); };
@@ -41,7 +42,7 @@ function TicketDetail({ id, onChanged, onDeleted }: { id: string; onChanged: () 
       setDetail(await action());
       onChanged();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Nem sikerült.');
+      setError(err instanceof ApiError ? err.message : tr('Nem sikerült.'));
     } finally {
       setBusy(false);
     }
@@ -55,7 +56,7 @@ function TicketDetail({ id, onChanged, onDeleted }: { id: string; onChanged: () 
     <section className="card ticket-admin-detail stagger-in">
       <div className="support-ticket-head">
         <div>
-          <span className="mono small muted">{ticketNumber(t.number)} · {t.topicLabel}{detail.reference ? ` · ${detail.reference}` : ''} · nyitva: {formatDateTime(t.createdAt)}</span>
+          <span className="mono small muted">{ticketNumber(t.number)} · {tr(t.topicLabel)}{detail.reference ? ` · ${detail.reference}` : ''}{' '}{tr('· nyitva:')}{' '}{formatDateTime(t.createdAt)}</span>
           <h2>{t.subject}</h2>
         </div>
         <span className={`status-pill ticket-status-${t.status}`}>{TICKET_STATUS_LABELS[t.status]}</span>
@@ -63,64 +64,62 @@ function TicketDetail({ id, onChanged, onDeleted }: { id: string; onChanged: () 
 
       {c && (
         <dl className="ticket-customer">
-          <div><dt>Vásárló</dt><dd className="mono small">{c.email}</dd></div>
-          <div><dt>Minecraft-név</dt><dd className="mono small">{c.minecraftName ?? '-'}</dd></div>
-          <div><dt>Előfizetés</dt><dd className="small">{c.subscriptionStatus ? SUBSCRIPTION_STATUS_LABELS[c.subscriptionStatus as keyof typeof SUBSCRIPTION_STATUS_LABELS] ?? c.subscriptionStatus : 'nincs'}</dd></div>
-          <div><dt>Fizetett rendelés</dt><dd className="small">{c.paidOrders}</dd></div>
-          <div><dt>Ticketjei</dt><dd className="small">{c.tickets}</dd></div>
-          <div><dt>Felelős</dt><dd className="small">{t.assignedName ?? '-'}</dd></div>
+          <div><dt>{tr('Vásárló')}</dt><dd className="mono small">{c.email}</dd></div>
+          <div><dt>{tr('Minecraft-név')}</dt><dd className="mono small">{c.minecraftName ?? '-'}</dd></div>
+          <div><dt>{tr('Előfizetés')}</dt><dd className="small">{c.subscriptionStatus ? SUBSCRIPTION_STATUS_LABELS[c.subscriptionStatus as keyof typeof SUBSCRIPTION_STATUS_LABELS] ?? c.subscriptionStatus : 'nincs'}</dd></div>
+          <div><dt>{tr('Fizetett rendelés')}</dt><dd className="small">{c.paidOrders}</dd></div>
+          <div><dt>{tr('Ticketjei')}</dt><dd className="small">{c.tickets}</dd></div>
+          <div><dt>{tr('Felelős')}</dt><dd className="small">{t.assignedName ?? '-'}</dd></div>
         </dl>
       )}
 
       <div className="ticket-admin-actions">
         {t.assignedName
-          ? <button type="button" className="btn-ghost btn-tiny" disabled={busy} onClick={() => act(() => supportAdminApi.assign(id, false))}>Felelős törlése</button>
-          : <button type="button" className="btn-ghost btn-tiny" disabled={busy} onClick={() => act(() => supportAdminApi.assign(id, true))}><Icon name="user" size={13} /> Átveszem</button>}
+          ? <button type="button" className="btn-ghost btn-tiny" disabled={busy} onClick={() => act(() => supportAdminApi.assign(id, false))}>{tr('Felelős törlése')}</button>
+          : <button type="button" className="btn-ghost btn-tiny" disabled={busy} onClick={() => act(() => supportAdminApi.assign(id, true))}><Icon name="user" size={13} />{' '}{tr('Átveszem')}</button>}
         {t.status === 'closed'
-          ? <button type="button" className="btn-ghost btn-tiny" disabled={busy} onClick={() => act(() => supportAdminApi.reopen(id))}><Icon name="refresh" size={13} /> Újranyitás</button>
-          : <button type="button" className="btn-ghost btn-tiny btn-danger" disabled={busy} onClick={() => window.confirm('Lezárod a ticketet?') && act(() => supportAdminApi.close(id))}><Icon name="lock" size={13} /> Lezárás</button>}
+          ? <button type="button" className="btn-ghost btn-tiny" disabled={busy} onClick={() => act(() => supportAdminApi.reopen(id))}><Icon name="refresh" size={13} />{' '}{tr('Újranyitás')}</button>
+          : <button type="button" className="btn-ghost btn-tiny btn-danger" disabled={busy} onClick={() => window.confirm(tr('Lezárod a ticketet?')) && act(() => supportAdminApi.close(id))}><Icon name="lock" size={13} />{' '}{tr('Lezárás')}</button>}
         <button
           type="button"
           className="btn-ghost btn-tiny"
           disabled={busy}
-          title="Ez a ticket ne számítson bele a várakozási időbe, így a vásárló azonnal nyithat újat."
+          title={tr('Ez a ticket ne számítson bele a várakozási időbe, így a vásárló azonnal nyithat újat.')}
           onClick={() => act(() => supportAdminApi.waive(id))}
         >
-          {t.cooldownWaived ? 'Várakozás visszaállítása' : 'Várakozás elengedése'}
+          {t.cooldownWaived ? tr('Várakozás visszaállítása') : tr('Várakozás elengedése')}
         </button>
         <button
           type="button"
           className="btn-ghost btn-tiny btn-danger ticket-delete"
           disabled={busy}
           onClick={async () => {
-            if (!window.confirm(`Véglegesen törlöd a(z) ${ticketNumber(t.number)} ticketet az összes üzenetével és csatolt képével? Ez nem vonható vissza, és a vásárlónál is eltűnik.`)) return;
+            if (!window.confirm(tr('Véglegesen törlöd a(z) {0} ticketet az összes üzenetével és csatolt képével? Ez nem vonható vissza, és a vásárlónál is eltűnik.', ticketNumber(t.number)))) return;
             setBusy(true);
             setError(null);
             try {
               await supportAdminApi.remove(id);
               onDeleted();
             } catch (err) {
-              setError(err instanceof ApiError ? err.message : 'Nem sikerült törölni.');
+              setError(err instanceof ApiError ? err.message : tr('Nem sikerült törölni.'));
               setBusy(false);
             }
           }}
         >
-          <Icon name="trash" size={13} /> Törlés
-        </button>
+          <Icon name="trash" size={13} />{' '}{tr('Törlés')}</button>
       </div>
 
       <TicketMessages messages={detail.messages} staff />
 
       <TicketComposer
-        placeholder="Válasz a vásárlónak... (a vásárló a nevedet nem, csak az „Avenge Support” feladót látja)"
+        placeholder={tr('Válasz a vásárlónak... (a vásárló a nevedet nem, csak az „Avenge Support” feladót látja)')}
         onSend={async (message, files, closeAfter) => {
           setDetail(await supportAdminApi.reply(id, message, files, closeAfter));
           onChanged();
         }}
         extra={(send, sending) => (
           <button type="button" className="btn-secondary btn-tiny" disabled={sending} onClick={() => send(true)}>
-            <Icon name="check" size={13} /> Küldés és lezárás
-          </button>
+            <Icon name="check" size={13} />{' '}{tr('Küldés és lezárás')}</button>
         )}
       />
       {error && <p className="error-text error-in">{error}</p>}
@@ -136,7 +135,7 @@ export function TicketsAdminTab() {
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(() => {
-    supportAdminApi.list(filter, query).then(setData).catch((err) => setError(err instanceof ApiError ? err.message : 'Nem sikerült betölteni a ticketeket.'));
+    supportAdminApi.list(filter, query).then(setData).catch((err) => setError(err instanceof ApiError ? err.message : tr('Nem sikerült betölteni a ticketeket.')));
   }, [filter, query]);
 
   useEffect(() => {
@@ -150,7 +149,7 @@ export function TicketsAdminTab() {
       await supportAdminApi.settings(body);
       load();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Nem sikerült menteni.');
+      setError(err instanceof ApiError ? err.message : tr('Nem sikerült menteni.'));
     }
   }
 
@@ -158,24 +157,24 @@ export function TicketsAdminTab() {
     <>
       <section className="card stagger-in">
         <div className="scans-head">
-          <h2 className="card-title"><Icon name="message" size={18} /> Ticketek</h2>
-          {data && <span className="muted small">{data.open} válaszra vár · {data.answered} megválaszolva · {data.closed} lezárva</span>}
+          <h2 className="card-title"><Icon name="message" size={18} />{' '}{tr('Ticketek')}</h2>
+          {data && <span className="muted small">{data.open}{' '}{tr('válaszra vár ·')}{' '}{data.answered}{' '}{tr('megválaszolva ·')}{' '}{data.closed}{' '}{tr('lezárva')}</span>}
         </div>
-        <p className="muted small">A vásárlók a weboldal Támogatás oldalán nyitnak ticketet. Egy vásárlónak egyszerre egy nyitott ticketje lehet, újat a beállított időnként nyithat.</p>
+        <p className="muted small">{tr('A vásárlók a weboldal Támogatás oldalán nyitnak ticketet. Egy vásárlónak egyszerre egy nyitott ticketje lehet, újat a beállított időnként nyithat.')}</p>
         {data && (
           <div className="ticket-settings">
             <label className="toggle-row ticket-toggle">
               <span className="toggle-text">
-                <strong>Új ticket nyitható</strong>
-                <small>Kikapcsolva a meglévő ticketekre továbbra is lehet válaszolni.</small>
+                <strong>{tr('Új ticket nyitható')}</strong>
+                <small>{tr('Kikapcsolva a meglévő ticketekre továbbra is lehet válaszolni.')}</small>
               </span>
               <input type="checkbox" className="switch" checked={data.enabled} onChange={(e) => saveSettings({ enabled: e.target.checked })} />
             </label>
             <label>
-              <span className="field-label">Új ticket vásárlónként</span>
+              <span className="field-label">{tr('Új ticket vásárlónként')}</span>
               <select value={data.cooldownHours} onChange={(e) => saveSettings({ cooldownHours: Number(e.target.value) })}>
                 {COOLDOWNS.map((c) => <option key={c.hours} value={c.hours}>{c.label}</option>)}
-                {!COOLDOWNS.some((c) => c.hours === data.cooldownHours) && <option value={data.cooldownHours}>{data.cooldownHours} óránként</option>}
+                {!COOLDOWNS.some((c) => c.hours === data.cooldownHours) && <option value={data.cooldownHours}>{data.cooldownHours}{' '}{tr('óránként')}</option>}
               </select>
             </label>
           </div>
@@ -193,7 +192,7 @@ export function TicketsAdminTab() {
           </div>
           <label className="filter-search">
             <Icon name="search" size={16} />
-            <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Keresés: tárgy, e-mail, név, #szám" aria-label="Keresés" />
+            <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={tr('Keresés: tárgy, e-mail, név, #szám')} aria-label={tr('Keresés')} />
           </label>
           {!data && !error && <Skeleton width="100%" height={60} />}
           <div className="support-list">
@@ -202,19 +201,19 @@ export function TicketsAdminTab() {
                 <span className="mono small muted">{ticketNumber(t.number)}</span>
                 <span className="support-row-main">
                   <strong>{t.subject}</strong>
-                  <small className="muted">{t.minecraftName ?? t.customerEmail} · {t.topicLabel} · {formatDateTime(t.updatedAt)}</small>
+                  <small className="muted">{t.minecraftName ?? t.customerEmail} · {tr(t.topicLabel)} · {formatDateTime(t.updatedAt)}</small>
                 </span>
                 <span className={`status-pill ticket-status-${t.status}`}>{TICKET_STATUS_LABELS[t.status]}</span>
               </button>
             ))}
-            {data && data.items.length === 0 && <p className="muted empty-row">Nincs ilyen ticket.</p>}
+            {data && data.items.length === 0 && <p className="muted empty-row">{tr('Nincs ilyen ticket.')}</p>}
           </div>
           {error && <p className="error-text error-in">{error}</p>}
         </section>
 
         {selected
           ? <TicketDetail key={selected} id={selected} onChanged={load} onDeleted={() => { setSelected(null); load(); }} />
-          : <section className="card ticket-admin-detail ticket-admin-empty"><Icon name="message" size={28} /><p className="muted">Válassz egy ticketet a listából.</p></section>}
+          : <section className="card ticket-admin-detail ticket-admin-empty"><Icon name="message" size={28} /><p className="muted">{tr('Válassz egy ticketet a listából.')}</p></section>}
       </div>
     </>
   );
